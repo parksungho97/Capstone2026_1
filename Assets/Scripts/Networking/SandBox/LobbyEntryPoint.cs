@@ -1,13 +1,11 @@
 using ParrelSync;
-using Unity.Netcode;
-using UnityEditor.EditorTools;
 using UnityEngine;
 
 namespace Network
 {
     public class LobbyEntryPoint : MonoBehaviour
     {
-        // [SerializeField] private RoomManager mRoomManager = null;
+        [SerializeField] private RoomManager mRoomManager = null;
         private void Start()
         {
             mNetworkRoot = NetworkRoot.Instance;
@@ -28,8 +26,30 @@ namespace Network
                 Debug.Log("이곳은 메인 에디터입니다. Host를 실행합니다.");
                 mNetworkRoot.StartHost();
             }
-        }
 
+            Debug.Assert(mRoomManager);
+
+            mRoomManager.OnRoomListChangedAction += (RoomKey roomKey) =>
+            {
+                this.roomKey = roomKey;
+                if(mRoomManager.TryFindRoom(roomKey, out Room room))
+                {
+                    Debug.Log(room.playerCount);
+                }
+            };
+        }
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.W))
+            {
+                mRoomManager.MakeRoomServerRpc("sdf", 8);
+            }
+            else if (Input.GetKeyDown(KeyCode.S))
+            {
+                mRoomManager.EnterRoomServerRpc(roomKey);
+            }
+        }
+        private RoomKey roomKey;
         private void OnDestroy()
         {
             mNetworkRoot.Shutdown();
