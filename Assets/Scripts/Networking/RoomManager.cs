@@ -22,6 +22,7 @@ namespace Network
 
     public class RoomManager : NetworkBehaviour
     {
+        public static RoomManager Instance { get; private set; }
         // 방 정보가 바뀌었을 때 바뀐 방의 키값을 줌
         public event Action<RoomKey> OnRoomListChangedAction;
 
@@ -188,6 +189,17 @@ namespace Network
         }
         private void Awake()
         {
+            // 1. 싱글톤 중복 체크 (중복 인스턴스 파괴)
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            Instance = this;
+
+            DontDestroyOnLoad(gameObject);
+
             mRooms = new NetworkList<Room>();
             mRoomPlayerMappingContexts = new NetworkList<RoomPlayerMappingContext>();
         }
@@ -198,6 +210,9 @@ namespace Network
             if (mRooms != null) mRooms.Dispose();
             if (mRoomPlayerMappingContexts != null) mRoomPlayerMappingContexts.Dispose();
 
+            // 3. 인스턴스 해제 (C++의 소멸자 처리와 유사)
+            if (Instance == this)
+                Instance = null;
         }
         private NetworkList<Room> mRooms = null;
         private NetworkList<RoomPlayerMappingContext> mRoomPlayerMappingContexts = null;
