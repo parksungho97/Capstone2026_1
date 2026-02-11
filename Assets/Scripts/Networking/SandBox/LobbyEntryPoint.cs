@@ -6,6 +6,7 @@ namespace Network
     public class LobbyEntryPoint : MonoBehaviour
     {
         [SerializeField] private RoomManager mRoomManager = null;
+        [SerializeField] private RoomController mRoomController = null;
         private void Start()
         {
             mNetworkRoot = NetworkRoot.Instance;
@@ -28,28 +29,31 @@ namespace Network
             }
 
             Debug.Assert(mRoomManager);
+            Debug.Assert(mRoomController);
 
-            mRoomManager.OnRoomListChangedAction += (RoomKey roomKey) =>
+            mRoomController.ActionRoomMemberInfoChanged += (RoomMemberInfo roomMemberInfo) =>
             {
-                this.roomKey = roomKey;
-                if(mRoomManager.TryFindRoom(roomKey, out Room room))
-                {
-                    Debug.Log(room.playerCount);
-                }
+                Debug.Log($"PlayerId: {roomMemberInfo.playerId}, Status: {roomMemberInfo.readyStatus}");
             };
+
+            // StartClient하자마자 Rpc함수 쓰면 안됌
+            // mRoomController.BindMemberServerRpc();
         }
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.W))
-            {
-                mRoomManager.MakeRoomServerRpc("sdf", 8);
-            }
-            else if (Input.GetKeyDown(KeyCode.S))
-            {
-                mRoomManager.EnterRoomServerRpc(roomKey);
-            }
+            if (Input.GetKeyDown(KeyCode.Q))
+                mRoomController.BindMemberServerRpc();
+
+            else if (Input.GetKeyDown(KeyCode.W))
+                mRoomController.ReleaseMemberServerRpc();
+
+            else if (Input.GetKeyDown(KeyCode.E))
+                mRoomController.ToggleReadyServerRpc();
+
+            else if (Input.GetKeyDown(KeyCode.R))
+                Debug.Log($"IsReadyToStart: {mRoomController.IsReadyToStart()}");
+
         }
-        private RoomKey roomKey;
         private void OnDestroy()
         {
             mNetworkRoot.Shutdown();

@@ -24,7 +24,7 @@ namespace Network
     {
         public static RoomManager Instance { get; private set; }
         // 방 정보가 바뀌었을 때 바뀐 방의 키값을 줌
-        public event Action<RoomKey> OnRoomListChangedAction;
+        public event Action<RoomKey> ActionRoomListChanged;
 
         // 방의 키값으로 방을 조회할 수 있음.
         public bool TryFindRoom(RoomKey roomKey, out Room room)
@@ -170,7 +170,7 @@ namespace Network
                  ? changeEvent.PreviousValue.roomId
                  : changeEvent.Value.roomId;
 
-                OnRoomListChangedAction?.Invoke(new RoomKey(roomId));
+                ActionRoomListChanged?.Invoke(new RoomKey(roomId));
             };
         }
 
