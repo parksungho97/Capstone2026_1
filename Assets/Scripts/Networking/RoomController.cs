@@ -8,7 +8,7 @@ namespace Network
 {
     public enum EReadyStatus : ushort
     {
-        NotReady, 
+        NotReady,
         Ready,
         Error,
     }
@@ -82,7 +82,7 @@ namespace Network
 
         public bool IsReadyToStart()
         {
-            foreach(RoomMemberInfo roomMemberInfo in mRoomMemberInfos)
+            foreach (RoomMemberInfo roomMemberInfo in mRoomMemberInfos)
             {
                 if (roomMemberInfo.readyStatus == EReadyStatus.NotReady)
                     return false;
@@ -92,7 +92,7 @@ namespace Network
 
         public bool TryGetMemberReadyStatus(ulong userId, out EReadyStatus readyStatus)
         {
-            if(TryFindMemberIndex(userId, out int index))
+            if (TryFindMemberIndex(userId, out int index))
             {
                 readyStatus = mRoomMemberInfos[index].readyStatus;
                 return true;
@@ -100,10 +100,10 @@ namespace Network
             readyStatus = EReadyStatus.Error;
             return false;
         }
-        
+
         private bool TryFindMemberIndex(ulong playerId, out int index)
         {
-            for(int i = 0;i<mRoomMemberInfos.Count;++i)
+            for (int i = 0; i < mRoomMemberInfos.Count; ++i)
             {
                 if (mRoomMemberInfos[i].playerId == playerId)
                 {

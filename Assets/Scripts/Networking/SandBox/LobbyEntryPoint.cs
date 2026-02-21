@@ -7,6 +7,7 @@ namespace Network
     {
         [SerializeField] private RoomManager mRoomManager = null;
         [SerializeField] private RoomController mRoomController = null;
+        [SerializeField] private Spawner mSpawner = null;
         private void Start()
         {
             mNetworkRoot = NetworkRoot.Instance;
@@ -30,11 +31,21 @@ namespace Network
 
             Debug.Assert(mRoomManager);
             Debug.Assert(mRoomController);
+            Debug.Assert(mSpawner);
 
             mRoomController.ActionRoomMemberInfoChanged += (RoomMemberInfo roomMemberInfo) =>
             {
                 Debug.Log($"PlayerId: {roomMemberInfo.playerId}, Status: {roomMemberInfo.readyStatus}");
             };
+
+            GameContextManager.Instance.BindNetworkDisconnectEvent(mNetworkRoot);
+
+            // 여기서는 테스트를 위해
+            // 원래는 방에 사람이 다 모이면 Start를 하는 순간 그 방에 있는 멤버들의 PlayerId를 전부 GCM에게 주면 됌
+            GameContextManager.Instance.JoinToGame(NetworkRoot.GetLocalClientId());
+            GameContextManager.Instance.JoinToGame(NetworkRoot.GetLocalClientId() + 1);
+
+            mSpawner.InitializeFromGameContextManager(GameContextManager.Instance);
 
             // StartClient하자마자 Rpc함수 쓰면 안됌
             // mRoomController.BindMemberServerRpc();
@@ -42,16 +53,26 @@ namespace Network
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Q))
-                mRoomController.BindMemberServerRpc();
-
+            {
+                Transform t = mSpawner.GetMappingSpawnPosition(NetworkRoot.GetLocalClientId());
+                Debug.Log(t.position);
+            }
             else if (Input.GetKeyDown(KeyCode.W))
-                mRoomController.ReleaseMemberServerRpc();
+            {
+                Transform t = mSpawner.GetMappingSpawnPosition(NetworkRoot.GetLocalClientId() + 1);
+                Debug.Log(t.position);
+            }
+            //if (Input.GetKeyDown(KeyCode.Q))
+            //    mRoomController.BindMemberServerRpc();
 
-            else if (Input.GetKeyDown(KeyCode.E))
-                mRoomController.ToggleReadyServerRpc();
+            //else if (Input.GetKeyDown(KeyCode.W))
+            //    mRoomController.ReleaseMemberServerRpc();
 
-            else if (Input.GetKeyDown(KeyCode.R))
-                Debug.Log($"IsReadyToStart: {mRoomController.IsReadyToStart()}");
+            //else if (Input.GetKeyDown(KeyCode.E))
+            //    mRoomController.ToggleReadyServerRpc();
+
+            //else if (Input.GetKeyDown(KeyCode.R))
+            //    Debug.Log($"IsReadyToStart: {mRoomController.IsReadyToStart()}");
 
         }
         private void OnDestroy()
