@@ -8,6 +8,7 @@ namespace Network
         [SerializeField] private RoomManager mRoomManager = null;
         [SerializeField] private RoomController mRoomController = null;
         [SerializeField] private Spawner mSpawner = null;
+        [SerializeField] private CapturePoint mCapturePoint = null;
         private void Start()
         {
             mNetworkRoot = NetworkRoot.Instance;
@@ -32,6 +33,8 @@ namespace Network
             Debug.Assert(mRoomManager);
             Debug.Assert(mRoomController);
             Debug.Assert(mSpawner);
+            Debug.Assert(mCapturePoint);
+            Debug.Assert(mCapturePoint.GetComponent<Activater>());
 
             mRoomController.ActionRoomMemberInfoChanged += (RoomMemberInfo roomMemberInfo) =>
             {
@@ -52,16 +55,30 @@ namespace Network
         }
         private void Update()
         {
+            Activater activater = mCapturePoint.GetComponent<Activater>();
             if (Input.GetKeyDown(KeyCode.Q))
-            {
-                Transform t = mSpawner.GetMappingSpawnPosition(NetworkRoot.GetLocalClientId());
-                Debug.Log(t.position);
-            }
+                activater.RegistActivateServerRpc(ERequestType.Red);
             else if (Input.GetKeyDown(KeyCode.W))
-            {
-                Transform t = mSpawner.GetMappingSpawnPosition(NetworkRoot.GetLocalClientId() + 1);
-                Debug.Log(t.position);
-            }
+                activater.UnregistActivateServerRpc(ERequestType.Red);
+            else if (Input.GetKeyDown(KeyCode.E))
+                activater.RegistActivateServerRpc(ERequestType.Blue);
+            else if (Input.GetKeyDown(KeyCode.R))
+                activater.UnregistActivateServerRpc(ERequestType.Blue);
+
+            Debug.Log($"RedProgress: {activater.GetRedProgress()}");
+            Debug.Log($"BlueProgress: {activater.GetBlueProgress()}");
+
+            activater.TryActivateCapturePoint(mCapturePoint);
+            //if (Input.GetKeyDown(KeyCode.Q))
+            //{
+            //    Transform t = mSpawner.GetMappingSpawnPosition(NetworkRoot.GetLocalClientId());
+            //    Debug.Log(t.position);
+            //}
+            //else if (Input.GetKeyDown(KeyCode.W))
+            //{
+            //    Transform t = mSpawner.GetMappingSpawnPosition(NetworkRoot.GetLocalClientId() + 1);
+            //    Debug.Log(t.position);
+            //}
             //if (Input.GetKeyDown(KeyCode.Q))
             //    mRoomController.BindMemberServerRpc();
 
