@@ -53,22 +53,25 @@ namespace Network
             // StartClient하자마자 Rpc함수 쓰면 안됌
             // mRoomController.BindMemberServerRpc();
         }
+        private float _logTimer;
         private void Update()
         {
-            Activater activater = mCapturePoint.GetComponent<Activater>();
-            if (Input.GetKeyDown(KeyCode.Q))
-                activater.RegistActivateServerRpc(ERequestType.Red);
-            else if (Input.GetKeyDown(KeyCode.W))
-                activater.UnregistActivateServerRpc(ERequestType.Red);
-            else if (Input.GetKeyDown(KeyCode.E))
-                activater.RegistActivateServerRpc(ERequestType.Blue);
-            else if (Input.GetKeyDown(KeyCode.R))
-                activater.UnregistActivateServerRpc(ERequestType.Blue);
+            var activater = mCapturePoint.GetComponent<Activater>();
 
-            Debug.Log($"RedProgress: {activater.GetRedProgress()}");
-            Debug.Log($"BlueProgress: {activater.GetBlueProgress()}");
+            if (Input.GetKeyDown(KeyCode.Q)) activater.RegistActivateServerRpc(ERequestType.Red);
+            else if (Input.GetKeyDown(KeyCode.W)) activater.UnregistActivateServerRpc(ERequestType.Red);
+            else if (Input.GetKeyDown(KeyCode.E)) activater.RegistActivateServerRpc(ERequestType.Blue);
+            else if (Input.GetKeyDown(KeyCode.R)) activater.UnregistActivateServerRpc(ERequestType.Blue);
+
+            _logTimer += Time.deltaTime;
+            if (_logTimer >= 0.25f)
+            {
+                _logTimer = 0f;
+                Debug.Log($"Red: {activater.GetRedProgress()} / Blue: {activater.GetBlueProgress()}");
+            }
 
             activater.TryActivateCapturePoint(mCapturePoint);
+        
             //if (Input.GetKeyDown(KeyCode.Q))
             //{
             //    Transform t = mSpawner.GetMappingSpawnPosition(NetworkRoot.GetLocalClientId());
