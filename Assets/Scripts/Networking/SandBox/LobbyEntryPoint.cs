@@ -97,7 +97,7 @@ namespace Network
         }
         private void OnDestroy()
         {
-            mNetworkRoot.Shutdown();
+            //mNetworkRoot.Shutdown();
         }
         private void OnClientConnected(ulong clientId)
         {
