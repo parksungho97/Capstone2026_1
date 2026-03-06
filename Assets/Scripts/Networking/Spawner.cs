@@ -1,40 +1,54 @@
-using Network;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Spawner : MonoBehaviour
+namespace Network
 {
-    [SerializeField] private Transform[] spawnPositions;
+    public class Spawner : MonoBehaviour
+    {
+        [Header("Spawn Points")]
+        [SerializeField] private Transform[] spawnPoints;
 
-    public void MappingToSpawnPosition(ulong playerId)
-    {
-        if (mappingIndices.ContainsKey(playerId))
-            return;
-        Debug.Assert(currentMappingIndex < spawnPositions.Length);
-        mappingIndices.Add(playerId, currentMappingIndex++);
-    }
-    public Transform GetMappingSpawnPosition(ulong playerId)
-    {
-        Debug.Assert(mappingIndices.ContainsKey(playerId));
-        uint index =  mappingIndices[playerId];
+        private readonly Dictionary<ulong, Transform> assignedSpawnPoints = new();
+        private readonly List<int> usedIndices = new();
 
-        return spawnPositions[index];
-    }
-    public void InitializeFromGameContextManager(GameContextManager manager)
-    {
-        ClearMappingState();
-        foreach (PlayerInfo playerInfo in  manager.PlayerInfos)
+        public Transform GetSpawnPoint(ulong clientId)
         {
-            MappingToSpawnPosition(playerInfo.playerId);
+            if (assignedSpawnPoints.TryGetValue(clientId, out Transform existingPoint))
+                return existingPoint;
+
+            if (spawnPoints == null || spawnPoints.Length == 0)
+            {
+                Debug.LogError("[Spawner] spawnPoints가 비어 있습니다.");
+                return null;
+            }
+
+            if (usedIndices.Count >= spawnPoints.Length)
+            {
+                Debug.LogError("[Spawner] 사용 가능한 spawn point가 부족합니다.");
+                return null;
+            }
+
+            List<int> availableIndices = new();
+
+            for (int i = 0; i < spawnPoints.Length; i++)
+            {
+                if (!usedIndices.Contains(i))
+                    availableIndices.Add(i);
+            }
+
+            int randomListIndex = Random.Range(0, availableIndices.Count);
+            int selectedIndex = availableIndices[randomListIndex];
+
+            usedIndices.Add(selectedIndex);
+            assignedSpawnPoints[clientId] = spawnPoints[selectedIndex];
+
+            return spawnPoints[selectedIndex];
+        }
+
+        public void ResetSpawner()
+        {
+            assignedSpawnPoints.Clear();
+            usedIndices.Clear();
         }
     }
-
-    private void ClearMappingState()
-    {
-        mappingIndices.Clear();
-        currentMappingIndex = 0;
-    }
-    private Dictionary<ulong, uint> mappingIndices = new();
-    private uint currentMappingIndex;
 }

@@ -8,12 +8,21 @@ namespace Network
 {
     public enum Team : byte { Red = 0, Blue = 1 }
 
+    public enum GameWinner : byte
+    {
+        None = 0,
+        Red = 1,
+        Blue = 2,
+    }
+
     public struct RoomKey : INetworkSerializable, IEquatable<RoomKey>
     {
         public int roomId;
         public RoomKey(int id) { roomId = id; }
+
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             => serializer.SerializeValue(ref roomId);
+
         public bool Equals(RoomKey other) => roomId == other.roomId;
     }
 
@@ -52,6 +61,7 @@ namespace Network
             serializer.SerializeValue(ref playerId);
             serializer.SerializeValue(ref roomId);
         }
+
         public bool Equals(RoomPlayerMappingContext other) => playerId == other.playerId && roomId == other.roomId;
     }
 
@@ -67,6 +77,7 @@ namespace Network
             serializer.SerializeValue(ref roomId);
             serializer.SerializeValue(ref team);
         }
+
         public bool Equals(RoomTeamMappingContext other) => playerId == other.playerId && roomId == other.roomId && team == other.team;
     }
 
@@ -82,6 +93,7 @@ namespace Network
             serializer.SerializeValue(ref roomId);
             serializer.SerializeValue(ref isReady);
         }
+
         public bool Equals(RoomPlayerReadyContext other) => playerId == other.playerId && roomId == other.roomId && isReady == other.isReady;
     }
 
@@ -99,13 +111,25 @@ namespace Network
         public NetworkList<RoomTeamMappingContext> RoomTeams => mRoomTeams;
         public NetworkList<RoomPlayerReadyContext> RoomReady => mRoomReady;
 
+        public int CurrentInGameRoomId => mCurrentInGameRoomId;
+        public GameWinner WinnerTeam => mWinnerTeam.Value;
+
         private static int sNextRoomId = 0;
 
-        // ✅ 필드에서 즉시 초기화 (NGO 요구사항)
+        private int mCurrentInGameRoomId = -1;
+
+        private NetworkVariable<GameWinner> mWinnerTeam = new(
+            GameWinner.None,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+
         private NetworkList<Room> mRooms = new();
         private NetworkList<RoomPlayerMappingContext> mRoomPlayers = new();
         private NetworkList<RoomTeamMappingContext> mRoomTeams = new();
         private NetworkList<RoomPlayerReadyContext> mRoomReady = new();
+
+        private bool mDisposed = false;
 
         private void Awake()
         {
@@ -143,51 +167,49 @@ namespace Network
             if (IsServer && NetworkManager.Singleton != null)
                 NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
 
-            // ✅ 네이티브 누수 방지(1순위)
             SafeDisposeLists();
-
             base.OnNetworkDespawn();
         }
 
-        private void OnDestroy()
+        private new void OnDestroy()
         {
-            // ✅ OnNetworkDespawn를 못 타는 경우 대비(2순위)
             SafeDisposeLists();
+
+            if (Instance == this)
+                Instance = null;
         }
 
 #if UNITY_EDITOR
         private void OnApplicationQuit()
         {
-            // ✅ 에디터 PlayMode 종료 시 남는 케이스 대비
             SafeDisposeLists();
-            Instance = null;
+
+            if (Instance == this)
+                Instance = null;
         }
 #endif
 
         private void SafeDisposeLists()
         {
+            if (mDisposed) return;
+            mDisposed = true;
+
             try
             {
-                // NetworkList는 내부적으로 NativeCollection을 사용함
                 if (mRooms != null) mRooms.Dispose();
                 if (mRoomPlayers != null) mRoomPlayers.Dispose();
                 if (mRoomTeams != null) mRoomTeams.Dispose();
                 if (mRoomReady != null) mRoomReady.Dispose();
             }
-            catch { /* ignore */ }
+            catch { }
             finally
             {
-                // 중복 Dispose/재진입 방지
                 mRooms = null;
                 mRoomPlayers = null;
                 mRoomTeams = null;
                 mRoomReady = null;
             }
         }
-
-        // ---------------------------
-        // NetworkList -> Event bridge
-        // ---------------------------
 
         private void OnRoomsListChanged(NetworkListEvent<Room> e)
         {
@@ -230,13 +252,10 @@ namespace Network
         private void OnClientDisconnected(ulong clientId)
         {
             if (!TryGetPlayerRoomId(clientId, out int roomId)) return;
+
             RemovePlayerFromRoomInternal(clientId, roomId);
             TryCleanupEmptyRoom(roomId);
         }
-
-        // ---------------------------
-        // Public helpers (UI에서 사용)
-        // ---------------------------
 
         public bool TryGetRoom(int roomId, out Room room)
         {
@@ -248,6 +267,7 @@ namespace Network
                     return true;
                 }
             }
+
             room = default;
             return false;
         }
@@ -255,6 +275,7 @@ namespace Network
         public bool TryGetPlayerRoomId(ulong playerId, out int roomId)
         {
             roomId = -1;
+
             for (int i = 0; i < mRoomPlayers.Count; i++)
             {
                 var mp = mRoomPlayers[i];
@@ -264,6 +285,7 @@ namespace Network
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -271,6 +293,7 @@ namespace Network
         {
             roomId = -1;
             if (NetworkManager.Singleton == null) return false;
+
             return TryGetPlayerRoomId(NetworkManager.Singleton.LocalClientId, out roomId);
         }
 
@@ -278,6 +301,7 @@ namespace Network
         {
             key = default;
             if (!TryGetMyRoomId(out int roomId)) return false;
+
             key = new RoomKey(roomId);
             return true;
         }
@@ -286,6 +310,7 @@ namespace Network
         {
             if (NetworkManager.Singleton == null) return false;
             if (!TryGetRoom(roomId, out var room)) return false;
+
             return room.hostId == NetworkManager.Singleton.LocalClientId;
         }
 
@@ -293,6 +318,7 @@ namespace Network
         {
             ready = false;
             if (NetworkManager.Singleton == null) return false;
+
             ulong me = NetworkManager.Singleton.LocalClientId;
 
             for (int i = 0; i < mRoomReady.Count; i++)
@@ -304,6 +330,7 @@ namespace Network
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -332,15 +359,12 @@ namespace Network
                     }
                 }
 
-                if (!found || !isReady) return false;
+                if (!found || !isReady)
+                    return false;
             }
 
             return true;
         }
-
-        // ---------------------------
-        // RPCs
-        // ---------------------------
 
         [ServerRpc(RequireOwnership = false)]
         public void MakeRoomServerRpc(string roomName, uint maxPlayers, ServerRpcParams rpcParams = default)
@@ -380,7 +404,8 @@ namespace Network
             if (room.playerCount >= room.maxPlayers) return;
 
             bool ok = EnterRoomInternal(sender, roomKey.roomId);
-            if (ok) SendGoToRoomSceneTo(sender);
+            if (ok)
+                SendGoToRoomSceneTo(sender);
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -422,18 +447,38 @@ namespace Network
 
             if (!IsPlayerInRoom(sender, roomId)) return;
 
+            bool changed = false;
+
             for (int i = 0; i < mRoomTeams.Count; i++)
             {
                 var tm = mRoomTeams[i];
                 if (tm.roomId == roomId && tm.playerId == sender)
                 {
-                    tm.team = newTeam;
-                    mRoomTeams[i] = tm;
+                    if (tm.team != newTeam)
+                    {
+                        tm.team = newTeam;
+                        mRoomTeams[i] = tm;
+                        changed = true;
+                    }
+                    break;
+                }
+            }
+
+            if (!changed) return;
+
+            for (int i = 0; i < mRoomReady.Count; i++)
+            {
+                var rc = mRoomReady[i];
+                if (rc.roomId == roomId && rc.playerId == sender)
+                {
+                    rc.isReady = false;
+                    mRoomReady[i] = rc;
                     break;
                 }
             }
 
             ActionRoomMembersChanged?.Invoke(roomId);
+            ActionRoomReadyChanged?.Invoke(roomId);
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -479,12 +524,12 @@ namespace Network
             if (room.hostId != sender) return;
             if (!AreAllNonHostReady(roomId)) return;
 
-            Debug.Log($"[RoomManager][Server] StartGame OK roomId={roomId} (TODO: inGame targeted 이동)");
-        }
+            mCurrentInGameRoomId = roomId;
+            mWinnerTeam.Value = GameWinner.None;
+            SendGoToInGameSceneToRoom(roomId);
 
-        // ---------------------------
-        // Internal
-        // ---------------------------
+            Debug.Log($"[RoomManager][Server] StartGame OK roomId={roomId}");
+        }
 
         private bool EnterRoomInternal(ulong playerId, int roomId)
         {
@@ -505,9 +550,25 @@ namespace Network
             room.playerCount += 1;
             mRooms[idx] = room;
 
-            mRoomPlayers.Add(new RoomPlayerMappingContext { playerId = playerId, roomId = roomId });
-            mRoomTeams.Add(new RoomTeamMappingContext { playerId = playerId, roomId = roomId, team = teamToAssign });
-            mRoomReady.Add(new RoomPlayerReadyContext { playerId = playerId, roomId = roomId, isReady = false });
+            mRoomPlayers.Add(new RoomPlayerMappingContext
+            {
+                playerId = playerId,
+                roomId = roomId
+            });
+
+            mRoomTeams.Add(new RoomTeamMappingContext
+            {
+                playerId = playerId,
+                roomId = roomId,
+                team = teamToAssign
+            });
+
+            mRoomReady.Add(new RoomPlayerReadyContext
+            {
+                playerId = playerId,
+                roomId = roomId,
+                isReady = false
+            });
 
             return true;
         }
@@ -515,16 +576,22 @@ namespace Network
         private void RemovePlayerFromRoomInternal(ulong playerId, int roomId)
         {
             for (int i = mRoomPlayers.Count - 1; i >= 0; i--)
+            {
                 if (mRoomPlayers[i].roomId == roomId && mRoomPlayers[i].playerId == playerId)
                     mRoomPlayers.RemoveAt(i);
+            }
 
             for (int i = mRoomTeams.Count - 1; i >= 0; i--)
+            {
                 if (mRoomTeams[i].roomId == roomId && mRoomTeams[i].playerId == playerId)
                     mRoomTeams.RemoveAt(i);
+            }
 
             for (int i = mRoomReady.Count - 1; i >= 0; i--)
+            {
                 if (mRoomReady[i].roomId == roomId && mRoomReady[i].playerId == playerId)
                     mRoomReady.RemoveAt(i);
+            }
 
             if (TryFindRoomIndex(roomId, out int idx))
             {
@@ -537,17 +604,21 @@ namespace Network
         private int CountTeamMembers(int roomId, Team team)
         {
             int count = 0;
+
             for (int i = 0; i < mRoomTeams.Count; i++)
             {
                 var tm = mRoomTeams[i];
-                if (tm.roomId == roomId && tm.team == team) count++;
+                if (tm.roomId == roomId && tm.team == team)
+                    count++;
             }
+
             return count;
         }
 
         private bool TryFindRoomIndex(int roomId, out int idx)
         {
             idx = -1;
+
             for (int i = 0; i < mRooms.Count; i++)
             {
                 if (mRooms[i].roomId == roomId)
@@ -556,6 +627,7 @@ namespace Network
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -564,18 +636,24 @@ namespace Network
             for (int i = 0; i < mRoomPlayers.Count; i++)
             {
                 var mp = mRoomPlayers[i];
-                if (mp.playerId == playerId && mp.roomId == roomId) return true;
+                if (mp.playerId == playerId && mp.roomId == roomId)
+                    return true;
             }
+
             return false;
         }
 
         private void TryCleanupEmptyRoom(int roomId)
         {
             if (!TryFindRoomIndex(roomId, out int idx)) return;
+
             var room = mRooms[idx];
             if (room.playerCount != 0) return;
 
             mRooms.RemoveAt(idx);
+
+            if (mCurrentInGameRoomId == roomId)
+                mCurrentInGameRoomId = -1;
         }
 
         private bool TryGetFirstOtherPlayerInRoom(int roomId, ulong excludePlayerId, out ulong playerId)
@@ -603,9 +681,18 @@ namespace Network
             mRooms[idx] = room;
         }
 
-        // ---------------------------
-        // Scene 이동: 대상만 이동
-        // ---------------------------
+        private void SendGoToInGameSceneToRoom(int roomId)
+        {
+            if (!IsServer) return;
+            if (NetworkManager.Singleton == null) return;
+
+            mCurrentInGameRoomId = roomId;
+
+            NetworkManager.Singleton.SceneManager.LoadScene(
+                SceneNames.InGame,
+                LoadSceneMode.Single
+            );
+        }
 
         [ClientRpc]
         private void GoToRoomSceneClientRpc(ClientRpcParams clientRpcParams = default)
@@ -629,8 +716,12 @@ namespace Network
         {
             var cp = new ClientRpcParams
             {
-                Send = new ClientRpcSendParams { TargetClientIds = new[] { clientId } }
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new[] { clientId }
+                }
             };
+
             GoToRoomSceneClientRpc(cp);
         }
 
@@ -638,14 +729,14 @@ namespace Network
         {
             var cp = new ClientRpcParams
             {
-                Send = new ClientRpcSendParams { TargetClientIds = new[] { clientId } }
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new[] { clientId }
+                }
             };
+
             GoToLobbySceneClientRpc(cp);
         }
-
-        // ---------------------------
-        // Snapshot helpers
-        // ---------------------------
 
         public System.Collections.Generic.IEnumerable<RoomTeamMappingContext> GetTeamMappingsSnapshot()
         {
@@ -663,6 +754,63 @@ namespace Network
         {
             for (int i = 0; i < mRoomReady.Count; i++)
                 yield return mRoomReady[i];
+        }
+
+        public System.Collections.Generic.List<ulong> GetPlayerIdsInRoom(int roomId)
+        {
+            var result = new System.Collections.Generic.List<ulong>();
+
+            for (int i = 0; i < mRoomPlayers.Count; i++)
+            {
+                var mp = mRoomPlayers[i];
+                if (mp.roomId == roomId)
+                    result.Add(mp.playerId);
+            }
+
+            return result;
+        }
+
+        public bool TryGetPlayerTeam(ulong playerId, int roomId, out Team team)
+        {
+            for (int i = 0; i < mRoomTeams.Count; i++)
+            {
+                var tm = mRoomTeams[i];
+                if (tm.playerId == playerId && tm.roomId == roomId)
+                {
+                    team = tm.team;
+                    return true;
+                }
+            }
+
+            team = Team.Red;
+            return false;
+        }
+
+        public bool TryGetPlayerTeam(ulong playerId, out Team team)
+        {
+            if (TryGetPlayerRoomId(playerId, out int roomId) == false)
+            {
+                team = Team.Red;
+                return false;
+            }
+
+            return TryGetPlayerTeam(playerId, roomId, out team);
+        }
+
+        public void SetWinnerTeam(GameWinner winnerTeam)
+        {
+            if (!IsServer)
+                return;
+
+            mWinnerTeam.Value = winnerTeam;
+        }
+
+        public void ClearWinnerTeam()
+        {
+            if (!IsServer)
+                return;
+
+            mWinnerTeam.Value = GameWinner.None;
         }
 
         public int GetRoomCount() => mRooms?.Count ?? 0;
