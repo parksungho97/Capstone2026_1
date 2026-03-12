@@ -1,113 +1,42 @@
-using ParrelSync;
+using Fusion;
+using Fusion.Sockets;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Network
 {
     public class LobbyEntryPoint : MonoBehaviour
     {
-        [SerializeField] private RoomManager mRoomManager = null;
-        [SerializeField] private RoomController mRoomController = null;
-        [SerializeField] private Spawner mSpawner = null;
-        [SerializeField] private CapturePoint mCapturePoint = null;
+        [SerializeField] private int sceneIndex;
+        [SerializeField] private LobbyManager lobbyManager;
         private void Start()
         {
-            mNetworkRoot = NetworkRoot.Instance;
+            Debug.Assert(lobbyManager);
+            Debug.Assert(MyNetworkRoot.Instance.Runner);
 
-            mNetworkRoot.Init("127.0.0.1", 7777);
-            mNetworkRoot.RegistClientConnected(OnClientConnected);
-            mNetworkRoot.RegistClientDisconnected(OnClientDisconnected);
-
-            if (ClonesManager.IsClone())
+            lobbyManager.ActionRoomChange += (List<SessionInfo> sessionInfos) =>
             {
-                // 복제본 에디터: 클라이언트로 시작
-                Debug.Log("이곳은 클론 에디터입니다. Client로 접속합니다.");
-                mNetworkRoot.StartClient();
-            }
-            else
-            {
-                // 원본 에디터: 호스트로 시작
-                Debug.Log("이곳은 메인 에디터입니다. Host를 실행합니다.");
-                mNetworkRoot.StartHost();
-            }
+                Debug.Log($"[로비] 방 목록 동기화됨. 현재 활성화된 방 개수: {sessionInfos.Count}");
 
-            Debug.Assert(mRoomManager);
-            Debug.Assert(mRoomController);
-            Debug.Assert(mSpawner);
-            Debug.Assert(mCapturePoint);
-            Debug.Assert(mCapturePoint.GetComponent<Activater>());
-
-            mRoomController.ActionRoomMemberInfoChanged += (RoomMemberInfo roomMemberInfo) =>
-            {
-                Debug.Log($"PlayerId: {roomMemberInfo.playerId}, Status: {roomMemberInfo.readyStatus}");
+                foreach (SessionInfo session in sessionInfos)
+                {
+                    Debug.Log($"- 방 이름: {session.Name} | 인원: {session.PlayerCount}/{session.MaxPlayers} | 입장가능?: {session.IsOpen}");
+                }
             };
 
-
-
-
-            // StartClient하자마자 Rpc함수 쓰면 안됌
-            // mRoomController.BindMemberServerRpc();
+            lobbyManager.Initalize();
         }
-        private float _logTimer;
         private void Update()
         {
-            var activater = mCapturePoint.GetComponent<Activater>();
-
-            if (Input.GetKeyDown(KeyCode.Q)) activater.RegistActivateServerRpc(ERequestType.Red);
-            else if (Input.GetKeyDown(KeyCode.W)) activater.UnregistActivateServerRpc(ERequestType.Red);
-            else if (Input.GetKeyDown(KeyCode.E)) activater.RegistActivateServerRpc(ERequestType.Blue);
-            else if (Input.GetKeyDown(KeyCode.R)) activater.UnregistActivateServerRpc(ERequestType.Blue);
-
-            _logTimer += Time.deltaTime;
-            if (_logTimer >= 0.25f)
+            if (Input.GetKeyDown(KeyCode.Q))
             {
-                _logTimer = 0f;
-                Debug.Log($"Red: {activater.GetRedProgress()} / Blue: {activater.GetBlueProgress()}");
+                lobbyManager.JoinOrCreateRoom("Room1", sceneIndex);
             }
-
-           // activater.TryActivateCapturePoint(mCapturePoint);
-
-            //if (Input.GetKeyDown(KeyCode.Q))
-            //{
-            //    Transform t = mSpawner.GetMappingSpawnPosition(NetworkRoot.GetLocalClientId());
-            //    Debug.Log(t.position);
-            //}
-            //else if (Input.GetKeyDown(KeyCode.W))
-            //{
-            //    Transform t = mSpawner.GetMappingSpawnPosition(NetworkRoot.GetLocalClientId() + 1);
-            //    Debug.Log(t.position);
-            //}
-            //if (Input.GetKeyDown(KeyCode.Q))
-            //    mRoomController.BindMemberServerRpc();
-
-            //else if (Input.GetKeyDown(KeyCode.W))
-            //    mRoomController.ReleaseMemberServerRpc();
-
-            //else if (Input.GetKeyDown(KeyCode.E))
-            //    mRoomController.ToggleReadyServerRpc();
-
-            //else if (Input.GetKeyDown(KeyCode.R))
-            //    Debug.Log($"IsReadyToStart: {mRoomController.IsReadyToStart()}");
-
+            else if (Input.GetKeyDown(KeyCode.W))
+            {
+                lobbyManager.JoinOrCreateRoom("Room2", sceneIndex);
+            }
         }
-        private void OnDestroy()
-        {
-            //mNetworkRoot.Shutdown();
-        }
-        private void OnClientConnected(ulong clientId)
-        {
-            Debug.Log($"{clientId} connected");
-        }
-
-        private void OnClientDisconnected(ulong clientId)
-        {
-            Debug.Log($"{clientId} disConnected");
-            // 여러가지 것들
-        }
-
-        private NetworkRoot mNetworkRoot = null;
-
     }
 }
-
-
-

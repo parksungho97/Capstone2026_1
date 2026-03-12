@@ -23,4 +23,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/result.unity
     guid: a3e4214af3dcd9141924f4219a4a8cef
+  - enabled: 1
+    path: Assets/Scenes/jjh/jjh-lobby.unity
+    guid: 9490ebe02b3c58f4d81747b3e8d400a6
+  - enabled: 1
+    path: Assets/Scenes/jjh/jjh-inRoom.unity
+    guid: 3f792732176194747a3e05e70ece5908
+  - enabled: 1
+    path: Assets/Scenes/jjh/jjh-inGame.unity
+    guid: 871ef55cd37b9fb4a9cc010f2d569711
   m_configObjects: {}
