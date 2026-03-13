@@ -1,104 +1,63 @@
-using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 
-namespace Network
+// 플레이어가 가질 수 있는 거점 활성화 컴포넌트
+public class CaptureInteractor : MonoBehaviour
 {
-    public class CaptureInteractor : NetworkBehaviour
+    // 만약 현재 충돌중인 거점이 있으면 활성화 시작(딱 한번만 호출됌)
+    public void TryStartActivateCapturePoint(ERequestType requestType)
     {
-        private readonly List<CaptureZoneController> mZones = new List<CaptureZoneController>();
-
-        private bool mIsHolding = false;
-
-        private CaptureZoneController GetCurrentZone()
+        if (capturePoint && activater && bAlreadyStartActivate == false)
         {
-            if (mZones.Count == 0)
-                return null;
-
-            return mZones[mZones.Count - 1];
-        }
-
-        private void Update()
-        {
-            if (!IsOwner)
-                return;
-
-            CaptureZoneController zone = GetCurrentZone();
-
-            if (Input.GetKeyDown(KeyCode.O))
-            {
-                mIsHolding = true;
-                Debug.Log("O key pressed");
-                if (zone != null)
-                    zone.StartCaptureServerRpc();
-            }
-
-            if (Input.GetKeyUp(KeyCode.O))
-            {
-                if (zone != null)
-                    zone.StopCaptureServerRpc();
-
-                mIsHolding = false;
-            }
-        }
-
-        private void OnTriggerEnter(Collider other)
-        {
-            if (!IsOwner)
-                return;
-
-            CaptureZoneController zone = other.GetComponent<CaptureZoneController>();
-            if (zone == null)
-                zone = other.GetComponentInParent<CaptureZoneController>();
-
-            if (zone == null)
-                return;
-
-            if (!mZones.Contains(zone))
-                mZones.Add(zone);
-
-            if (mIsHolding)
-                zone.StartCaptureServerRpc();
-        }
-
-        private void OnTriggerExit(Collider other)
-        {
-            if (!IsOwner)
-                return;
-
-            CaptureZoneController zone = other.GetComponent<CaptureZoneController>();
-            if (zone == null)
-                zone = other.GetComponentInParent<CaptureZoneController>();
-
-            if (zone == null)
-                return;
-
-            bool wasCurrentZone = (GetCurrentZone() == zone);
-
-            if (wasCurrentZone && mIsHolding)
-                zone.StopCaptureServerRpc();
-
-            mZones.Remove(zone);
-
-            if (mIsHolding)
-            {
-                CaptureZoneController currentZone = GetCurrentZone();
-                if (currentZone != null)
-                    currentZone.StartCaptureServerRpc();
-            }
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            if (!IsOwner)
-                return;
-
-            CaptureZoneController zone = GetCurrentZone();
-            if (mIsHolding && zone != null)
-                zone.StopCaptureServerRpc();
-
-            mIsHolding = false;
-            mZones.Clear();
+            activater.StartActivateRpc(requestType);
+            bAlreadyStartActivate = true;
         }
     }
+
+    // 만약 현재 활성화 중인 거점의 활성화를 중지함
+    public void TryStopActivateCapturePoint(ERequestType requestType)
+    {
+        if (capturePoint && activater && bAlreadyStartActivate)
+        {
+            activater.StopActivateRpc(requestType);
+            bAlreadyStartActivate = false;
+        }
+    }
+
+    // 현재 활성화 가능한 거점이 있는지 확인
+    public bool IsReadyToActivate()
+    {
+        return capturePoint && activater && bAlreadyStartActivate == false;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Assert(this.capturePoint == null && this.activater == null);
+
+        CapturePoint capturePoint = other.gameObject.GetComponent<CapturePoint>();
+        Activater activater = other.gameObject.GetComponent<Activater>();
+
+        if (capturePoint && activater)
+        {
+            this.capturePoint = capturePoint;
+            this.activater = activater;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        CapturePoint capturePoint = other.gameObject.GetComponent<CapturePoint>();
+        Activater activater = other.gameObject.GetComponent<Activater>();
+
+        if (capturePoint && activater)
+        {
+            Debug.Assert(capturePoint && activater);
+
+            this.capturePoint = null;
+            this.activater = null;
+        }
+    }
+
+    private CapturePoint capturePoint;
+    private Activater activater;
+    private bool bAlreadyStartActivate = false;
 }
