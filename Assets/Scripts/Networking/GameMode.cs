@@ -9,24 +9,25 @@ public enum EResultType : byte
 public class GameMode : MonoBehaviour
 {
     [Header("Capture Points (Fixed Size: 3)")]
-    [SerializeField] private Network.CapturePoint[] capturePoints = new Network.CapturePoint[3];
+    [SerializeField] private CapturePoint[] capturePoints = new CapturePoint[3];
     
+    // 현재 게임 결과 확인 가능
     public EResultType DecideGameResult()
     {
         int RedCount = 0;
         int BlueCount = 0;
 
-        foreach (Network.CapturePoint capturePoint in capturePoints)
+        foreach (CapturePoint capturePoint in capturePoints)
         {
-            Network.ECaptureState eCaptureState = capturePoint.GetCaptureState();
+            ECaptureState eCaptureState = capturePoint.GetCaptureState();
             switch(eCaptureState)
             {
-                case Network.ECaptureState.None:
+                case ECaptureState.None:
                     break;
-                case Network.ECaptureState.Red:
+                case ECaptureState.Red:
                     RedCount += 1;
                     break;
-                case Network.ECaptureState.Blue:
+                case ECaptureState.Blue:
                     BlueCount += 1;
                     break;
             }
@@ -38,12 +39,21 @@ public class GameMode : MonoBehaviour
             return EResultType.Blue;
         else
             return EResultType.Red;
+
+        /*
+         * NetworkManager.Singleton.SceneManager.LoadScene(
+                SceneNames.Result,
+                LoadSceneMode.Single
+            );
+         */
     }
-    private void Awake()
+
+    private void Start()
     {
-        foreach(Network.CapturePoint capturePoint in capturePoints)
+        foreach(CapturePoint capturePoint in capturePoints)
             Debug.Assert(capturePoint != null);
     }
+
     private void OnValidate()
     {
         // 배열 크기가 3이 아니면 강제로 3으로 재조정

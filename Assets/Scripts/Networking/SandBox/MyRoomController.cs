@@ -1,5 +1,4 @@
 using Fusion;
-using Network;
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,6 +14,7 @@ public struct MyPlayerContext : INetworkStruct
 {
     public NetworkString<_16> name;
     public EPlayerTeam team;
+    public bool bReady;
 }
 
 public class MyRoomController : NetworkBehaviour
@@ -54,10 +54,24 @@ public class MyRoomController : NetworkBehaviour
         MyPlayerContext newContext = new MyPlayerContext
         {
             team = team,
-            name = playerName
+            name = playerName,
+            bReady = false
         };
 
         PlayerContexts.Add(playerId, newContext);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void ReadyRPC(int playerId, bool bReady)
+    {
+        if(PlayerContexts.TryGet(playerId, out MyPlayerContext newContext))
+        {
+            if (newContext.bReady == bReady)
+                return;
+
+            newContext.bReady = bReady;
+            PlayerContexts.Set(playerId, newContext);
+        }
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
@@ -96,6 +110,12 @@ public class MyRoomController : NetworkBehaviour
     public void StartGameRPC(int sceneIndex)
     {
         // 방장의 컴퓨터에서만 실행되므로 이 체크는 이제 100% true입니다.
+        foreach(var context in PlayerContexts)
+        {
+            if (context.Value.bReady == false)
+                return;
+        }
+
         Runner.LoadScene(SceneRef.FromIndex(sceneIndex), LoadSceneMode.Single);
     }
 
@@ -103,7 +123,7 @@ public class MyRoomController : NetworkBehaviour
     {
         foreach (var a in PlayerContexts)
         {
-            Debug.Log($"name: {a.Value.name}, team: {a.Value.team}");
+            Debug.Log($"name: {a.Value.name}, team: {a.Value.team}, ready: {a.Value.bReady}");
         }
     }
 

@@ -1,42 +1,37 @@
 using Fusion;
-using Fusion.Sockets;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Network
+public class LobbyEntryPoint : MonoBehaviour
 {
-    public class LobbyEntryPoint : MonoBehaviour
+    [SerializeField] private int sceneIndex;
+    [SerializeField] private LobbyManager lobbyManager;
+    private void Start()
     {
-        [SerializeField] private int sceneIndex;
-        [SerializeField] private LobbyManager lobbyManager;
-        private void Start()
+        Debug.Assert(lobbyManager);
+        Debug.Assert(Network.MyNetworkRoot.Instance.Runner);
+
+        lobbyManager.ActionRoomChange += (List<SessionInfo> sessionInfos) =>
         {
-            Debug.Assert(lobbyManager);
-            Debug.Assert(MyNetworkRoot.Instance.Runner);
+            Debug.Log($"[로비] 방 목록 동기화됨. 현재 활성화된 방 개수: {sessionInfos.Count}");
 
-            lobbyManager.ActionRoomChange += (List<SessionInfo> sessionInfos) =>
+            foreach (SessionInfo session in sessionInfos)
             {
-                Debug.Log($"[로비] 방 목록 동기화됨. 현재 활성화된 방 개수: {sessionInfos.Count}");
+                Debug.Log($"- 방 이름: {session.Name} | 인원: {session.PlayerCount}/{session.MaxPlayers} | 입장가능?: {session.IsOpen}");
+            }
+        };
 
-                foreach (SessionInfo session in sessionInfos)
-                {
-                    Debug.Log($"- 방 이름: {session.Name} | 인원: {session.PlayerCount}/{session.MaxPlayers} | 입장가능?: {session.IsOpen}");
-                }
-            };
-
-            lobbyManager.Initalize();
+        lobbyManager.Initalize();
+    }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            lobbyManager.JoinOrCreateRoom("Room1", sceneIndex);
         }
-        private void Update()
+        else if (Input.GetKeyDown(KeyCode.W))
         {
-            if (Input.GetKeyDown(KeyCode.Q))
-            {
-                lobbyManager.JoinOrCreateRoom("Room1", sceneIndex);
-            }
-            else if (Input.GetKeyDown(KeyCode.W))
-            {
-                lobbyManager.JoinOrCreateRoom("Room2", sceneIndex);
-            }
+            lobbyManager.JoinOrCreateRoom("Room2", sceneIndex);
         }
     }
 }
