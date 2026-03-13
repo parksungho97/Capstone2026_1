@@ -98,6 +98,9 @@ public class PlayerController : NetworkBehaviour
             MoveServerRpc(moveDir);
         }
 
+        // 마우스가 가리키는 방향으로 회전
+        HandleMouseLook();
+
         if (Input.GetKeyDown(KeyCode.J))
         {
             animator.SetTrigger(jTriggerParam);
@@ -117,6 +120,26 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    private void HandleMouseLook()
+    {
+        if (mainCamera == null) return;
+
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        Plane plane = new Plane(Vector3.up, transform.position);
+
+        if (plane.Raycast(ray, out float enter))
+        {
+            Vector3 hitPoint = ray.GetPoint(enter);
+            Vector3 lookDir = hitPoint - transform.position;
+            lookDir.y = 0f;
+
+            if (lookDir.sqrMagnitude > 0.0001f)
+            {
+                RotateServerRpc(lookDir.normalized);
+            }
+        }
+    }
+
     [ServerRpc]
     private void SetMoveStateServerRpc(bool isMoving)
     {
@@ -127,16 +150,19 @@ public class PlayerController : NetworkBehaviour
     private void MoveServerRpc(Vector3 dir)
     {
         transform.position += dir * moveSpeed * Time.deltaTime;
+    }
 
-        if (faceMoveDirection && dir.sqrMagnitude > 0.0001f)
-        {
-            Quaternion targetRot = Quaternion.LookRotation(dir, Vector3.up);
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                targetRot,
-                turnSpeed * Time.deltaTime
-            );
-        }
+    [ServerRpc]
+    private void RotateServerRpc(Vector3 lookDir)
+    {
+        if (lookDir.sqrMagnitude <= 0.0001f) return;
+
+        Quaternion targetRot = Quaternion.LookRotation(lookDir, Vector3.up);
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            targetRot,
+            turnSpeed * Time.deltaTime
+        );
     }
 
     [ServerRpc]
