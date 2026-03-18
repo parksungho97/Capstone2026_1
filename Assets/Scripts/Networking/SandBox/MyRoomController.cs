@@ -1,4 +1,5 @@
 using Fusion;
+using Network;
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -105,11 +106,9 @@ public class MyRoomController : NetworkBehaviour
         }
     }
 
-    // 오직 방장(StateAuthority)만 이 RPC를 쏠 수 있고, 실행도 방장만 합니다.
     [Rpc(RpcSources.StateAuthority, RpcTargets.StateAuthority)]
-    public void StartGameRPC(int sceneIndex)
+    public void StartGameRpc(int sceneIndex)
     {
-        // 방장의 컴퓨터에서만 실행되므로 이 체크는 이제 100% true입니다.
         foreach(var context in PlayerContexts)
         {
             if (context.Value.bReady == false)

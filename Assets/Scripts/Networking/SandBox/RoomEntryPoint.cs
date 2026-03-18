@@ -31,7 +31,13 @@ public class RoomEntryPoint : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.S))
         {
             if (roomSession.IsHost)
-                roomController.StartGameRPC(nextSceneIndex);
+            {
+                roomSession.ChangeRoomState("InGame");
+                roomController.StartGameRpc(nextSceneIndex);
+            }
         }
+
+        else if (Input.GetKeyDown(KeyCode.Escape))
+            roomSession.LeaveRoom(6);
     }
 }

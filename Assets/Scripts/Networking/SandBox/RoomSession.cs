@@ -1,4 +1,5 @@
 using Fusion;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,6 +13,9 @@ namespace Network
         private void Awake()
         {
             _runner = MyNetworkRoot.Instance.Runner;
+            Debug.Assert(_runner);
+
+            Debug.Log($"RoomState: {_runner.SessionInfo.Properties["RoomState"]}");
         }
 
 
@@ -24,11 +28,20 @@ namespace Network
         // 4. 방 나가기 (Shutdown)
         public async void LeaveRoom(int sceneIndex)
         {
-            if (_runner != null)
-            {
-                await _runner.Shutdown();
-                SceneManager.LoadScene(sceneIndex);
-            }
+            await _runner.Shutdown();
+            SceneManager.LoadScene(sceneIndex);
+        }
+
+        public void ChangeRoomState(string roomState)
+        {
+            Debug.Assert(roomState == "Room" || roomState == "InGame");
+            Debug.Assert(_runner.SessionInfo.Properties.ContainsKey("RoomState"));
+
+            var newProperties = new Dictionary<string, SessionProperty>();
+
+            newProperties["RoomState"] = roomState;
+
+            _runner.SessionInfo.UpdateCustomProperties(newProperties);
         }
     }
 }
