@@ -22,8 +22,6 @@ public class CapturePointController : NetworkBehaviour
         if (!Object.HasStateAuthority)
             return;
 
-        Debug.Log($"Red: {mActivater.GetRedProgress()}, Blue: {mActivater.GetBlueProgress()}");
-
         EActivateSuccessType successType = mActivater.IsActivatePossible();
 
         if (successType == EActivateSuccessType.Notyet)
@@ -35,6 +33,13 @@ public class CapturePointController : NetworkBehaviour
             mCapturePoint.SetCaptureStateRpc(ECaptureState.Blue);
 
         mActivater.ClearState();
+    }
+
+    public override void Spawned()
+    {
+        base.Spawned();
+
+        Debug.Log($"RoomState: {Runner.SessionInfo.Properties["RoomState"]}");
     }
 
     private CapturePoint mCapturePoint = null;

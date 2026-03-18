@@ -1,4 +1,4 @@
-using Unity.Netcode;
+using Fusion;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
@@ -19,24 +19,23 @@ public class PlayerController : NetworkBehaviour
     private Camera mainCamera;
     private CameraFollow cameraFollow;
 
-    private NetworkVariable<bool> isMoveNet =
-        new NetworkVariable<bool>(
-            false,
-            NetworkVariableReadPermission.Everyone,
-            NetworkVariableWritePermission.Server
-        );
+    // NGO의 NetworkVariable -> Fusion의 [Networked] 속성
+    // OnChangedRender를 통해 값이 바뀔 때마다 OnMoveChanged가 호출됩니다.
+    [Networked, OnChangedRender(nameof(OnMoveChanged))]
+    public bool IsMoveNet { get; set; }
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
     }
 
-    public override void OnNetworkSpawn()
+    // OnNetworkSpawn -> Spawned
+    public override void Spawned()
     {
-        isMoveNet.OnValueChanged += OnMoveChanged;
-        animator.SetBool(moveBoolParam, isMoveNet.Value);
+        animator.SetBool(moveBoolParam, IsMoveNet);
 
-        if (IsOwner)
+        // NGO의 IsOwner -> Fusion에서는 플레이어 입력 권한인 HasInputAuthority를 주로 사용합니다.
+        if (HasInputAuthority)
         {
             mainCamera = Camera.main;
 
@@ -51,19 +50,20 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    public override void OnNetworkDespawn()
-    {
-        isMoveNet.OnValueChanged -= OnMoveChanged;
-    }
+    // Fusion에서는 [Networked] 변수의 이벤트 구독/해제를 엔진이 자동 처리하므로 
+    // OnNetworkDespawn에서 수동으로 빼줄 필요가 없습니다.
+    public override void Despawned(NetworkRunner runner, bool hasState) { }
 
-    private void OnMoveChanged(bool previousValue, bool newValue)
+    // 값이 변경될 때 실행될 콜백 함수 (파라미터 없이 작성)
+    private void OnMoveChanged()
     {
-        animator.SetBool(moveBoolParam, newValue);
+        animator.SetBool(moveBoolParam, IsMoveNet);
     }
 
     private void Update()
     {
-        if (!IsOwner) return;
+        // 내 캐릭터인지 확인
+        if (!HasInputAuthority) return;
 
         if (mainCamera == null)
             mainCamera = Camera.main;
@@ -79,8 +79,9 @@ public class PlayerController : NetworkBehaviour
         Vector3 input = new Vector3(x, 0f, z);
         bool hasInput = input.sqrMagnitude > 0.0001f;
 
+        // 로컬 애니메이션 즉시 적용
         animator.SetBool(moveBoolParam, hasInput);
-        SetMoveStateServerRpc(hasInput);
+        Rpc_SetMoveState(hasInput);
 
         if (hasInput && mainCamera != null)
         {
@@ -95,28 +96,27 @@ public class PlayerController : NetworkBehaviour
 
             Vector3 moveDir = (camForward * input.z + camRight * input.x).normalized;
 
-            MoveServerRpc(moveDir);
+            Rpc_Move(moveDir);
         }
 
-        // 마우스가 가리키는 방향으로 회전
         HandleMouseLook();
 
         if (Input.GetKeyDown(KeyCode.J))
         {
             animator.SetTrigger(jTriggerParam);
-            PlayActionServerRpc(0);
+            Rpc_PlayAction(0);
         }
 
         if (Input.GetKeyDown(KeyCode.K))
         {
             animator.SetTrigger(kTriggerParam);
-            PlayActionServerRpc(1);
+            Rpc_PlayAction(1);
         }
 
         if (Input.GetKeyDown(KeyCode.L))
         {
             animator.SetTrigger(lTriggerParam);
-            PlayActionServerRpc(2);
+            Rpc_PlayAction(2);
         }
     }
 
@@ -135,25 +135,27 @@ public class PlayerController : NetworkBehaviour
 
             if (lookDir.sqrMagnitude > 0.0001f)
             {
-                RotateServerRpc(lookDir.normalized);
+                Rpc_Rotate(lookDir.normalized);
             }
         }
     }
 
-    [ServerRpc]
-    private void SetMoveStateServerRpc(bool isMoving)
+    // InputAuthority(클라이언트)가 StateAuthority(방장/서버)에게 실행을 요청
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void Rpc_SetMoveState(bool isMoving)
     {
-        isMoveNet.Value = isMoving;
+        IsMoveNet = isMoving;
     }
 
-    [ServerRpc]
-    private void MoveServerRpc(Vector3 dir)
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void Rpc_Move(Vector3 dir)
     {
-        transform.position += dir * moveSpeed * Time.deltaTime;
+        // 네트워크 RPC 내부에서는 Time.deltaTime 대신 Runner.DeltaTime을 사용하는 것이 안전합니다.
+        transform.position += dir * moveSpeed * Runner.DeltaTime;
     }
 
-    [ServerRpc]
-    private void RotateServerRpc(Vector3 lookDir)
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void Rpc_Rotate(Vector3 lookDir)
     {
         if (lookDir.sqrMagnitude <= 0.0001f) return;
 
@@ -161,20 +163,17 @@ public class PlayerController : NetworkBehaviour
         transform.rotation = Quaternion.Slerp(
             transform.rotation,
             targetRot,
-            turnSpeed * Time.deltaTime
+            turnSpeed * Runner.DeltaTime
         );
     }
 
-    [ServerRpc]
-    private void PlayActionServerRpc(int actionIndex)
+    // 기존의 ServerRpc -> ClientRpc 구조를 합쳐서 
+    // 클라이언트가 "모든 사람(All)"에게 직접 쏘도록 최적화했습니다.
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    private void Rpc_PlayAction(int actionIndex)
     {
-        PlayActionClientRpc(actionIndex);
-    }
-
-    [ClientRpc]
-    private void PlayActionClientRpc(int actionIndex)
-    {
-        if (IsOwner) return;
+        // RPC를 쏜 본인(내 캐릭터)은 Update문에서 이미 트리거를 작동시켰으므로 무시합니다.
+        if (HasInputAuthority) return;
 
         switch (actionIndex)
         {
