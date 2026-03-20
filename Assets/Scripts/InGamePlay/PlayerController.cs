@@ -50,10 +50,6 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    // Fusion에서는 [Networked] 변수의 이벤트 구독/해제를 엔진이 자동 처리하므로 
-    // OnNetworkDespawn에서 수동으로 빼줄 필요가 없습니다.
-    public override void Despawned(NetworkRunner runner, bool hasState) { }
-
     // 값이 변경될 때 실행될 콜백 함수 (파라미터 없이 작성)
     private void OnMoveChanged()
     {

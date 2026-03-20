@@ -35,12 +35,9 @@ public enum EActivateSuccessType : byte
 
 public class Activater : NetworkBehaviour
 {
-    // 원하는 이미지의 진척도를 현재 상황에 맞게 표시해줌
-    public void ShowProgressToUI(Image image)
+    public uint GetGreaterProgress()
     {
-        uint showProgress = RedProgress > BlueProgress ? RedProgress : BlueProgress;
-
-        image.fillAmount = (float)showProgress / 100.0f;
+        return RedProgress > BlueProgress ? RedProgress : BlueProgress;
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
