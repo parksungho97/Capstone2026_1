@@ -8,7 +8,8 @@ public class CaptureInteractor : MonoBehaviour
     {
         if (capturePoint && activater && bAlreadyStartActivate == false)
         {
-            activater.StartActivateRpc(requestType);
+            ObjectId objectId = new ObjectId(gameObject);
+            activater.StartActivateRpc(objectId, requestType);
             bAlreadyStartActivate = true;
         }
     }
@@ -18,7 +19,8 @@ public class CaptureInteractor : MonoBehaviour
     {
         if (capturePoint && activater && bAlreadyStartActivate)
         {
-            activater.StopActivateRpc(requestType);
+            ObjectId objectId = new ObjectId(gameObject);
+            activater.StopActivateRpc(objectId);
             bAlreadyStartActivate = false;
         }
     }

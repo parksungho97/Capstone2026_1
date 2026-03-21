@@ -1,5 +1,6 @@
 using Fusion;
 using System;
+using System.Linq;
 using UnityEngine;
 
 public enum ERequestType : byte
@@ -32,6 +33,16 @@ public enum EActivateSuccessType : byte
     Blue,
 }
 
+public struct ObjectId : INetworkStruct
+{
+    public ObjectId(GameObject gameObject)
+    {
+        Id = gameObject.GetInstanceID();
+    }
+    public int Id { get; private set;  }
+}
+
+
 public class Activater : NetworkBehaviour
 {
     public uint GetGreaterProgress()
@@ -40,19 +51,38 @@ public class Activater : NetworkBehaviour
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void StartActivateRpc(ERequestType requestType)
+    public void StartActivateRpc(ObjectId id, ERequestType requestType)
     {
         Debug.Assert(requestType != ERequestType.End);
-        ActivateRequests.Set((int)requestType, ActivateRequests[(int)requestType] + 1);
+        
+        if(requestType == ERequestType.Red)
+        {
+            if (RedActivateRequests.ContainsKey(id.Id))
+                return;
+            RedActivateRequests.Add(id.Id, id.Id);
+        }
+        else
+        {
+            if (BlueActivateRequests.ContainsKey(id.Id))
+                return;
+            BlueActivateRequests.Add(id.Id, id.Id);
+        }
+        Debug.Log("StartActivateRpc Success");
+        //ActivateRequests.Set((int)requestType, ActivateRequests[(int)requestType] + 1);
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void StopActivateRpc(ERequestType requestType)
+    public void StopActivateRpc(ObjectId id)
     {
-        Debug.Assert(requestType != ERequestType.End);
-
-        if (ActivateRequests[(int)requestType] > 0)
-            ActivateRequests.Set((int)requestType, ActivateRequests[(int)requestType] - 1);
+        if (RedActivateRequests.ContainsKey(id.Id))
+            RedActivateRequests.Remove(id.Id);
+        else if (BlueActivateRequests.ContainsKey(id.Id))
+            BlueActivateRequests.Remove(id.Id);
+        else
+            return;
+        Debug.Log("StopActivateRpc Success");
+        //if (ActivateRequests[(int)requestType] > 0)
+        //    ActivateRequests.Set((int)requestType, ActivateRequests[(int)requestType] - 1);
     }
 
     public EActivateSuccessType IsActivatePossible()
@@ -75,8 +105,8 @@ public class Activater : NetworkBehaviour
         if (!Object.HasStateAuthority)
             return;
 
-        ActivateRequests.Set(0, 0);
-        ActivateRequests.Set(1, 0);
+        RedActivateRequests.Clear();
+        BlueActivateRequests.Clear();
 
         RedProgress = 0;
         BlueProgress = 0;
@@ -98,8 +128,8 @@ public class Activater : NetworkBehaviour
         // bool isBlueEnough = mActivateRequests[(int)ERequestType.Blue] >= 2;
 
         // 테스트용 (1인만 눌러도 점령)
-        bool isRedEnough = ActivateRequests[(int)ERequestType.Red] > 0;
-        bool isBlueEnough = ActivateRequests[(int)ERequestType.Blue] > 0;
+        bool isRedEnough = RedActivateRequests.Count > 0;
+        bool isBlueEnough = BlueActivateRequests.Count > 0;
 
         if (isRedEnough && isBlueEnough)
             requestResult = ERequestResultType.Both;
@@ -278,8 +308,11 @@ public class Activater : NetworkBehaviour
         TimeProgress = 0.0f;
     }
 
-    [Networked, Capacity((int)ERequestType.End)]
-    private NetworkArray<uint> ActivateRequests => default;
+    [Networked]
+    private NetworkDictionary<int, int> RedActivateRequests => default;
+
+    [Networked]
+    private NetworkDictionary<int, int> BlueActivateRequests => default;
 
     [Networked]
     private EActivateStateType ActivateType { get; set; }

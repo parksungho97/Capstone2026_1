@@ -27,6 +27,7 @@ public class GameEntryPoint : MonoBehaviour
         var newPlayer = await MyNetworkRoot.Instance.Runner.SpawnAsync(player, position: Vector3.zero,
         rotation: Quaternion.identity,
         inputAuthority: MyNetworkRoot.Instance.Runner.LocalPlayer);
+        playerInstance = newPlayer;
 
         cameraController.SetTarget(newPlayer.transform);
 
@@ -45,13 +46,14 @@ public class GameEntryPoint : MonoBehaviour
 
     private void Update()
     {
+        ObjectId objectId = new ObjectId(playerInstance.gameObject);
         if (Input.GetKeyDown(KeyCode.Q))
-            capturePointControllers[0].Activater.StartActivateRpc(ERequestType.Red);
+            capturePointControllers[0].Activater.StartActivateRpc(objectId, ERequestType.Red);
         else if (Input.GetKeyDown(KeyCode.W))
-            capturePointControllers[0].Activater.StartActivateRpc(ERequestType.Blue);
+            capturePointControllers[0].Activater.StartActivateRpc(objectId, ERequestType.Blue);
         else if (Input.GetKeyDown(KeyCode.E))
-            capturePointControllers[0].Activater.StopActivateRpc(ERequestType.Red);
-        else if (Input.GetKeyDown(KeyCode.R))
-            capturePointControllers[0].Activater.StopActivateRpc(ERequestType.Blue);
+            capturePointControllers[0].Activater.StopActivateRpc(objectId);
     }
+
+    private NetworkObject playerInstance = null;
 }
