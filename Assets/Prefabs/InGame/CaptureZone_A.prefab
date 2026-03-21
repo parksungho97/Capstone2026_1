@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 490518578329114829}
   - component: {fileID: 3708944767528203670}
   - component: {fileID: 8345881871095588560}
+  - component: {fileID: 1585391778416381938}
   m_Layer: 0
   m_Name: CaptureZone_A
   m_TagString: Untagged
@@ -100,7 +101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4247189580
+  GlobalObjectIdHash: 1187446576
   InScenePlacedSourceGlobalObjectIdHash: 1086405449
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -167,3 +168,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 680e0000c84919e42addb2824dba0ff6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1585391778416381938
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9023250100616125993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 2928760416
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 490518578329114829}
+  - {fileID: 3708944767528203670}
+  - {fileID: 8345881871095588560}
+  ForceRemoteRenderTimeframe: 0
