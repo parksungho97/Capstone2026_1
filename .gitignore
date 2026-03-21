@@ -32,3 +32,6 @@
 !ProjectSettings/**/*.asset
 !Packages/manifest.json
 !Packages/packages-lock.json
+
+# BUT: pdb meta는 다시 제외
+Assets/**/*.pdb.meta
