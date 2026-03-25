@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameEntryPoint : MonoBehaviour
+public class GameEntryPoint : NetworkBehaviour
 {
     [SerializeField] private CameraController cameraController;
     [SerializeField] private NetworkObject player;
@@ -24,16 +24,16 @@ public class GameEntryPoint : MonoBehaviour
         Debug.Assert(playerController);
         Debug.Assert(activaterUIControllers.Count() == capturePointControllers.Count() && activaterUIControllers.Count() == activateProgressImages.Count());
 
-        var newPlayer = await MyNetworkRoot.Instance.Runner.SpawnAsync(player, position: Vector3.zero,
+        var newPlayer = await Runner.SpawnAsync(player, position: Vector3.zero,
         rotation: Quaternion.identity,
-        inputAuthority: MyNetworkRoot.Instance.Runner.LocalPlayer);
+        inputAuthority: Runner.LocalPlayer);
         playerInstance = newPlayer;
 
         cameraController.SetTarget(newPlayer.transform);
 
-        var newPlayerController = await MyNetworkRoot.Instance.Runner.SpawnAsync(playerController, position: Vector3.zero,
+        var newPlayerController = await Runner.SpawnAsync(playerController, position: Vector3.zero,
             rotation: Quaternion.identity,
-            inputAuthority: MyNetworkRoot.Instance.Runner.LocalPlayer);
+            inputAuthority: Runner.LocalPlayer);
         newPlayerController.GetComponent<PlayerController>().Initalize(newPlayer.gameObject, cameraController);
 
         AudioListener audioListener = newPlayer.GetComponent<AudioListener>();
