@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class RoomEntryPoint : NetworkBehaviour
 {
     [SerializeField] private RoomController roomController;
-    [SerializeField] private Network.RoomSession roomSession;
+    [SerializeField] private RoomSession roomSession;
     [SerializeField] private int gameSceneIndex;
     [SerializeField] private int lobbySceneIndex;
     [SerializeField] private RoomPlayerStateManager roomPlayerStateManager;
@@ -15,6 +15,8 @@ public class RoomEntryPoint : NetworkBehaviour
     [SerializeField] private Button readyButton;
     [SerializeField] private Button startButton;
     [SerializeField] private Button exitButton;
+    [SerializeField] private Button redTeamButton;
+    [SerializeField] private Button blueTeamButton;
 
     public override void Spawned()
     {
@@ -56,6 +58,14 @@ public class RoomEntryPoint : NetworkBehaviour
         {
             roomPlayerStateManager.Exit();
             roomSession.LeaveRoom(lobbySceneIndex);
+        });
+        redTeamButton.onClick.AddListener(() =>
+        {
+            roomController.ChangeTeamRPC(roomSession.LocalPlayerId, EPlayerTeam.Red);
+        });
+        blueTeamButton.onClick.AddListener(() =>
+        {
+            roomController.ChangeTeamRPC(roomSession.LocalPlayerId, EPlayerTeam.Blue);
         });
 
         if (roomSession.IsHost)

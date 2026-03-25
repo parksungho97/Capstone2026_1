@@ -161,6 +161,8 @@ MonoBehaviour:
   readyButton: {fileID: 482571563}
   startButton: {fileID: 482571562}
   exitButton: {fileID: 482571561}
+  redTeamButton: {fileID: 763960222}
+  blueTeamButton: {fileID: 521934510}
 --- !u!4 &233067689
 Transform:
   m_ObjectHideFlags: 0
@@ -493,6 +495,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &521934510 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4473026565176966362, guid: 75de5784abe6b21448c00e1d608d5f27, type: 3}
+  m_PrefabInstance: {fileID: 482571558}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &624686083
 GameObject:
   m_ObjectHideFlags: 0
@@ -559,6 +572,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _PlayerContexts:
     _items: []
+--- !u!114 &763960222 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7426498582889480771, guid: 75de5784abe6b21448c00e1d608d5f27, type: 3}
+  m_PrefabInstance: {fileID: 482571558}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &962186468
 GameObject:
   m_ObjectHideFlags: 0

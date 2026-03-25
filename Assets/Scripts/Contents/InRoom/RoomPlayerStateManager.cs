@@ -19,6 +19,11 @@ public class RoomPlayerStateManager : NetworkBehaviour
         bReady = !bReady;
         roomController.ReadyRPC(playerId, bReady);
     }
+    //public void ChangeTeam(EPlayerTeam team)
+    //{
+    //    if (bReady == false)
+    //        roomController.ChangeTeamRPC(playerId, team);
+    //}
     public void Exit()
     {
         Debug.Log($"Player {playerId} Exit");
