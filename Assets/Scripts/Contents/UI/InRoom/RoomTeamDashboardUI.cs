@@ -56,11 +56,7 @@ public class RoomTeamDashboardUI : MonoBehaviour
 
         AddRedPlayer("Player 1");
         AddRedPlayer("Player 2");
-        AddRedPlayer("Player 3");
-        AddRedPlayer("Player 4");
 
-        AddBluePlayer("Player 1");
-        AddBluePlayer("Player 2");
         AddBluePlayer("Player 3");
         AddBluePlayer("Player 4");
     }
