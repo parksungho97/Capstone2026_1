@@ -26,7 +26,6 @@ public class RoomPlayerStateManager : NetworkBehaviour
     //}
     public void Exit()
     {
-        Debug.Log($"Player {playerId} Exit");
         roomController.RemovePlayerRPC(playerId);
     }
 

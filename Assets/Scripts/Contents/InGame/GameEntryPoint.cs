@@ -15,8 +15,9 @@ public class GameEntryPoint : NetworkBehaviour
     [SerializeField] private ActivaterUIController[] activaterUIControllers;
     [SerializeField] private Image[] activateProgressImages;
 
-    private async void Start()
+    public override async void Spawned()
     {
+        base.Spawned();
         Debug.Log("GameScene");
 
         Debug.Assert(cameraController);
@@ -40,12 +41,15 @@ public class GameEntryPoint : NetworkBehaviour
         Debug.Assert(audioListener);
         audioListener.enabled = true;
 
-        for(int i = 0;i< activaterUIControllers.Count();++i)
+        for (int i = 0; i < activaterUIControllers.Count(); ++i)
             activaterUIControllers[i].Initalize(capturePointControllers[i].Activater, activateProgressImages[i]);
     }
 
     private void Update()
     {
+        if (playerInstance == null)
+            return;
+
         ObjectId objectId = new ObjectId(playerInstance.gameObject);
         if (Input.GetKeyDown(KeyCode.Q))
             capturePointControllers[0].Activater.StartActivateRpc(objectId, ERequestType.Red);
