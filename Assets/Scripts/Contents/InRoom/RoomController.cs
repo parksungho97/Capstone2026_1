@@ -9,7 +9,6 @@ public enum EPlayerTeam : byte
     Red,
     Blue,
 }
-
 // 1. INetworkStruct 상속 추가: "이 구조체는 메모리 크기가 고정된 네트워크용 데이터다!"
 public struct PlayerContext : INetworkStruct
 {
@@ -27,6 +26,27 @@ public class RoomController : NetworkBehaviour
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RemovePlayerRPC(int playerId)
+    {
+        if (PlayerContexts.TryGet(playerId, out PlayerContext foundContext))
+        {
+            // Remove the player context and adjust team counts
+            PlayerContexts.Remove(playerId);
+
+            if (foundContext.team == EPlayerTeam.Red)
+            {
+                if (RedPlayerCount > 0)
+                    RedPlayerCount -= 1;
+            }
+            else
+            {
+                if (BluePlayerCount > 0)
+                    BluePlayerCount -= 1;
+            }
+        }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void AddPlayerRPC(int playerId, NetworkString<_16> playerName)
     {
         if (PlayerContexts.ContainsKey(playerId))
@@ -34,7 +54,7 @@ public class RoomController : NetworkBehaviour
 
         if (PlayerContexts.Count >= maxRedPlayerCount + maxBluePlayerCount)
             return;
-
+        
         EPlayerTeam team = EPlayerTeam.Red;
         if (RedPlayerCount >= maxRedPlayerCount)
         {
