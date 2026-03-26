@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -5,7 +6,8 @@ public class CreateRoomPopupUI : MonoBehaviour
 {
     [SerializeField] private GameObject popupObject;
     [SerializeField] private TMP_InputField roomNameInputField;
-    [SerializeField] private RoomListUIManager roomListUIManager;
+
+    public Action<string> OnCreateRoomRequested;
 
     public void OpenPopup()
     {
@@ -29,16 +31,10 @@ public class CreateRoomPopupUI : MonoBehaviour
             return;
         }
 
-        if (roomListUIManager == null)
-        {
-            Debug.LogError("RoomListUIManager가 연결되지 않았습니다.");
-            return;
-        }
+        Debug.Log("방 생성 요청: " + roomName);
 
-        Debug.Log("방 생성: " + roomName);
-
-        // 대시보드에 방 추가
-        roomListUIManager.AddRoom(roomName, 1, 4);
+        // 입력한 방 이름을 바깥으로 전달
+        OnCreateRoomRequested?.Invoke(roomName);
 
         // 팝업 닫기
         popupObject.SetActive(false);
