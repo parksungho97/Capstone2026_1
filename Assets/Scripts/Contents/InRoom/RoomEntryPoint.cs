@@ -78,29 +78,27 @@ public class RoomEntryPoint : NetworkBehaviour
             startButton.gameObject.SetActive(false);
             readyButton.gameObject.SetActive(true);
         }
-        //roomController.ActionPlayerContextChanged += (List<MyPlayerContext> redPlayers, List<MyPlayerContext> bluePlayers) =>
-        //{
-        //    roomTeamDashboardUI.ClearAll();
-        //    foreach (MyPlayerContext redPlayerContext in redPlayers)
-        //    {
-        //        roomTeamDashboardUI.AddRedPlayer(redPlayerContext.name.ToString());
-        //    }
-        //    foreach (MyPlayerContext bluePlayerContext in bluePlayers)
-        //    {
-        //        roomTeamDashboardUI.AddRedPlayer(bluePlayerContext.name.ToString());
-        //    }
-        //};
+        roomController.ActionPlayerContextChanged += (List<PlayerContext> redPlayers, List<PlayerContext> bluePlayers) =>
+        {
+            roomTeamDashboardUI.ClearAll();
+            foreach (PlayerContext redPlayerContext in redPlayers)
+            {
+                var ui = roomTeamDashboardUI.AddRedPlayer(redPlayerContext.name.ToString());
+                if(redPlayerContext.bReady)
+                    ui.ReadyEffect();
+            }
+            foreach (PlayerContext bluePlayerContext in bluePlayers)
+            {
+                var ui = roomTeamDashboardUI.AddBluePlayer(bluePlayerContext.name.ToString());
+                if (bluePlayerContext.bReady)
+                    ui.ReadyEffect();
+            }
+        };
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
-            roomController.ChangeTeamRPC(roomSession.LocalPlayerId, EPlayerTeam.Red);
-        else if (Input.GetKeyDown(KeyCode.W))
-            roomController.ChangeTeamRPC(roomSession.LocalPlayerId, EPlayerTeam.Blue);
-
-
-        else if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
             roomController.Log();
     }
 }

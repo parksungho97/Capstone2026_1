@@ -5,9 +5,9 @@ using TMPro;
 
 public class NetworkTimerClockUI : NetworkBehaviour
 {
-    [Header("UI")]
-    [SerializeField] private TextMeshProUGUI timerText;
-    [SerializeField] private Image circleFillImage; // 선택사항 (Radial 360 이미지)
+    //[Header("UI")]
+    //[SerializeField] private TextMeshProUGUI timerText;
+    //[SerializeField] private Image circleFillImage; // 선택사항 (Radial 360 이미지)
 
     [Header("Default Timer")]
     [SerializeField] private float defaultDuration = 60f;
@@ -45,13 +45,12 @@ public class NetworkTimerClockUI : NetworkBehaviour
         {
             StartTimer(defaultDuration);
         }
-
-        UpdateUI();
+        // UpdateUI();
     }
 
     public override void Render()
     {
-        UpdateUI();
+        //UpdateUI();
     }
 
     /// 타이머 시작
@@ -99,33 +98,33 @@ public class NetworkTimerClockUI : NetworkBehaviour
         return Timer.Expired(Runner);
     }
 
-    private void UpdateUI()
-    {
-        float remain = GetRemainingTime();
+    //private void UpdateUI()
+    //{
+    //    float remain = GetRemainingTime();
 
-        if (IsRunning && IsExpired())
-        {
-            remain = 0f;
-        }
+    //    if (IsRunning && IsExpired())
+    //    {
+    //        remain = 0f;
+    //    }
 
-        int minutes = Mathf.FloorToInt(remain / 60f);
-        int seconds = Mathf.FloorToInt(remain % 60f);
+    //    int minutes = Mathf.FloorToInt(remain / 60f);
+    //    int seconds = Mathf.FloorToInt(remain % 60f);
 
-        if (timerText != null)
-        {
-            timerText.text = $"{minutes:00}:{seconds:00}";
-        }
+    //    if (timerText != null)
+    //    {
+    //        timerText.text = $"{minutes:00}:{seconds:00}";
+    //    }
 
-        if (circleFillImage != null)
-        {
-            if (TotalDuration > 0f)
-            {
-                circleFillImage.fillAmount = remain / TotalDuration;
-            }
-            else
-            {
-                circleFillImage.fillAmount = 0f;
-            }
-        }
-    }
+    //    if (circleFillImage != null)
+    //    {
+    //        if (TotalDuration > 0f)
+    //        {
+    //            circleFillImage.fillAmount = remain / TotalDuration;
+    //        }
+    //        else
+    //        {
+    //            circleFillImage.fillAmount = 0f;
+    //        }
+    //    }
+    //}
 }

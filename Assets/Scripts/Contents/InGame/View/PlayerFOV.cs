@@ -9,7 +9,7 @@ public class PlayerFOV : MonoBehaviour
     [SerializeField] private float maxDistance = 5.0f;
     [SerializeField] private float fov = 60.0f;
 
-    void Start()
+    private void Awake()
     {
         meshFilter = GetComponent<MeshFilter>();
         meshRenderer = GetComponent<MeshRenderer>();

@@ -13,9 +13,6 @@ public class PlayerHealth : NetworkBehaviour
     [Networked] public int MaxArmor { get; private set; }
     [Networked] public int CurrentArmor { get; private set; }
 
-    [Networked] public NetworkBool IsDead { get; private set; }
-
-
     /*
         상태 변경은 권한 있는 쪽에서
         보통 Object.HasStateAuthority가 있는 쪽에서 HP/Armor/Timer를 바꾸는 게 맞다. 
@@ -39,8 +36,6 @@ public class PlayerHealth : NetworkBehaviour
 
             MaxArmor = defaultMaxArmor;
             CurrentArmor = defaultMaxArmor;
-
-            IsDead = false;
         }
     }
 
@@ -50,7 +45,6 @@ public class PlayerHealth : NetworkBehaviour
     public void AddHP(int amount)
     {
         if (!Object.HasStateAuthority) return;
-        if (IsDead) return;
         if (amount <= 0) return;
 
         CurrentHP = Mathf.Min(CurrentHP + amount, MaxHP);
@@ -61,7 +55,6 @@ public class PlayerHealth : NetworkBehaviour
     public void AddArmor(int amount)
     {
         if (!Object.HasStateAuthority) return;
-        if (IsDead) return;
         if (amount <= 0) return;
 
         CurrentArmor = Mathf.Min(CurrentArmor + amount, MaxArmor);
@@ -73,7 +66,6 @@ public class PlayerHealth : NetworkBehaviour
     public void ServeHP(int damage)
     {
         if (!Object.HasStateAuthority) return;
-        if (IsDead) return;
         if (damage <= 0) return;
 
         int remainingDamage = damage;
@@ -88,16 +80,7 @@ public class PlayerHealth : NetworkBehaviour
 
         // 2. 남은 데미지를 HP에 적용
         if (remainingDamage > 0)
-        {
             CurrentHP = Mathf.Max(CurrentHP - remainingDamage, 0);
-        }
-
-        // 3. 사망 처리
-        if (CurrentHP <= 0)
-        {
-            CurrentHP = 0;
-            IsDead = true;
-        }
     }
 
     // 체력/방어구 완전 초기화
@@ -107,6 +90,5 @@ public class PlayerHealth : NetworkBehaviour
 
         CurrentHP = MaxHP;
         CurrentArmor = MaxArmor;
-        IsDead = false;
     }
 }

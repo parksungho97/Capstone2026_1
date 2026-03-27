@@ -6,26 +6,26 @@ public class RoomTeamDashboardUI : MonoBehaviour
     [SerializeField] private Transform blueTeamListParent;
     [SerializeField] private GameObject playerNameItemPrefab;
 
-    public void AddRedPlayer(string playerName)
+    public PlayerNameItemUI AddRedPlayer(string playerName)
     {
         GameObject item = Instantiate(playerNameItemPrefab, redTeamListParent);
         PlayerNameItemUI itemUI = item.GetComponent<PlayerNameItemUI>();
 
-        if (itemUI != null)
-        {
-            itemUI.SetPlayerName(playerName);
-        }
+        Debug.Assert(itemUI);
+        itemUI.SetPlayerName(playerName);
+
+        return itemUI;
     }
 
-    public void AddBluePlayer(string playerName)
+    public PlayerNameItemUI AddBluePlayer(string playerName)
     {
         GameObject item = Instantiate(playerNameItemPrefab, blueTeamListParent);
         PlayerNameItemUI itemUI = item.GetComponent<PlayerNameItemUI>();
 
-        if (itemUI != null)
-        {
-            itemUI.SetPlayerName(playerName);
-        }
+        Debug.Assert(itemUI);
+        itemUI.SetPlayerName(playerName);
+
+        return itemUI;
     }
 
     public void ClearRedTeam()
@@ -48,16 +48,5 @@ public class RoomTeamDashboardUI : MonoBehaviour
     {
         ClearRedTeam();
         ClearBlueTeam();
-    }
-
-    private void Start()
-    {
-        ClearAll();
-
-        AddRedPlayer("Player 1");
-        AddRedPlayer("Player 2");
-
-        AddBluePlayer("Player 3");
-        AddBluePlayer("Player 4");
     }
 }

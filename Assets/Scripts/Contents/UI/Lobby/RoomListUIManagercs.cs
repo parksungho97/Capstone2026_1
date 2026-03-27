@@ -1,11 +1,15 @@
+using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class RoomListUIManager : MonoBehaviour
 {
     [SerializeField] private Transform contentParent;
     [SerializeField] private GameObject roomItemPrefab;
 
-    public void AddRoom(string roomName, int currentPlayers, int maxPlayers)
+    public Action<RoomItemUI> ActionRoomSelected;
+
+    public void AddRoom(string roomSession, string roomName, int currentPlayers, int maxPlayers)
     {
         Debug.Log($"[RoomListUIManager] AddRoom 호출됨: {roomName}, {currentPlayers}/{maxPlayers}");
 
@@ -25,10 +29,11 @@ public class RoomListUIManager : MonoBehaviour
         Debug.Log($"[RoomListUIManager] roomItem 생성됨: {roomItemObject.name}");
 
         RoomItemUI roomItemUI = roomItemObject.GetComponent<RoomItemUI>();
+        roomItemUI.GetComponent<Button>().onClick.AddListener(() => RoomItemSelected(roomItemUI));
 
         if (roomItemUI != null)
         {
-            roomItemUI.SetRoomInfo(roomName, currentPlayers, maxPlayers);
+            roomItemUI.SetRoomInfo(roomSession, roomName, currentPlayers, maxPlayers);
             Debug.Log("[RoomListUIManager] SetRoomInfo 실행 완료");
         }
         else
@@ -51,5 +56,10 @@ public class RoomListUIManager : MonoBehaviour
         }
 
         Debug.Log("[RoomListUIManager] ClearRooms 완료");
+    }
+
+    private void RoomItemSelected(RoomItemUI roomItem)
+    {
+        ActionRoomSelected?.Invoke(roomItem);
     }
 }
