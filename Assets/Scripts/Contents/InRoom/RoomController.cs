@@ -160,6 +160,7 @@ public class RoomController : NetworkBehaviour
     public Action<List<PlayerContext>, List<PlayerContext>> ActionPlayerContextChanged;
 
     [Networked]
+    [Capacity(8)]
     [OnChangedRender(nameof(OnPlayerContextsChanged))]
     public NetworkDictionary<int, PlayerContext> PlayerContexts => default;
 

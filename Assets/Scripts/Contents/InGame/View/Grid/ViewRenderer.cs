@@ -58,7 +58,8 @@ public class ViewRenderer
         commandBuffer.Clear();
 
         int tempRT = Shader.PropertyToID("_TempViewRender");
-        commandBuffer.GetTemporaryRT(tempRT, -1, -1, 0, FilterMode.Bilinear, RenderTextureFormat.Default);
+        // -1 대신 카메라의 실제 픽셀 크기를 넣습니다.
+        commandBuffer.GetTemporaryRT(tempRT, mainCamera.pixelWidth, mainCamera.pixelHeight, 0, FilterMode.Bilinear, RenderTextureFormat.Default);
 
         // [1] 현재 화면 임시 텍스처에 복사
         commandBuffer.Blit(BuiltinRenderTextureType.CameraTarget, tempRT);
