@@ -412,12 +412,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c195a7ef813ede4bbd07d50905d5e47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneIndex: 3
   lobbyManager: {fileID: 1560932346}
-  maxPlayerCount: 8
   roomListUIManager: {fileID: 236198253}
   createRoomPopupUI: {fileID: 2002491300}
   joinRoomButton: {fileID: 937753517}
+  nameText: {fileID: 0}
 --- !u!4 &839567104
 Transform:
   m_ObjectHideFlags: 0
@@ -632,6 +631,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49adc25f8af030641bc49978f16b105d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sceneIndex: 3
+  maxPlayerCount: 8
 --- !u!4 &1560932347
 Transform:
   m_ObjectHideFlags: 0

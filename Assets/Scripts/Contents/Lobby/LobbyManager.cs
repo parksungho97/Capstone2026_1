@@ -1,4 +1,5 @@
 using Fusion;
+using Fusion.Photon.Realtime;
 using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
@@ -21,38 +22,33 @@ public struct CRoomInfo
 
 public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 {
+    [SerializeField] private int sceneIndex;
+    [SerializeField] private int maxPlayerCount = 8;
+
     public Action<List<CRoomInfo>> ActionRoomChange;
 
-    private uint mRoomNumber = 0;
+    private Network.NetworkRoot networkRoot;
 
     private void Start()
     {
-        Debug.Assert(Network.NetworkRoot.Instance != null, "[LobbyManager] NetworkRoot가 존재하지 않습니다.");
-        Network.NetworkRoot.Instance.Runner.AddCallbacks(this);
+        networkRoot = Network.NetworkRoot.Instance;
+        Debug.Assert(networkRoot != null, "[LobbyManager] NetworkRoot가 존재하지 않습니다.");
+        networkRoot.Runner.AddCallbacks(this);
         JoinLobby();
     }
 
     private void OnDestroy()
     {
-        if (Network.NetworkRoot.Instance != null && Network.NetworkRoot.Instance.Runner != null)
-            Network.NetworkRoot.Instance.Runner.RemoveCallbacks(this);
+        if (networkRoot != null && networkRoot.Runner != null)
+            networkRoot.Runner.RemoveCallbacks(this);
     }
 
-    private async void JoinLobby()
-    {
-        StartGameResult result = await Network.NetworkRoot.Instance.Runner.JoinSessionLobby(SessionLobby.Shared);
-        if (result.Ok)
-            Debug.Log("[로비] 접속 성공!");
-        else
-            Debug.LogError($"[로비] JoinSessionLobby 실패: {result.ShutdownReason}");
-    }
-
-    public async void CreateAndJoinRoom(string roomName, int maxPlayerCount, int sceneIndex)
+    public async void CreateAndJoinRoom(string roomName)
     {
         NetworkRunner runner = Network.NetworkRoot.Instance.Runner;
         NetworkSceneManagerDefault sceneManager = Network.NetworkRoot.Instance.SceneManagerDefault;
 
-        string sessionName = $"ROOM_{mRoomNumber++}_{Guid.NewGuid().ToString().Substring(0, 5)}";
+        string sessionName = $"ROOM_{Guid.NewGuid().ToString().Substring(0, 5)}";
 
         var customProps = new Dictionary<string, SessionProperty>
         {
@@ -61,7 +57,7 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
             ["RoomState"] = "Room",
             ["MasterClientId"] = -1
         };
-
+        
         StartGameResult result = await runner.StartGame(new StartGameArgs
         {
             GameMode = GameMode.Shared,
@@ -69,7 +65,7 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
             Scene = SceneRef.FromIndex(sceneIndex),
             SceneManager = sceneManager,
             PlayerCount = maxPlayerCount,
-            SessionProperties = customProps
+            SessionProperties = customProps,
         });
 
         if (result.Ok)
@@ -86,7 +82,7 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
             Debug.LogError($"[로비] 방 생성 실패: {result.ShutdownReason}");
     }
 
-    public async void JoinRoom(string sessionName)
+    public async void JoinRoom(string roomSession)
     {
         NetworkRunner runner = Network.NetworkRoot.Instance.Runner;
         NetworkSceneManagerDefault sceneManager = Network.NetworkRoot.Instance.SceneManagerDefault;
@@ -94,12 +90,12 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
         StartGameResult result = await runner.StartGame(new StartGameArgs
         {
             GameMode = GameMode.Shared,
-            SessionName = sessionName,
+            SessionName = roomSession,
             SceneManager = sceneManager
         });
 
         if (result.Ok)
-            Debug.Log($"[로비] 세션 '{sessionName}' 입장 성공!");
+            Debug.Log($"[로비] 세션 '{roomSession}' 입장 성공!");
         else
             Debug.LogError($"[로비] 방 입장 실패: {result.ShutdownReason}");
     }
@@ -139,6 +135,20 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
         ActionRoomChange?.Invoke(roomInfos);
     }
 
+    private async void JoinLobby()
+    {
+        var runner = Network.NetworkRoot.Instance.Runner;
+        StartGameResult result = await runner.JoinSessionLobby(SessionLobby.Shared);
+
+        if (result.Ok)
+        {
+            Debug.Log("[로비] 접속 성공!");
+        }
+        else
+        {
+            Debug.LogError($"[로비] JoinSessionLobby 실패: {result.ShutdownReason}");
+        }
+    }
     void INetworkRunnerCallbacks.OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     void INetworkRunnerCallbacks.OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }

@@ -11,6 +11,7 @@ public class RoomEntryPoint : NetworkBehaviour
     [SerializeField] private int gameSceneIndex;
     [SerializeField] private int lobbySceneIndex;
     [SerializeField] private RoomPlayerStateManager roomPlayerStateManager;
+
     [SerializeField] private RoomTeamDashboardUI roomTeamDashboardUI;
     [SerializeField] private Button readyButton;
     [SerializeField] private Button startButton;
@@ -41,7 +42,7 @@ public class RoomEntryPoint : NetworkBehaviour
 
         roomController.Initalize(4, 4);
         roomPlayerStateManager.Initalize(roomController, roomSession.LocalPlayerId
-            , roomSession.LocalPlayerId.ToString(), roomSession.IsHost);
+            , "Player"+ roomSession.LocalPlayerId.ToString(), roomSession.IsHost);
         roomTeamDashboardUI.AddRedPlayer("sdf");
         roomTeamDashboardUI.AddRedPlayer("sdf1231");
 

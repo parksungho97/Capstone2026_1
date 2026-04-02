@@ -1,16 +1,15 @@
-using Photon.Realtime;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class LobbyEntryPoint : MonoBehaviour
 {
-    [SerializeField] private int sceneIndex;
     [SerializeField] private LobbyManager lobbyManager;
-    [SerializeField] private int maxPlayerCount = 8;
     [SerializeField] private RoomListUIManager roomListUIManager;
     [SerializeField] private CreateRoomPopupUI createRoomPopupUI;
     [SerializeField] private Button joinRoomButton;
+    [SerializeField] private TextMeshPro nameText;
 
     private void Awake()
     {
@@ -18,6 +17,7 @@ public class LobbyEntryPoint : MonoBehaviour
         Debug.Assert(roomListUIManager);
         Debug.Assert(createRoomPopupUI);
         Debug.Assert(joinRoomButton);
+
 
         lobbyManager.ActionRoomChange += (List<CRoomInfo> roomInfos) =>
         {
@@ -41,7 +41,7 @@ public class LobbyEntryPoint : MonoBehaviour
                 Debug.LogWarning("[로비] 방 이름이 유효하지 않습니다. 방 이름을 입력해주세요.");
                 return;
             }
-            lobbyManager.CreateAndJoinRoom(roomName, maxPlayerCount, sceneIndex);
+            lobbyManager.CreateAndJoinRoom(roomName);
         };
 
         joinRoomButton.onClick.AddListener(() =>
