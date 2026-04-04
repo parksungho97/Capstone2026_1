@@ -7,6 +7,8 @@ public class RoomListUIManager : MonoBehaviour
     [SerializeField] private Transform contentParent;
     [SerializeField] private GameObject roomItemPrefab;
 
+    private RoomItemUI selectedRoomItem;
+
     public Action<RoomItemUI> ActionRoomSelected;
 
     public void AddRoom(string roomSession, string roomName, int currentPlayers, int maxPlayers)
@@ -26,40 +28,49 @@ public class RoomListUIManager : MonoBehaviour
         }
 
         GameObject roomItemObject = Instantiate(roomItemPrefab, contentParent);
-        Debug.Log($"[RoomListUIManager] roomItem 생성됨: {roomItemObject.name}");
 
         RoomItemUI roomItemUI = roomItemObject.GetComponent<RoomItemUI>();
-        roomItemUI.GetComponent<Button>().onClick.AddListener(() => RoomItemSelected(roomItemUI));
+        if (roomItemUI == null)
+        {
+            Debug.LogError("[RoomListUIManager] RoomItemUI 컴포넌트 없음");
+            return;
+        }
 
-        if (roomItemUI != null)
+        Button button = roomItemObject.GetComponentInChildren<Button>();
+        if (button == null)
         {
-            roomItemUI.SetRoomInfo(roomSession, roomName, currentPlayers, maxPlayers);
-            Debug.Log("[RoomListUIManager] SetRoomInfo 실행 완료");
+            Debug.LogError("[RoomListUIManager] Button 컴포넌트 없음");
+            return;
         }
-        else
-        {
-            Debug.LogError("[RoomListUIManager] roomItemPrefab에 RoomItemUI 컴포넌트가 없습니다.");
-        }
+
+        roomItemUI.SetRoomInfo(roomSession, roomName, currentPlayers, maxPlayers);
+
+        button.onClick.RemoveAllListeners();
+        button.onClick.AddListener(() => RoomItemSelected(roomItemUI));
     }
 
     public void ClearRooms()
     {
-        if (contentParent == null)
-        {
-            Debug.LogError("[RoomListUIManager] contentParent가 연결되지 않았습니다.");
-            return;
-        }
-
         for (int i = contentParent.childCount - 1; i >= 0; i--)
         {
             Destroy(contentParent.GetChild(i).gameObject);
         }
 
-        Debug.Log("[RoomListUIManager] ClearRooms 완료");
+        selectedRoomItem = null;
     }
 
     private void RoomItemSelected(RoomItemUI roomItem)
     {
+        if (selectedRoomItem != null && selectedRoomItem != roomItem)
+        {
+            selectedRoomItem.DeselectUI();
+        }
+
+        selectedRoomItem = roomItem;
+        selectedRoomItem.SelectUI();
+
+        Debug.Log($"선택된 방: {roomItem.RoomName}");
+
         ActionRoomSelected?.Invoke(roomItem);
     }
 }
