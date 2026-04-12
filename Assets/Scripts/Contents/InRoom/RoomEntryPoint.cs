@@ -39,6 +39,13 @@ public class RoomEntryPoint : NetworkBehaviour
         {
             roomSession.LeaveRoom(lobbySceneIndex);
         };
+        roomSession.ActionSceneLoadStart += () =>
+        {
+            var map = new Dictionary<int, EPlayerTeam>();
+            foreach (var kv in roomController.PlayerContexts)
+                map[kv.Key] = kv.Value.team;
+            TeamInfo.Instance.Set(map);
+        };
 
         roomController.Initalize(4, 4);
         roomPlayerStateManager.Initalize(roomController, roomSession.LocalPlayerId

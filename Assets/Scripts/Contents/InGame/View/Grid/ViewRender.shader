@@ -130,14 +130,11 @@ Shader "jjh/ViewRender"
 {
     Properties
     {
-        // Blit 호출 시 소스 텍스처(현재 화면)가 자동으로 할당됩니다.
         _MainTex ("Source Texture", 2D) = "white" {}
     }
 
     SubShader
     {
-        // 후처리 셰이더 설정: 깊이 테스트/쓰기 끄고, 컬링 끔
-        // Blend Off를 통해 우리가 직접 배경과 안개를 합성합니다.
         ZTest Always ZWrite Off Cull Off
         Blend Off
 
@@ -149,14 +146,12 @@ Shader "jjh/ViewRender"
             #pragma target 4.5
             #include "UnityCG.cginc"
 
-            // --- 변수 선언 ---
             sampler2D _MainTex;
             float4 _MainTex_TexelSize;
 
             UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
             sampler2D _GridTex;
             sampler2D _ObstacleMask;
-
             float4   _GridTex_TexelSize;
             float4   _WorldOrigin;
             float    _WorldX;
@@ -168,15 +163,26 @@ Shader "jjh/ViewRender"
             float3   _PlayerPos;
             int      _GridX;
             int      _GridY;
-            float4x4 _ViewProj;
+            float4x4 _ObstacleMaskVP;
+            float4   _ObstacleMask_TexelSize;
+
+            bool SampleObstacleMask(float2 uv)
+            {
+                // return tex2D(_ObstacleMask, uv).r >= 1.0f;
+                // 3x3 max 필터링 주석을 푸는 것을 추천합니다 (외곽선 보정용)
+                 float2 ts = _ObstacleMask_TexelSize.xy;
+                 float maxVal = 0;
+                 [unroll] for (int dy = -1; dy <= 1; dy++)
+                 [unroll] for (int dx = -1; dx <= 1; dx++)
+                      maxVal = max(maxVal, tex2D(_ObstacleMask, uv + float2(dx, dy) * ts).r);
+                 return maxVal >= 0.5;
+            }
 
             fixed4 frag(v2f_img i) : SV_Target
             {
-                // [1] 원본 화면 샘플링 (UV 보정 포함)
                 float2 uv = i.uv;
                 fixed4 screenCol = tex2D(_MainTex, uv);
 
-                // [2] 월드 좌표 복원 (Depth -> NDC -> World)
                 float rawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uv);
                 
                 #if defined(UNITY_REVERSED_Z)
@@ -189,11 +195,9 @@ Shader "jjh/ViewRender"
                 float4 worldPos = mul(_InvVP, ndc);
                 worldPos /= worldPos.w;
 
-                // [3] 월드 XZ -> 그리드 UV 좌표 변환
                 float gfx = (worldPos.x - _WorldOrigin.x) / _WorldX;
                 float gfz = (worldPos.z - _WorldOrigin.z) / _WorldY;
 
-                // 그리드 범위를 벗어난 지역 처리 (원본에 안개 적용)
                 if (gfx < 0.0 || gfx >= 1.0 || gfz < 0.0 || gfz >= 1.0)
                     return fixed4(lerp(screenCol.rgb, _FogColor.rgb, _FogOpacity), screenCol.a);
 
@@ -201,22 +205,20 @@ Shader "jjh/ViewRender"
                 if(grid == 0.0)
                     return fixed4(lerp(screenCol.rgb, _FogColor.rgb, _FogOpacity), screenCol.a);
 
-                // [4] 장애물 자체 마스크 체크 (현재 픽셀이 장애물인지)
-                bool bObstacle = tex2D(_ObstacleMask, uv).r > 0.5;
-                if(bObstacle)
-                {
-                    // 장애물은 안개를 씌우지 않고 원본(혹은 특정 색상)을 출력
-                    return screenCol;
-                }
-
-                // [5] Ray-Stepping: 현재 지점에서 플레이어까지 가려졌는지 검사
+                // [4] 장애물 자체 마스크 체크
+                float4 topDownClip4 = mul(_ObstacleMaskVP, float4(worldPos.xyz, 1.0));
+                float2 topDownUV = topDownClip4.xy / topDownClip4.w * 0.5 + 0.5;
+                bool bObstacle = SampleObstacleMask(topDownUV);
+                if (bObstacle)
+                    return fixed4(screenCol.rgb, screenCol.a); // XRay 패스가 이미 배경으로 교체함
+                
+                // [5] Ray-Stepping (문제 인지 주석 유지)
                 float3 pixelWorld  = worldPos.xyz;
                 float3 playerWorld = _PlayerPos;
                 
                 float3 toPlayer   = playerWorld - pixelWorld;
                 float  worldDist  = length(toPlayer);
                 float  cellSize   = _WorldX / (float)_GridX;
-                // 셀 크기 기준으로 스텝 수 계산
                 int    stepCount  = max(1, (int)(worldDist / cellSize));
                 float3 stepWorld  = toPlayer / (float)stepCount;
                 
@@ -225,44 +227,38 @@ Shader "jjh/ViewRender"
                 for (int s = 1; s < stepCount; ++s)
                 {
                     float3 checkWorld = pixelWorld + stepWorld * (float)s;
-                
-                    // 체크 지점을 다시 화면 UV로 투영하여 장애물 마스크 확인
-                    float4 clip     = mul(_ViewProj, float4(checkWorld, 1.0));
-                    float2 screenUV = clip.xy / clip.w * 0.5 + 0.5;
+                    float4 topDownCheckClip = mul(_ObstacleMaskVP, float4(checkWorld, 1.0));
+                    float2 topDownCheckUV = topDownCheckClip.xy / topDownCheckClip.w * 0.5 + 0.5;
 
-                    if (tex2D(_ObstacleMask, screenUV).r > 0.5)
+                    if (SampleObstacleMask(topDownCheckUV))
                     {
                         blocked = true;
                         break;
                     }
                 }
                 
-                // 가려진 지점이라면 즉시 안개 처리
                 if (blocked)
                 {
                     return fixed4(lerp(screenCol.rgb, _FogColor.rgb, _FogOpacity), screenCol.a);
                 }
 
-                // [6] 3x3 가우시안 블러 (시야 그리드 경계 부드럽게)
+                // [6] 3x3 가우시안 블러
                 float2 guv = float2(gfx, gfz);
                 float2 ts = _GridTex_TexelSize.xy;
                 
                 float visible =
                     tex2D(_GridTex, guv + float2(-ts.x, -ts.y)).r * (1.0 / 16.0) +
-                    tex2D(_GridTex, guv + float2(  0.0, -ts.y)).r * (2.0 / 16.0) +
+                    tex2D(_GridTex, guv + float2( 0.0, -ts.y)).r * (2.0 / 16.0) +
                     tex2D(_GridTex, guv + float2( ts.x, -ts.y)).r * (1.0 / 16.0) +
-                    tex2D(_GridTex, guv + float2(-ts.x,   0.0)).r * (2.0 / 16.0) +
-                    tex2D(_GridTex, guv                       ).r * (4.0 / 16.0) +
-                    tex2D(_GridTex, guv + float2( ts.x,   0.0)).r * (2.0 / 16.0) +
+                    tex2D(_GridTex, guv + float2(-ts.x,  0.0)).r * (2.0 / 16.0) +
+                    tex2D(_GridTex, guv                        ).r * (4.0 / 16.0) +
+                    tex2D(_GridTex, guv + float2( ts.x,  0.0)).r * (2.0 / 16.0) +
                     tex2D(_GridTex, guv + float2(-ts.x,  ts.y)).r * (1.0 / 16.0) +
                     tex2D(_GridTex, guv + float2(  0.0,  ts.y)).r * (2.0 / 16.0) +
                     tex2D(_GridTex, guv + float2( ts.x,  ts.y)).r * (1.0 / 16.0);
 
                 // [7] 최종 합성
-                // 시야 확보(visible=1) -> fogFactor=0 (원본 보존)
-                // 시야 없음(visible=0) -> fogFactor=_FogOpacity (안개 적용)
                 float fogFactor = _FogOpacity * (1.0 - visible);
-                
                 fixed3 finalRGB = lerp(screenCol.rgb, _FogColor.rgb, fogFactor);
                 
                 return fixed4(finalRGB, screenCol.a);

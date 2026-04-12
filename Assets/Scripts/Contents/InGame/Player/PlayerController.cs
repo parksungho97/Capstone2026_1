@@ -13,6 +13,9 @@ public class PlayerController : NetworkBehaviour
 
         stateManager = player.GetComponent<PlayerStateManager>();
         Debug.Assert(stateManager);
+
+        captureInteractor = player.GetComponent<CaptureInteractor>();
+        Debug.Assert(captureInteractor);
     }
 
     public override void Spawned()
@@ -43,22 +46,41 @@ public class PlayerController : NetworkBehaviour
 
             moveDegree = moveDegree * Runner.DeltaTime;
             bMove = move.Move(moveDegree);
-        }
 
+
+            EPlayerTeam playerTeam = TeamInfo.Instance.GetTeam(Runner.LocalPlayer.PlayerId);
+            ERequestType requestType = playerTeam == EPlayerTeam.Red ? ERequestType.Red : ERequestType.Blue;
+
+            if (data.buttons.WasPressed(previousButtons, EInputButton.Space))
+            {
+                move.bMove = false;
+                captureInteractor.TryStartActivateCapturePoint(requestType);
+            }
+            if (data.buttons.WasReleased(previousButtons, EInputButton.Space))
+            {
+                move.bMove = true;
+                captureInteractor.TryStopActivateCapturePoint(requestType);
+            }
+
+            previousButtons = data.buttons;
+
+            if (cameraController.GetMouseWorldPosition(data.mousePosition, out Vector3 mouseWorldPosition))
+            {
+                Vector3 lookDir = mouseWorldPosition - player.transform.position;
+                lookDir.y = 0f;
+
+                if (lookDir.sqrMagnitude > 0.0001f)
+                    move.RotateTo(lookDir.normalized, Runner.DeltaTime);
+            }
+        }
         stateManager.Move = bMove;
-
-        if (cameraController.GetMouseWorldPosition(data.mousePosition, out Vector3 mouseWorldPosition))
-        {
-            Vector3 lookDir = mouseWorldPosition - player.transform.position;
-            lookDir.y = 0f;
-
-            if (lookDir.sqrMagnitude > 0.0001f)
-                move.RotateTo(lookDir.normalized, Runner.DeltaTime);
-        }
     }
 
     private GameObject player;
     private PlayerMove move;
     private PlayerStateManager stateManager;
     private CameraController cameraController;
+    private CaptureInteractor captureInteractor;
+
+    [Networked] private NetworkButtons previousButtons { get; set; }
 }

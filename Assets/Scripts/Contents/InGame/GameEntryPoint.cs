@@ -1,19 +1,16 @@
 using Fusion;
 using Network;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class GameEntryPoint : NetworkBehaviour
 {
     [SerializeField] private CameraController cameraController;
-    [SerializeField] private NetworkObject player;
+    [SerializeField] private NetworkObject    player;
     [SerializeField] private PlayerController playerController;
-    [SerializeField] private InputManager inputManager;
+    [SerializeField] private InputManager     inputManager;
 
-    [SerializeField] private CapturePointController[] capturePointControllers;
-    [SerializeField] private ActivaterUIController[] activaterUIControllers;
-    [SerializeField] private Image[] activateProgressImages;
+    [SerializeField] private CapturePointManager capturePointManager;
+    [SerializeField] private CGameMode           gameMode;
 
     public override async void Spawned()
     {
@@ -23,12 +20,19 @@ public class GameEntryPoint : NetworkBehaviour
         Debug.Assert(cameraController);
         Debug.Assert(player);
         Debug.Assert(playerController);
-        Debug.Assert(activaterUIControllers.Count() == capturePointControllers.Count() && activaterUIControllers.Count() == activateProgressImages.Count());
+        Debug.Assert(capturePointManager);
+        Debug.Assert(gameMode);
+
+        capturePointManager.Initialize();
+        gameMode.Initialize(capturePointManager);
+        gameMode.ActionGameEnded += (EResultType resultType) =>
+        {
+            Debug.Log($"Game Ended! Result: {resultType}");
+        };
 
         var newPlayer = await Runner.SpawnAsync(player, position: Vector3.zero,
-        rotation: Quaternion.identity,
-        inputAuthority: Runner.LocalPlayer);
-        playerInstance = newPlayer;
+            rotation: Quaternion.identity,
+            inputAuthority: Runner.LocalPlayer);
 
         cameraController.SetTarget(newPlayer.transform);
 
@@ -40,24 +44,6 @@ public class GameEntryPoint : NetworkBehaviour
         AudioListener audioListener = newPlayer.GetComponent<AudioListener>();
         Debug.Assert(audioListener);
         audioListener.enabled = true;
-
-        for (int i = 0; i < activaterUIControllers.Count(); ++i)
-            activaterUIControllers[i].Initalize(capturePointControllers[i].Activater, activateProgressImages[i]);
     }
-
-    private void Update()
-    {
-        if (playerInstance == null)
-            return;
-
-        ObjectId objectId = new ObjectId(playerInstance.gameObject);
-        if (Input.GetKeyDown(KeyCode.Q))
-            capturePointControllers[0].Activater.StartActivateRpc(objectId, ERequestType.Red);
-        else if (Input.GetKeyDown(KeyCode.W))
-            capturePointControllers[0].Activater.StartActivateRpc(objectId, ERequestType.Blue);
-        else if (Input.GetKeyDown(KeyCode.E))
-            capturePointControllers[0].Activater.StopActivateRpc(objectId);
-    }
-
-    private NetworkObject playerInstance = null;
 }
+

@@ -1,3 +1,5 @@
+using Fusion;
+using System;
 using UnityEngine;
 
 public enum EResultType : byte
@@ -6,61 +8,48 @@ public enum EResultType : byte
     Blue,
     Draw
 }
-public class CGameMode : MonoBehaviour
+
+// 이름 중복 방지 위해 CGameMode로 명명
+public class CGameMode : NetworkBehaviour
 {
-    [Header("Capture Points (Fixed Size: 3)")]
-    [SerializeField] private CapturePoint[] capturePoints = new CapturePoint[3];
-    
-    // 현재 게임 결과 확인 가능
-    public EResultType DecideGameResult()
+    public Action<EResultType> ActionGameEnded;
+    public void Initialize(CapturePointManager capturePointManager)
     {
-        int RedCount = 0;
-        int BlueCount = 0;
+        this.capturePointManager = capturePointManager;
+    }
 
-        foreach (CapturePoint capturePoint in capturePoints)
+    public override void FixedUpdateNetwork()
+    {
+        base.FixedUpdateNetwork();
+
+        if (bGameEnded == true)
+            return;
+
+        if (capturePointManager.IsAllCaptured(out ECaptureState[] captureStates))
         {
-            ECaptureState eCaptureState = capturePoint.GetCaptureState();
-            switch(eCaptureState)
+            int redCount = 0;
+            int blueCount = 0;
+            foreach (ECaptureState captureState in captureStates)
             {
-                case ECaptureState.None:
-                    break;
-                case ECaptureState.Red:
-                    RedCount += 1;
-                    break;
-                case ECaptureState.Blue:
-                    BlueCount += 1;
-                    break;
+                if (captureState == ECaptureState.Red)
+                    redCount++;
+                else if (captureState == ECaptureState.Blue)
+                    blueCount++;
             }
-        }
 
-        if(RedCount == BlueCount)
-            return EResultType.Draw;
-        else if(RedCount < BlueCount)
-            return EResultType.Blue;
-        else
-            return EResultType.Red;
+            bGameEnded = true;
 
-        /*
-         * NetworkManager.Singleton.SceneManager.LoadScene(
-                SceneNames.Result,
-                LoadSceneMode.Single
-            );
-         */
-    }
-
-    private void Start()
-    {
-        foreach(CapturePoint capturePoint in capturePoints)
-            Debug.Assert(capturePoint != null);
-    }
-
-    private void OnValidate()
-    {
-        // 배열 크기가 3이 아니면 강제로 3으로 재조정
-        if (capturePoints != null && capturePoints.Length != 3)
-        {
-            Debug.LogWarning("GameMode: CapturePoints 배열 크기는 3으로 고정됩니다.");
-            System.Array.Resize(ref capturePoints, 3);
+            if (redCount > blueCount)
+                ActionGameEnded?.Invoke(EResultType.Red);
+            else if (blueCount > redCount)
+                ActionGameEnded?.Invoke(EResultType.Blue);
+            else
+                ActionGameEnded?.Invoke(EResultType.Draw);
         }
     }
+
+    private CapturePointManager capturePointManager;
+    private bool bGameEnded = false;
+
 }
+

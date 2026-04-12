@@ -35,13 +35,6 @@ public class CapturePointController : NetworkBehaviour
         Activater.ClearState();
     }
 
-    public override void Spawned()
-    {
-        base.Spawned();
-
-        Debug.Log($"RoomState: {Runner.SessionInfo.Properties["RoomState"]}");
-    }
-
     public CapturePoint CapturePoint { get; private set; }
     public Activater Activater { get; private set; }
 }

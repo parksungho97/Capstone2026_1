@@ -9,6 +9,7 @@ public class RoomSession : NetworkBehaviour, INetworkRunnerCallbacks
 {
     public Action<int> ActionPlayerExit;
     public Action ActionRoomDestroy;
+    public Action ActionSceneLoadStart;
 
     public override void Spawned()
     {
@@ -75,7 +76,7 @@ public class RoomSession : NetworkBehaviour, INetworkRunnerCallbacks
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) { }
     public void OnSceneLoadDone(NetworkRunner runner) { }
-    public void OnSceneLoadStart(NetworkRunner runner) { }
+    public void OnSceneLoadStart(NetworkRunner runner) { ActionSceneLoadStart?.Invoke(); }
 
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
     {

@@ -41,9 +41,9 @@ public class ViewInfo
     public void RegistObstacle(GameObject obstacle)
     {
         Renderer renderer = obstacle.GetComponent<Renderer>();
-        Debug.Assert(renderer, $"Obstacle {obstacle.name} has no Renderer component.");
-
-        Obstacles.Add(renderer);
+        if(renderer)
+            Obstacles.Add(renderer);
+        //Debug.Assert(renderer, $"Obstacle {obstacle.name} has no Renderer component.");
     }
     public Vector3 GetLeftBottom()
     {
@@ -66,80 +66,4 @@ public class ViewInfo
 
         return new Vector2Int(x, z);
     }
-    //public void AddObstacle(GameObject obstacle)
-    //{
-    //    Bounds aabb = col.bounds;
-    //    int gxMin = Mathf.Max(0, Mathf.FloorToInt((aabb.min.x - _worldOrigin.x) / _viewGrid.WorldX * gridXf));
-    //    int gxMax = Mathf.Min((int)_viewGrid.GridX - 1, Mathf.CeilToInt((aabb.max.x - _worldOrigin.x) / _viewGrid.WorldX * gridXf));
-    //    int gzMin = Mathf.Max(0, Mathf.FloorToInt((aabb.min.z - _worldOrigin.z) / _viewGrid.WorldY * gridYf));
-    //    int gzMax = Mathf.Min((int)_viewGrid.GridY - 1, Mathf.CeilToInt((aabb.max.z - _worldOrigin.z) / _viewGrid.WorldY * gridYf));
-
-    //    // 비볼록 MeshCollider는 ClosestPoint가 지원되지 않으므로 AABB 폴백
-    //    bool useAabb = col is MeshCollider mc && !mc.convex;
-
-    //    for (int gx = gxMin; gx <= gxMax; gx++)
-    //    {
-    //        for (int gz = gzMin; gz <= gzMax; gz++)
-    //        {
-    //            if (useAabb)
-    //            {
-    //                cells.Add(new ObstacleCell { x = (uint)gx, y = (uint)gz });
-    //                continue;
-    //            }
-
-    //            float wx = _worldOrigin.x + (gx + 0.5f) / gridXf * _viewGrid.WorldX;
-    //            float wz = _worldOrigin.z + (gz + 0.5f) / gridYf * _viewGrid.WorldY;
-    //            Vector3 cellCenter = new Vector3(wx, aabb.center.y, wz);
-
-    //            // 셀 중심이 Collider 내부에 있으면 ClosestPoint == cellCenter
-    //            Vector3 closest = col.ClosestPoint(cellCenter);
-    //            if ((closest - cellCenter).sqrMagnitude < 0.0001f)
-    //                cells.Add(new ObstacleCell { x = (uint)gx, y = (uint)gz });
-    //        }
-    //    }
-    //}
-    //public void SetObstacles(IEnumerable<Transform> obstacles)
-    //{
-    //    if (_viewGrid == null) return;
-
-    //    float gridXf = (float)_viewGrid.GridX;
-    //    float gridYf = (float)_viewGrid.GridY;
-
-    //    var cells = new List<ObstacleCell>();
-    //    foreach (var t in obstacles)
-    //    {
-    //        Collider col = t.GetComponent<Collider>();
-    //        if (col == null) continue;
-
-    //        Bounds aabb = col.bounds;
-    //        int gxMin = Mathf.Max(0, Mathf.FloorToInt((aabb.min.x - _worldOrigin.x) / _viewGrid.WorldX * gridXf));
-    //        int gxMax = Mathf.Min((int)_viewGrid.GridX - 1, Mathf.CeilToInt((aabb.max.x - _worldOrigin.x) / _viewGrid.WorldX * gridXf));
-    //        int gzMin = Mathf.Max(0, Mathf.FloorToInt((aabb.min.z - _worldOrigin.z) / _viewGrid.WorldY * gridYf));
-    //        int gzMax = Mathf.Min((int)_viewGrid.GridY - 1, Mathf.CeilToInt((aabb.max.z - _worldOrigin.z) / _viewGrid.WorldY * gridYf));
-
-    //        // 비볼록 MeshCollider는 ClosestPoint가 지원되지 않으므로 AABB 폴백
-    //        bool useAabb = col is MeshCollider mc && !mc.convex;
-
-    //        for (int gx = gxMin; gx <= gxMax; gx++)
-    //        {
-    //            for (int gz = gzMin; gz <= gzMax; gz++)
-    //            {
-    //                if (useAabb)
-    //                {
-    //                    cells.Add(new ObstacleCell { x = (uint)gx, y = (uint)gz });
-    //                    continue;
-    //                }
-
-    //                float wx = _worldOrigin.x + (gx + 0.5f) / gridXf * _viewGrid.WorldX;
-    //                float wz = _worldOrigin.z + (gz + 0.5f) / gridYf * _viewGrid.WorldY;
-    //                Vector3 cellCenter = new Vector3(wx, aabb.center.y, wz);
-
-    //                // 셀 중심이 Collider 내부에 있으면 ClosestPoint == cellCenter
-    //                Vector3 closest = col.ClosestPoint(cellCenter);
-    //                if ((closest - cellCenter).sqrMagnitude < 0.0001f)
-    //                    cells.Add(new ObstacleCell { x = (uint)gx, y = (uint)gz });
-    //            }
-    //        }
-    //    }
-    //}
 }
