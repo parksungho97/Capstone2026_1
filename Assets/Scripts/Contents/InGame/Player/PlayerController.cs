@@ -30,7 +30,7 @@ public class PlayerController : NetworkBehaviour
 
         if (Object.HasStateAuthority == false)
             return;
-
+        
         bool bMove = false;
         if (GetInput<NetworkInputData>(out NetworkInputData data))
         {

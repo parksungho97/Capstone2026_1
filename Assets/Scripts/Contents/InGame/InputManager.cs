@@ -11,6 +11,7 @@ public enum EInputButton
     A = 2,
     D = 3,
     Space = 4,
+    I = 5,
     End,
 }
 
@@ -42,6 +43,8 @@ public class InputManager : NetworkBehaviour, INetworkRunnerCallbacks
             data.buttons.Set(EInputButton.D, true);
         if (Input.GetKey(KeyCode.Space))
             data.buttons.Set(EInputButton.Space, true);
+        if (Input.GetKey(KeyCode.I))
+            data.buttons.Set(EInputButton.I, true);
         data.mousePosition = Input.mousePosition;
 
         input.Set(data); // Fusion 시스템에 입력을 전달!

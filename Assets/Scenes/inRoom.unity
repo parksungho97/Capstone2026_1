@@ -154,7 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   roomController: {fileID: 624686088}
   roomSession: {fileID: 444480564}
-  gameSceneIndex: 6
+  gameSceneIndex: 4
   lobbySceneIndex: 2
   roomPlayerStateManager: {fileID: 2009351001}
   roomTeamDashboardUI: {fileID: 962186469}

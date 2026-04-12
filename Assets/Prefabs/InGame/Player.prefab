@@ -129,6 +129,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5659626534878db43b6e257276f9e34f, type: 3}
       insertIndex: -1
       addedObject: {fileID: -6241124838145135713}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5659626534878db43b6e257276f9e34f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7075430939028817429}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5659626534878db43b6e257276f9e34f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4512981196502497330}
   m_SourcePrefab: {fileID: 100100000, guid: 5659626534878db43b6e257276f9e34f, type: 3}
 --- !u!1 &7106837159742798860 stripped
 GameObject:
@@ -382,6 +388,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0c7525a3e4dcee438af1456f30f5884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveSpeed: 3
+  turnSpeed: 15
 --- !u!81 &5884929588108543930
 AudioListener:
   m_ObjectHideFlags: 0
@@ -403,3 +411,43 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _Move: 0
+--- !u!114 &7075430939028817429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7106837159742798860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98780c4ad508f584c9e7db763cc6f1a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  viewBuildComputeShader: {fileID: 7200000, guid: 17601f641f097624e87ef42cf28c738f, type: 3}
+  _fogColor: {r: 0, g: 0, b: 0, a: 1}
+  _fogOpacity: 0.7
+  gridX: 4096
+  gridY: 4096
+  worldX: 400
+  worldY: 400
+  playerTag: Player
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  fovs:
+  - angle: 80
+    radius: 20
+  - angle: 360
+    radius: 3
+--- !u!114 &4512981196502497330
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7106837159742798860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dd580abc724ed44db0ce36fb5648c1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

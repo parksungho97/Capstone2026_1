@@ -1,80 +1,69 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using UnityEngine;
 
-public class ItemSlot
+public class Inventory : MonoBehaviour
 {
-    public ItemData Data { get; }
-    public int Count { get; set; }
+    [SerializeField] private int slotCapacity = 20;
 
-    public ItemSlot(ItemData data)
+    private SlotManager _slotManager;
+    private readonly Dictionary<int, int> _itemIdToSlotKey = new Dictionary<int, int>();
+
+    public SlotManager SlotManager => _slotManager;
+
+    public event Action<int, int, int> ActionItemAdd;    // itemId, count, maxCount
+    public event Action<int, int, int> ActionItemSub;    // itemId, count, maxCount
+    public event Action<int> ActionItemRemove;           // itemId
+
+    private void Awake()
     {
-        Data = data;
+        _slotManager = new SlotManager(slotCapacity);
     }
 
-    public void Add(int amount)
+    public void AddItem(int itemId, int count, int maxCount)
     {
-        Count += amount;
-    }
+        Debug.Assert(count > 0, "Inventory>> count must be greater than 0");
+        Debug.Assert(count <= maxCount, "Inventory>> count must be <= maxCount");
+        Debug.Assert(!_itemIdToSlotKey.ContainsKey(itemId), $"Inventory>> itemId {itemId}는 이미 슬롯이 존재합니다.");
 
-    public void Sub(int amount)
-    {
-        Count -= amount;
-    }
-}
+        int slotKey = _slotManager.Add(count, maxCount);
+        if (slotKey == -1) return;
 
-public class Inventory
-{
-    private List<ItemSlot> slots;
-
-    public IReadOnlyList<ItemSlot> Slots => slots;
-
-    public event Action OnChanged;
-
-    public void Regist(ItemData item, int amount)
-    {
-        Debug.Assert(item.maxCount <= amount, $"Inventory Regist: Item.MaxCount Check, {item.maxCount}, {amount}");
-
-        slots.Add(new ItemSlot(item) { Count = amount });
-    }
-
-    public void Add(ItemData item, int count = 1)
-    {
-        ItemSlot slot = GetSlot(item.id);
-        Debug.Assert(slot != null, $"Inventory Add: ItemSlot Check, {item.id}");
-
-        slot.Add(count);
-
-        if (slot.Count > item.maxCount)
-        {
-            int excess = slot.Count - item.maxCount;
-            Regist(item, excess);
-
-            slot.Count = item.maxCount;
-        }
-
-        OnChanged?.Invoke();
+        _itemIdToSlotKey[itemId] = slotKey;
+        ActionItemAdd?.Invoke(itemId, count, maxCount);
     }
 
     public void Remove(int itemId, int count = 1)
     {
-        ItemSlot slot = GetSlot(itemId);
-        Debug.Assert(slot != null, $"Inventory Remove: ItemSlot Check, {itemId}");
+        if (!_itemIdToSlotKey.TryGetValue(itemId, out int slotKey))
+        {
+            Debug.LogError($"Inventory Remove: itemId {itemId}에 해당하는 슬롯이 없습니다.");
+            return;
+        }
 
-        slot.Sub(count);
+        ItemSlot slot = _slotManager.Get(slotKey);
+        slot.Count -= count;
+
         if (slot.Count <= 0)
-            slots.Remove(slot);
-
-        OnChanged?.Invoke();
+        {
+            _slotManager.Remove(slotKey);
+            _itemIdToSlotKey.Remove(itemId);
+            ActionItemRemove?.Invoke(itemId);
+        }
+        else
+        {
+            ActionItemSub?.Invoke(itemId, slot.Count, slot.MaxCount);
+        }
     }
 
-    private ItemSlot GetSlot(int itemId)
+    public int GetTotalCount(int itemId)
     {
-        foreach (var slot in slots)
-        {
-            if (slot.Data.id == itemId)
-                return slot;
-        }
-        return null;
+        if (!_itemIdToSlotKey.TryGetValue(itemId, out int slotKey))
+            return 0;
+
+        if (_slotManager.TryGet(slotKey, out ItemSlot slot))
+            return slot.Count;
+
+        return 0;
     }
 }
