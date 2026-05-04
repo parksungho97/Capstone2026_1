@@ -1,5 +1,8 @@
 using Fusion;
 using Network;
+using Photon.Voice.Fusion;
+using Photon.Voice.Unity;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameEntryPoint : NetworkBehaviour
@@ -11,6 +14,9 @@ public class GameEntryPoint : NetworkBehaviour
 
     [SerializeField] private CapturePointManager capturePointManager;
     [SerializeField] private CGameMode gameMode;
+    [SerializeField] private ViewContext viewContext;
+    [SerializeField] private NetworkObject voices;
+    [SerializeField] private PlayerStatUIController playerStatUIController;
 
     public override async void Spawned()
     {
@@ -20,15 +26,16 @@ public class GameEntryPoint : NetworkBehaviour
         Debug.Assert(cameraController);
         Debug.Assert(player);
         Debug.Assert(playerController);
-        // Debug.Assert(capturePointManager);
-        // Debug.Assert(gameMode);
-        
-        // capturePointManager.Initialize();
-        // gameMode.Initialize(capturePointManager);
-        // gameMode.ActionGameEnded += (EResultType resultType) =>
-        // {
-        //     Debug.Log($"Game Ended! Result: {resultType}");
-        // };
+        Debug.Assert(capturePointManager);
+        Debug.Assert(gameMode);
+        Debug.Assert(viewContext);
+        Debug.Assert(playerStatUIController);
+
+        gameMode.Initialize(capturePointManager);
+        gameMode.ActionGameEnded += (EResultType resultType) =>
+        {
+            Debug.Log($"Game Ended! Result: {resultType}");
+        };
 
         var newPlayer = await Runner.SpawnAsync(player, position: Vector3.zero,
             rotation: Quaternion.identity,
@@ -41,9 +48,13 @@ public class GameEntryPoint : NetworkBehaviour
             inputAuthority: Runner.LocalPlayer);
         newPlayerController.GetComponent<PlayerController>().Initalize(newPlayer.gameObject, cameraController);
 
-        AudioListener audioListener = newPlayer.GetComponent<AudioListener>();
-        Debug.Assert(audioListener);
+        AudioListener audioListener = newPlayer.AddComponent<AudioListener>();
         audioListener.enabled = true;
+
+        viewContext.Initalize(newPlayer.gameObject);
+        
+        PlayerHealth playerHealth = newPlayer.GetComponent<PlayerHealth>();
+        playerStatUIController.Initialize(playerHealth);
     }
 }
 

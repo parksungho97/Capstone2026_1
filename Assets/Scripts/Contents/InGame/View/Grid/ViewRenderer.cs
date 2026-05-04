@@ -12,8 +12,6 @@ public class ViewRenderer
         mainCamera.depthTextureMode |= DepthTextureMode.Depth;
 
         viewRenderMaterial = new Material(Shader.Find("jjh/ViewRender"));
-        stencilWriteMat    = new Material(Shader.Find("jjh/StencilWrite"));
-        xrayBlendMat       = new Material(Shader.Find("jjh/XRayBlend"));
 
         commandBuffer = new CommandBuffer { name = "ViewGrid Fog Overlay" };
         mainCamera.AddCommandBuffer(CameraEvent.AfterForwardAlpha, commandBuffer);
@@ -40,10 +38,6 @@ public class ViewRenderer
         topDownCamera.cullingMask = 0;
         topDownCamera.enabled = false;
         topDownCamera.aspect = 1;
-
-        noObstacleCameraGO = new GameObject("NoObstacleCamera");
-        noObstacleCamera = noObstacleCameraGO.AddComponent<Camera>();
-        noObstacleCamera.enabled = false;
     }
 
     public void SetFogColor(Color color, float opacity)
@@ -71,7 +65,7 @@ public class ViewRenderer
 
         viewRenderMaterial.SetVector("_PlayerPos", playerPos);
 
-        // [Step 1] 메인 카메라 프러스텀 내 장애물만 추림
+        // [Step 1]
         Plane[] cameraPlanes = GeometryUtility.CalculateFrustumPlanes(mainCamera);
         var frustumObstacles = viewInfo.Obstacles
             .Where(r => r != null && GeometryUtility.TestPlanesAABB(cameraPlanes, r.bounds))
@@ -80,24 +74,35 @@ public class ViewRenderer
         // [Step 2] 프러스텀 내 장애물 중 카메라→플레이어 레이에 맞는 것 선별
         List<Renderer> xRayObstacles = FindXRayObstacles(mainCamera.transform.position, playerPos, frustumObstacles);
 
-        // [Step 3] XRay 장애물 레이어 이동 후 배경 렌더링
-        var layerBackup = new Dictionary<Renderer, int>();
+        // [Step 3] 레이에 맞은 장애물 → 원본 복사+투명화, 해제된 장애물 → 원래 재질 복원
+        var newXRaySet = new HashSet<Renderer>(xRayObstacles);
+
+        var toRestore = new List<Renderer>();
+        foreach (var kvp in _xrayActive)
+        {
+            if (kvp.Key == null || !newXRaySet.Contains(kvp.Key))
+            {
+                if (kvp.Key != null) kvp.Key.sharedMaterials = kvp.Value.originals;
+                foreach (var m in kvp.Value.transparents)
+                    if (m != null) Object.Destroy(m);
+                toRestore.Add(kvp.Key);
+            }
+        }
+        foreach (var r in toRestore)
+            _xrayActive.Remove(r);
+
         foreach (var r in xRayObstacles)
         {
-            layerBackup[r] = r.gameObject.layer;
-            r.gameObject.layer = xRayTempLayer;
+            if (r == null || _xrayActive.ContainsKey(r)) continue;
+            var originals = r.sharedMaterials;
+            var transparents = new Material[originals.Length];
+            for (int i = 0; i < originals.Length; i++)
+                transparents[i] = originals[i] != null ? MakeTransparentCopy(originals[i]) : null;
+            _xrayActive[r] = (originals, transparents);
+            r.sharedMaterials = transparents;
         }
-        EnsureNoObstacleTexture();
-        noObstacleCameraGO.transform.SetPositionAndRotation(mainCamera.transform.position, mainCamera.transform.rotation);
-        noObstacleCamera.CopyFrom(mainCamera);
-        noObstacleCamera.targetTexture = noObstacleTexture;
-        noObstacleCamera.cullingMask = mainCamera.cullingMask & ~(1 << xRayTempLayer);
-        noObstacleCamera.depthTextureMode = DepthTextureMode.None;
-        noObstacleCamera.RemoveAllCommandBuffers();
-        noObstacleCamera.enabled = false;
-        noObstacleCamera.Render();
-        foreach (var kvp in layerBackup)
-            if (kvp.Key != null) kvp.Key.gameObject.layer = kvp.Value;
+
+        commandBuffer.Clear();
 
         // 탑다운 카메라를 월드 센터 위에 고정 (안개 레이스테핑용)
         // aspect=1 (512×512 정사각형 RT), orthographicSize는 맵의 넓은 쪽 절반을 커버
@@ -107,27 +112,6 @@ public class ViewRenderer
         Matrix4x4 topDownGpuProj = GL.GetGPUProjectionMatrix(topDownCamera.projectionMatrix, false);
         Matrix4x4 topDownVP = topDownGpuProj * topDownCamera.worldToCameraMatrix;
         viewRenderMaterial.SetMatrix("_ObstacleMaskVP", topDownVP);
-
-        commandBuffer.Clear();
-
-        // ── Phase 1: XRay 스텐실 블랜드 ─────────────────────────────────────────
-        // [Step 4] 카메라→플레이어 레이에 걸린 장애물 픽셀에 스텐실=1 기록
-        // [Step 5] 스텐실=1 픽셀을 noObstacleRT(배경)와 블랜딩
-        if (xRayObstacles.Count > 0)
-        {
-            xrayBlendMat.SetTexture("_NoObstacleRT", noObstacleTexture);
-
-            commandBuffer.SetViewProjectionMatrices(mainCamera.worldToCameraMatrix, gpuProj);
-            foreach (var r in xRayObstacles)
-                if (r != null) commandBuffer.DrawRenderer(r, stencilWriteMat);
-
-            int xrayTempRT = Shader.PropertyToID("_XRayTemp");
-            commandBuffer.GetTemporaryRT(xrayTempRT, mainCamera.pixelWidth, mainCamera.pixelHeight, 0, FilterMode.Bilinear, RenderTextureFormat.Default);
-            commandBuffer.Blit(BuiltinRenderTextureType.CameraTarget, xrayTempRT);
-            commandBuffer.Blit(xrayTempRT, BuiltinRenderTextureType.CameraTarget, xrayBlendMat);
-            commandBuffer.ReleaseTemporaryRT(xrayTempRT);
-        }
-
         // ── Phase 2: ViewRender 안개 후처리 ──────────────────────────────────────
         // [Step 6] 탑다운 장애물 마스크 생성 후 안개 셰이더 적용
         int fogTempRT = Shader.PropertyToID("_FogTemp");
@@ -140,9 +124,8 @@ public class ViewRenderer
         commandBuffer.SetViewProjectionMatrices(topDownCamera.worldToCameraMatrix, topDownGpuProj);
 
         Plane[] topDownPlanes = GeometryUtility.CalculateFrustumPlanes(topDownCamera);
-        foreach (var r in viewInfo.Obstacles)
-            if (r != null && GeometryUtility.TestPlanesAABB(topDownPlanes, r.bounds))
-                commandBuffer.DrawRenderer(r, stencilMat);
+        foreach (var r in frustumObstacles)
+            commandBuffer.DrawRenderer(r, stencilMat);
 
         commandBuffer.SetGlobalTexture("_ObstacleMask", obstacleMaskTexture);
         commandBuffer.Blit(fogTempRT, BuiltinRenderTextureType.CameraTarget, viewRenderMaterial);
@@ -151,6 +134,14 @@ public class ViewRenderer
 
     public void Cleanup()
     {
+        foreach (var kvp in _xrayActive)
+        {
+            if (kvp.Key != null) kvp.Key.sharedMaterials = kvp.Value.originals;
+            foreach (var m in kvp.Value.transparents)
+                if (m != null) Object.Destroy(m);
+        }
+        _xrayActive.Clear();
+
         if (commandBuffer != null)
         {
             if (mainCamera)
@@ -163,31 +154,10 @@ public class ViewRenderer
             Object.Destroy(viewRenderMaterial);
             viewRenderMaterial = null;
         }
-        if (stencilWriteMat != null)
-        {
-            Object.Destroy(stencilWriteMat);
-            stencilWriteMat = null;
-        }
-        if (xrayBlendMat != null)
-        {
-            Object.Destroy(xrayBlendMat);
-            xrayBlendMat = null;
-        }
         if (topDownCameraGO != null)
         {
             Object.Destroy(topDownCameraGO);
             topDownCameraGO = null;
-        }
-        if (noObstacleTexture != null)
-        {
-            noObstacleTexture.Release();
-            Object.Destroy(noObstacleTexture);
-            noObstacleTexture = null;
-        }
-        if (noObstacleCameraGO != null)
-        {
-            Object.Destroy(noObstacleCameraGO);
-            noObstacleCameraGO = null;
         }
     }
 
@@ -224,25 +194,31 @@ public class ViewRenderer
         return new List<Renderer>(result);
     }
 
-    private void EnsureNoObstacleTexture()
+    private static Material MakeTransparentCopy(Material original, float alpha = 0.1f)
     {
-        int w = mainCamera.pixelWidth;
-        int h = mainCamera.pixelHeight;
-        if (noObstacleTexture != null && noObstacleTexture.width == w && noObstacleTexture.height == h)
-            return;
-        if (noObstacleTexture != null) { noObstacleTexture.Release(); Object.Destroy(noObstacleTexture); }
-        noObstacleTexture = new RenderTexture(w, h, 24, RenderTextureFormat.Default)
+        var mat = new Material(original);
+        if (mat.HasProperty("_SrcBlend"))
         {
-            name = "NoObstacleTexture",
-            filterMode = FilterMode.Bilinear,
-        };
-        noObstacleTexture.Create();
+            mat.SetFloat("_Mode", 3);
+            mat.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+            mat.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+            mat.SetInt("_ZWrite", 0);
+            mat.DisableKeyword("_ALPHATEST_ON");
+            mat.EnableKeyword("_ALPHABLEND_ON");
+            mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            mat.renderQueue = 3000;
+        }
+        if (mat.HasProperty("_Color"))
+        {
+            Color c = mat.GetColor("_Color");
+            c.a = alpha;
+            mat.SetColor("_Color", c);
+        }
+        return mat;
     }
 
     private Camera mainCamera;
     private Material viewRenderMaterial;
-    private Material stencilWriteMat;
-    private Material xrayBlendMat;
     private CommandBuffer commandBuffer;
 
     private RenderTexture obstacleMaskTexture;
@@ -253,8 +229,6 @@ public class ViewRenderer
     private GameObject topDownCameraGO;
     private float topDownHeight;
 
-    private Camera noObstacleCamera;
-    private GameObject noObstacleCameraGO;
-    private RenderTexture noObstacleTexture;
-    private const int xRayTempLayer = 31;
+    private readonly Dictionary<Renderer, (Material[] originals, Material[] transparents)> _xrayActive =
+        new Dictionary<Renderer, (Material[] originals, Material[] transparents)>();
 }

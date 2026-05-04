@@ -32,6 +32,11 @@ public class Activater : NetworkBehaviour
         return RedState.Progress > BlueState.Progress ? RedState.Progress : BlueState.Progress;
     }
 
+    public ERequestType GetGreaterTeam()
+    {
+        return RedState.Progress > BlueState.Progress ? ERequestType.Red : ERequestType.Blue;
+    }
+
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void StartActivateRpc(ObjectId id, ERequestType requestType)
     {

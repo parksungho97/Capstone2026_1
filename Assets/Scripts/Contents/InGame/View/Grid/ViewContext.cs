@@ -54,11 +54,14 @@ public class ViewContext : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (refGameObject == null)
+            return;
+
         foreach (var fov in fovs)
         {
             ViewInfo.AddFovInfo(
-                transform.position,
-                transform.forward,
+                refGameObject.transform.position,
+                refGameObject.transform.forward,
                 fov.angle,
                 fov.radius);
         }
@@ -67,16 +70,9 @@ public class ViewContext : MonoBehaviour
 
         viewBuilder.BuildViewGrid(ViewInfo);
         viewRenderer.SetFogColor(_fogColor, _fogOpacity);
-        viewRenderer.RenderView(viewBuilder.ViewGridBuffer, ViewInfo, transform.position);
+        viewRenderer.RenderView(viewBuilder.ViewGridBuffer, ViewInfo, refGameObject.transform.position);
 
         ViewInfo.Clear();
-    }
-
-    public void RegistFOV(GameObject gameObject)
-    {
-        FOV[] fov = gameObject.GetComponents<FOV>();
-        foreach (var f in fov)
-            fovs.Add(f);
     }
 
     private void OnDisable()
@@ -85,7 +81,14 @@ public class ViewContext : MonoBehaviour
         viewRenderer.Cleanup();
     }
 
+    public void Initalize(GameObject refGameObject)
+    {
+        Debug.Assert(refGameObject);
+        this.refGameObject = refGameObject;
+    }
+
     private ViewCulling viewCulling;
     private ViewBuilder viewBuilder;
     private ViewRenderer viewRenderer;
+    private GameObject refGameObject;
 }

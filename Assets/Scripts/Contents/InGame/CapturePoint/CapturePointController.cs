@@ -7,8 +7,18 @@ using UnityEngine;
 public class CapturePointController : NetworkBehaviour
 {
     // 거점 활성화를 담당하는 컴포넌트
-    private void Start()
+    //private void Start()
+    //{
+    //    CapturePoint = GetComponent<CapturePoint>();
+    //    Activater = GetComponent<Activater>();
+
+    //    Debug.Assert(CapturePoint);
+    //    Debug.Assert(Activater);
+    //}
+
+    public override void Spawned()
     {
+        base.Spawned();
         CapturePoint = GetComponent<CapturePoint>();
         Activater = GetComponent<Activater>();
 

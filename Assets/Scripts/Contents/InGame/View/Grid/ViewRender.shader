@@ -168,14 +168,15 @@ Shader "jjh/ViewRender"
 
             bool SampleObstacleMask(float2 uv)
             {
-                // return tex2D(_ObstacleMask, uv).r >= 1.0f;
-                // 3x3 max 필터링 주석을 푸는 것을 추천합니다 (외곽선 보정용)
-                 float2 ts = _ObstacleMask_TexelSize.xy;
-                 float maxVal = 0;
-                 [unroll] for (int dy = -1; dy <= 1; dy++)
-                 [unroll] for (int dx = -1; dx <= 1; dx++)
-                      maxVal = max(maxVal, tex2D(_ObstacleMask, uv + float2(dx, dy) * ts).r);
-                 return maxVal >= 0.5;
+                // // return tex2D(_ObstacleMask, uv).r >= 1.0f;
+                // // 3x3 max 필터링 주석을 푸는 것을 추천합니다 (외곽선 보정용)
+                // float2 ts = _ObstacleMask_TexelSize.xy;
+                // float maxVal = 0;
+                // [unroll] for (int dy = -1; dy <= 1; dy++)
+                // [unroll] for (int dx = -1; dx <= 1; dx++)
+                //      maxVal = max(maxVal, tex2D(_ObstacleMask, uv + float2(dx, dy) * ts).r);
+                // return maxVal >= 0.5;
+                return tex2D(_ObstacleMask, uv).r >= 0.5f;
             }
 
             fixed4 frag(v2f_img i) : SV_Target

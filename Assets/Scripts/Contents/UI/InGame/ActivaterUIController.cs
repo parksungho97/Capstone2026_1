@@ -3,24 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ActivaterUIController : MonoBehaviour
+public class ActivaterUIController
 {
-    public void Initalize(Activater activater, Image image)
+    public ActivaterUIController(CapturePointController capturePointController, CaptureGaugeUI captureGaugeUI)
     {
-        this.activater = activater; 
-        this.image = image;
+        this.capturePointController = capturePointController; 
+        this.captureGaugeUI = captureGaugeUI;
     }
 
-    private void Update()
+    public void Update()
     {
         // NetworkBehaviour랑 시간차이 때문에 어쩔 수 없이 null체크
-        if (activater == null)
+        if (capturePointController == null)
             return;
         // 원래 이전 정보 저장해서 바뀌었을 때만 하면 되긴하는데 그냥 하자
-        float showProgress = activater.GetGreaterProgress();
-        image.fillAmount = (float)showProgress / 100.0f;
+        float showProgress = capturePointController.Activater.GetGreaterProgress();
+        ERequestType requestType = capturePointController.Activater.GetGreaterTeam();
+
+        EGuageColor teamType = requestType == ERequestType.Red ? EGuageColor.Red : EGuageColor.Blue;
+        captureGaugeUI.SetGauge(showProgress, 100.0f, teamType);
     }
 
-    private Activater activater;
-    private Image image;
+    private CapturePointController capturePointController;
+    private CaptureGaugeUI captureGaugeUI;
 }
