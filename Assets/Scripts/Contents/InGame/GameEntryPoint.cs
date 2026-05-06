@@ -17,6 +17,7 @@ public class GameEntryPoint : NetworkBehaviour
     [SerializeField] private ViewContext viewContext;
     [SerializeField] private NetworkObject voices;
     [SerializeField] private PlayerStatUIController playerStatUIController;
+    [SerializeField] private VoiceNPCStateManager voiceNPCStateManager;
 
     public override async void Spawned()
     {
@@ -30,6 +31,7 @@ public class GameEntryPoint : NetworkBehaviour
         Debug.Assert(gameMode);
         Debug.Assert(viewContext);
         Debug.Assert(playerStatUIController);
+        Debug.Assert(voiceNPCStateManager);
 
         gameMode.Initialize(capturePointManager);
         gameMode.ActionGameEnded += (EResultType resultType) =>
@@ -55,6 +57,8 @@ public class GameEntryPoint : NetworkBehaviour
         
         PlayerHealth playerHealth = newPlayer.GetComponent<PlayerHealth>();
         playerStatUIController.Initialize(playerHealth);
+
+        voiceNPCStateManager.AddTargetChaseState(newPlayer.gameObject);
     }
 }
 

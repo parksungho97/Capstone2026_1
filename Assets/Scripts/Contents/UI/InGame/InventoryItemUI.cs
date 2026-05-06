@@ -44,7 +44,7 @@ public class InventoryItemUI : MonoBehaviour
 
         if (countText != null)
         {
-            countText.text = count > 1 ? $"x{count}" : "";
+            countText.text = count >= 1 ? $"x{count}" : "";
         }
     }
 
