@@ -2,8 +2,18 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
+    [SerializeField] private float moveSpeed = 3.0f;
+    [SerializeField] private float turnSpeed = 15.0f;
+
+    private void Start()
+    {
+        bMove = true;
+    }
     public bool Move(Vector3 moveDegree)
     {
+        if (bMove == false)
+            return false;
+
         if(moveDegree == Vector3.zero) 
             return false;
 
@@ -27,6 +37,5 @@ public class PlayerMove : MonoBehaviour
         return true;
     }
 
-    private float moveSpeed = 3.0f;
-    private float turnSpeed = 15.0f;
+    public bool bMove { get; set; }
 }

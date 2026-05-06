@@ -6,15 +6,9 @@ Shader "jjh/ObstacleMask"
         
         Pass
         {
-ZWrite Off
-ZTest LEqual    // depth 복사본으로 판단
-ColorMask R
-            Stencil
-            {
-                Ref 1
-                Comp Always
-                Pass Replace // 항상 스텐실 값을 1로 교체
-            }
+            ZWrite On
+            ZTest LEqual
+            ColorMask R
 
             CGPROGRAM
             #pragma vertex vert
@@ -33,7 +27,7 @@ ColorMask R
             fixed4 frag (v2f i) : SV_Target
     {
         // 통과된 픽셀(보이는 장애물 영역)에 1(흰색)을 채움
-        return fixed4(1, 0, 0, 1);
+        return fixed4(1.5, 0, 0, 1);
     }
             ENDCG
         }

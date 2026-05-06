@@ -35,3 +35,6 @@
 
 # BUT: pdb meta는 다시 제외
 Assets/**/*.pdb.meta
+
+Assets/MapElements/
+Assets/MapElements.meta

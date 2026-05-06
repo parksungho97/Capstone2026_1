@@ -39,6 +39,13 @@ public class RoomEntryPoint : NetworkBehaviour
         {
             roomSession.LeaveRoom(lobbySceneIndex);
         };
+        roomSession.ActionSceneLoadStart += () =>
+        {
+            var map = new Dictionary<int, EPlayerTeam>();
+            foreach (var kv in roomController.PlayerContexts)
+                map[kv.Key] = kv.Value.team;
+            TeamInfo.Instance.Set(map);
+        };
 
         roomController.Initalize(4, 4);
         roomPlayerStateManager.Initalize(roomController, roomSession.LocalPlayerId
@@ -85,14 +92,12 @@ public class RoomEntryPoint : NetworkBehaviour
             foreach (PlayerContext redPlayerContext in redPlayers)
             {
                 var ui = roomTeamDashboardUI.AddRedPlayer(redPlayerContext.name.ToString());
-                if(redPlayerContext.bReady)
-                    ui.ReadyEffect();
+                ui.SetReady(redPlayerContext.bReady);
             }
             foreach (PlayerContext bluePlayerContext in bluePlayers)
             {
                 var ui = roomTeamDashboardUI.AddBluePlayer(bluePlayerContext.name.ToString());
-                if (bluePlayerContext.bReady)
-                    ui.ReadyEffect();
+                ui.SetReady(bluePlayerContext.bReady);
             }
         };
     }

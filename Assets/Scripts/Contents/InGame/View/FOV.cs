@@ -2,11 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FOV : MonoBehaviour
+[System.Serializable]
+public struct FOV
 {
-    [SerializeField] private float angle;
-    [SerializeField] private float radius;
-
-    public float Angle => angle;
-    public float Radius => radius;
+    public float angle;
+    public float radius;
 }

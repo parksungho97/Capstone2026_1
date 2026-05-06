@@ -1,3 +1,6 @@
+using Fusion;
+using Photon.Realtime;
+using TMPro.Examples;
 using UnityEngine;
 
 // 플레이어가 가질 수 있는 거점 활성화 컴포넌트
@@ -42,6 +45,7 @@ public class CaptureInteractor : MonoBehaviour
         {
             this.capturePoint = capturePoint;
             this.activater = activater;
+            Debug.Log("Capture Point Entered");
         }
     }
 
@@ -56,6 +60,7 @@ public class CaptureInteractor : MonoBehaviour
 
             this.capturePoint = null;
             this.activater = null;
+            Debug.Log("Capture Point Exited");
         }
     }
 

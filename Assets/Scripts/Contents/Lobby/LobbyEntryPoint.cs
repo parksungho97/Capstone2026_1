@@ -31,7 +31,6 @@ public class LobbyEntryPoint : MonoBehaviour
         roomListUIManager.ActionRoomSelected += (RoomItemUI roomItemUI) =>
         {
             selectedRoom = roomItemUI;
-            roomItemUI.SelectUI();
         };
 
         createRoomPopupUI.OnCreateRoomRequested += (string roomName) =>

@@ -1,18 +1,37 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerNameItemUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text playerNameText;
+    [SerializeField] private Image backgroundImage;
+
+    [SerializeField] private Color normalColor = new Color(1f, 1f, 1f, 0.3f);
+    [SerializeField] private Color readyColor = new Color(0.3f, 1f, 0.3f, 0.7f);
+
+    public bool IsReady { get; private set; }
 
     public void SetPlayerName(string playerName)
     {
         playerNameText.text = playerName;
+        SetReady(false);
     }
 
-    public void ReadyEffect()
+    public void SetReady(bool ready)
     {
-        // Todo: 뭐 바뀐다던가 아무튼 준비 상태일 때 어떻게 ui가 바뀔건지
-        Debug.Log("준비 효과");
+        IsReady = ready;
+
+        if (backgroundImage != null)
+        {
+            backgroundImage.color = IsReady ? readyColor : normalColor;
+        }
+
+        Debug.Log($"{playerNameText.text} Ready 상태: {IsReady}");
+    }
+
+    public void ToggleReady()
+    {
+        SetReady(!IsReady);
     }
 }
