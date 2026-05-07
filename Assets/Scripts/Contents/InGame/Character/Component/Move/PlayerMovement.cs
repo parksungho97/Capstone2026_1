@@ -28,10 +28,7 @@ public class PlayerMovement : MonoBehaviour
         movement.bMovePossible = bMovePossible;
     }
 
-    private void LateUpdate()
-    {
-        bMove = false;
-    }
+    public void MoveEnd() { bMove = false; }
 
     private Movement movement;
     public bool bMove { get; private set;  }

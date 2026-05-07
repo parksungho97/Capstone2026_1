@@ -36,7 +36,10 @@ public class ItemCollector : MonoBehaviour
     {
         ItemInstance itemInstance = other.GetComponent<ItemInstance>();
         if (itemInstance)
+        {
             itemsInRange.Add(itemInstance);
+            AcquireItemOne();
+        }
     }
 
     public void OnTriggerExit(Collider other)

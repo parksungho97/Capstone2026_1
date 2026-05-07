@@ -1,12 +1,13 @@
 
-using System.Diagnostics;
+using UnityEngine;
 
 public class PlayerIdle : State<PlayerContext>
 {
     public override void Enter(PlayerContext context)
     {
         // 기본 애니메이션 재생
-        
+        Debug.Log("Idle");
+        context.Animator.SetBool("IsMove", false);
     }
 
     public override void Exit(PlayerContext context)
@@ -22,12 +23,32 @@ public class PlayerWalk : State<PlayerContext>
 {
     public override void Enter(PlayerContext context)
     {
+        Debug.Log("Walk");
         context.Animator.SetBool("IsMove", true);
     }
 
     public override void Exit(PlayerContext context)
     {
         context.Animator.SetBool("IsMove", false);
+    }
+
+    public override void Update(PlayerContext context)
+    {
+    }
+}
+
+public class PlayerInteract : State<PlayerContext>
+{
+    public override void Enter(PlayerContext context)
+    {
+        Debug.Log("Interact");
+        context.Animator.SetBool("IsMove", false);
+        context.PlayerMovement.SetMovePossible(false);
+    }
+
+    public override void Exit(PlayerContext context)
+    {
+        context.PlayerMovement.SetMovePossible(true);
     }
 
     public override void Update(PlayerContext context)
@@ -49,5 +70,21 @@ public class IsWalk : StateTransition
     }
 
     private PlayerMovement playerMovement;
+    private bool bCompareValue;
+}
+
+public class IsInteract : StateTransition
+{
+    public IsInteract(CaptureInteractor captureInteractor, bool bCompareValue)
+    {
+        this.captureInteractor = captureInteractor;
+        this.bCompareValue = bCompareValue;
+    }
+    public override bool ShouldTransition()
+    {
+        return captureInteractor.bAlreadyStartActivate == bCompareValue;
+    }
+
+    private CaptureInteractor captureInteractor;
     private bool bCompareValue;
 }

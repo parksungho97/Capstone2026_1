@@ -29,9 +29,9 @@ public class PlayerController : NetworkBehaviour
         if (Object.HasStateAuthority == false)
             return;
 
+        Vector3 moveDegree = Vector3.zero;
         if (GetInput<NetworkInputData>(out NetworkInputData data))
         {
-            Vector3 moveDegree = Vector3.zero;
             if (data.buttons.IsSet(EInputButton.W))
                 moveDegree += new Vector3(0.0f, 0.0f, 1f);
             if (data.buttons.IsSet(EInputButton.S))
@@ -50,12 +50,10 @@ public class PlayerController : NetworkBehaviour
 
             if (data.buttons.WasPressed(previousButtons, EInputButton.Space))
             {
-                move.SetMovePossible(false);
                 captureInteractor.TryStartActivateCapturePoint(requestType);
             }
             if (data.buttons.WasReleased(previousButtons, EInputButton.Space))
             {
-                move.SetMovePossible(true);
                 captureInteractor.TryStopActivateCapturePoint(requestType);
             }
 
@@ -70,6 +68,9 @@ public class PlayerController : NetworkBehaviour
                     move.RotateTo(lookDir.normalized, Runner.DeltaTime);
             }
         }
+
+        if (moveDegree == Vector3.zero)
+            move.MoveEnd();
     }
 
     private GameObject player;

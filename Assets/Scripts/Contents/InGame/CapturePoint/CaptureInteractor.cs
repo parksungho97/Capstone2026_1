@@ -66,5 +66,5 @@ public class CaptureInteractor : MonoBehaviour
 
     private CapturePoint capturePoint;
     private Activater activater;
-    private bool bAlreadyStartActivate = false;
+    public bool bAlreadyStartActivate { get; private set; }
 }
