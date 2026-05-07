@@ -8,11 +8,9 @@ public class PlayerController : NetworkBehaviour
         this.player = player;
         this.cameraController = cameraController;
 
-        move = player.GetComponent<PlayerMove>();
+        move = player.GetComponent<PlayerMovement>();
         Debug.Assert(move);
 
-        stateManager = player.GetComponent<PlayerStateManager>();
-        Debug.Assert(stateManager);
 
         captureInteractor = player.GetComponent<CaptureInteractor>();
         Debug.Assert(captureInteractor);
@@ -30,8 +28,7 @@ public class PlayerController : NetworkBehaviour
 
         if (Object.HasStateAuthority == false)
             return;
-        
-        bool bMove = false;
+
         if (GetInput<NetworkInputData>(out NetworkInputData data))
         {
             Vector3 moveDegree = Vector3.zero;
@@ -45,7 +42,7 @@ public class PlayerController : NetworkBehaviour
                 moveDegree += new Vector3(1f, 0.0f, 0.0f);
 
             moveDegree = moveDegree * Runner.DeltaTime;
-            bMove = move.Move(moveDegree);
+            move.Move(moveDegree);
 
 
             EPlayerTeam playerTeam = TeamInfo.Instance.GetTeam(Runner.LocalPlayer.PlayerId);
@@ -53,12 +50,12 @@ public class PlayerController : NetworkBehaviour
 
             if (data.buttons.WasPressed(previousButtons, EInputButton.Space))
             {
-                move.bMove = false;
+                move.SetMovePossible(false);
                 captureInteractor.TryStartActivateCapturePoint(requestType);
             }
             if (data.buttons.WasReleased(previousButtons, EInputButton.Space))
             {
-                move.bMove = true;
+                move.SetMovePossible(true);
                 captureInteractor.TryStopActivateCapturePoint(requestType);
             }
 
@@ -73,12 +70,10 @@ public class PlayerController : NetworkBehaviour
                     move.RotateTo(lookDir.normalized, Runner.DeltaTime);
             }
         }
-        stateManager.Move = bMove;
     }
 
     private GameObject player;
-    private PlayerMove move;
-    private PlayerStateManager stateManager;
+    private PlayerMovement move;
     private CameraController cameraController;
     private CaptureInteractor captureInteractor;
 

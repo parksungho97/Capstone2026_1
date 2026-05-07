@@ -3,23 +3,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChaseTarget : State
+public class NpcChaseTarget : State<NpcContext>
 {
-    public ChaseTarget(NpcMove npcMove, Transform targetTransform)
+    public NpcChaseTarget(NpcMove npcMove, Transform targetTransform)
     {
         this.npcMove = npcMove;
         this.targetTransform = targetTransform;
     }
-    public override void Enter()
+    public override void Enter(NpcContext npcContext)
     {
 
     }
 
-    public override void Exit()
+    public override void Exit(NpcContext npcContext)
     {
     }
 
-    public override void Update()
+    public override void Update(NpcContext npcContext)
     {
         npcMove.SetDestination(targetTransform.position);
     }
@@ -28,22 +28,22 @@ public class ChaseTarget : State
     private Transform targetTransform;
 }
 
-public class Back : State
+public class NpcBack : State<NpcContext>
 {
-    public Back(NpcMove npcMove, Vector3 originPosition)
+    public NpcBack(NpcMove npcMove, Vector3 originPosition)
     {
         this.npcMove = npcMove;
         this.originPosition = originPosition;
     }
-    public override void Enter()
+    public override void Enter(NpcContext npcContext)
     {
     }
 
-    public override void Exit()
+    public override void Exit(NpcContext npcContext)
     {
     }
 
-    public override void Update()
+    public override void Update(NpcContext npcContext)
     {
         npcMove.SetDestination(originPosition);
     }
@@ -122,10 +122,11 @@ public class VoiceNPCStateManager : NetworkBehaviour
     [SerializeField] private float detectDistance;
     private void Start()
     {
-        stateMachine = new StateMachine();
+        npcContext = new NpcContext();
+        stateMachine = new StateMachine<NpcContext>(npcContext);
 
         NpcMove npcMove = GetComponent<NpcMove>();
-        idle = new Idle(npcMove);
+        idle = new NpcIdle(npcMove);
 
         stateMachine.SetState(idle);
     }
@@ -141,8 +142,8 @@ public class VoiceNPCStateManager : NetworkBehaviour
     {
         NpcMove npcMove = GetComponent<NpcMove>();
 
-        chaseTarget = new ChaseTarget(npcMove, target.transform);
-        back = new Back(npcMove, npcMove.CenterPos);
+        chaseTarget = new NpcChaseTarget(npcMove, target.transform);
+        back = new NpcBack(npcMove, npcMove.CenterPos);
 
         MeetTarget meetTarget = new MeetTarget(gameObject, target, detectDistance);
         stateMachine.AddTransition(idle, chaseTarget, meetTarget);
@@ -153,11 +154,12 @@ public class VoiceNPCStateManager : NetworkBehaviour
         ReachPosition reachPosition = new ReachPosition(gameObject.transform, npcMove.CenterPos);
         stateMachine.AddTransition(back, idle, reachPosition);
     }
-    
 
-    private StateMachine stateMachine;
 
-    private Idle idle;
-    private ChaseTarget chaseTarget;
-    private Back back;
+    private NpcContext npcContext;
+    private StateMachine<NpcContext> stateMachine;
+
+    private NpcIdle idle;
+    private NpcChaseTarget chaseTarget;
+    private NpcBack back;
 }

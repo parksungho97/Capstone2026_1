@@ -10,7 +10,7 @@ public enum EPlayerTeam : byte
     Blue,
 }
 // 1. INetworkStruct 상속 추가: "이 구조체는 메모리 크기가 고정된 네트워크용 데이터다!"
-public struct PlayerContext : INetworkStruct
+public struct PlayerRoomContext : INetworkStruct
 {
     public NetworkString<_16> name;
     public EPlayerTeam team;
@@ -28,7 +28,7 @@ public class RoomController : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RemovePlayerRPC(int playerId)
     {
-        if (PlayerContexts.TryGet(playerId, out PlayerContext foundContext))
+        if (PlayerContexts.TryGet(playerId, out PlayerRoomContext foundContext))
         {
             // Remove the player context and adjust team counts
             PlayerContexts.Remove(playerId);
@@ -67,7 +67,7 @@ public class RoomController : NetworkBehaviour
             RedPlayerCount += 1;
         }
 
-        PlayerContext newContext = new PlayerContext
+        PlayerRoomContext newContext = new PlayerRoomContext
         {
             team = team,
             name = playerName,
@@ -80,7 +80,7 @@ public class RoomController : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void ReadyRPC(int playerId, bool bReady)
     {
-        if (PlayerContexts.TryGet(playerId, out PlayerContext newContext))
+        if (PlayerContexts.TryGet(playerId, out PlayerRoomContext newContext))
         {
             if (newContext.bReady == bReady)
                 return;
@@ -93,7 +93,7 @@ public class RoomController : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void ChangeTeamRPC(int playerId, EPlayerTeam team)
     {
-        if (PlayerContexts.TryGet(playerId, out PlayerContext foundContext))
+        if (PlayerContexts.TryGet(playerId, out PlayerRoomContext foundContext))
         {
             if (foundContext.team == team)
                 return;
@@ -143,8 +143,8 @@ public class RoomController : NetworkBehaviour
 
     private void OnPlayerContextsChanged()
     {
-        List<PlayerContext> redPlayers = new List<PlayerContext>();
-        List<PlayerContext> bluePlayers = new List<PlayerContext>();
+        List<PlayerRoomContext> redPlayers = new List<PlayerRoomContext>();
+        List<PlayerRoomContext> bluePlayers = new List<PlayerRoomContext>();
 
         foreach (var context in PlayerContexts)
         {
@@ -157,12 +157,12 @@ public class RoomController : NetworkBehaviour
         ActionPlayerContextChanged?.Invoke(redPlayers, bluePlayers);
     }
 
-    public Action<List<PlayerContext>, List<PlayerContext>> ActionPlayerContextChanged;
+    public Action<List<PlayerRoomContext>, List<PlayerRoomContext>> ActionPlayerContextChanged;
 
     [Networked]
     [Capacity(8)]
     [OnChangedRender(nameof(OnPlayerContextsChanged))]
-    public NetworkDictionary<int, PlayerContext> PlayerContexts => default;
+    public NetworkDictionary<int, PlayerRoomContext> PlayerContexts => default;
 
 
     [Networked]

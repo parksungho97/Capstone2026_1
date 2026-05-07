@@ -1,25 +1,30 @@
 using Fusion;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Idle : State
+public class NpcContext
 {
-    public Idle(NpcMove npcMove)
+    
+}
+public class NpcIdle : State<NpcContext>
+{
+    public NpcIdle(NpcMove npcMove)
     {
         this.npcMove = npcMove;
         Debug.Assert(npcMove);
     }
 
-    public override void Enter()
+    public override void Enter(NpcContext npcContext)
     {
     }
 
-    public override void Exit()
+    public override void Exit(NpcContext npcContext)
     {
     }
 
-    public override void Update()
+    public override void Update(NpcContext npcContext)
     {
         if (npcMove.IsReach())
             npcMove.SetRandomDestination();
@@ -34,10 +39,11 @@ public class BasicNPCStateManager : NetworkBehaviour
     {
         base.Spawned();
 
-        stateMachine = new StateMachine();
+        npcContext = new NpcContext();
+        stateMachine = new StateMachine<NpcContext>(npcContext);
 
         NpcMove npcMove = GetComponent<NpcMove>();
-        idle = new Idle(npcMove);
+        idle = new NpcIdle(npcMove);
 
         stateMachine.SetState(idle);
     }
@@ -49,7 +55,8 @@ public class BasicNPCStateManager : NetworkBehaviour
         stateMachine.Update();
     }
 
-    private StateMachine stateMachine;
+    private NpcContext npcContext;
+    private StateMachine<NpcContext> stateMachine;
 
-    private Idle idle;
+    private NpcIdle idle;
 }

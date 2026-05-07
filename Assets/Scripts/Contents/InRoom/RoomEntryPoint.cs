@@ -86,15 +86,15 @@ public class RoomEntryPoint : NetworkBehaviour
             startButton.gameObject.SetActive(false);
             readyButton.gameObject.SetActive(true);
         }
-        roomController.ActionPlayerContextChanged += (List<PlayerContext> redPlayers, List<PlayerContext> bluePlayers) =>
+        roomController.ActionPlayerContextChanged += (List<PlayerRoomContext> redPlayers, List<PlayerRoomContext> bluePlayers) =>
         {
             roomTeamDashboardUI.ClearAll();
-            foreach (PlayerContext redPlayerContext in redPlayers)
+            foreach (PlayerRoomContext redPlayerContext in redPlayers)
             {
                 var ui = roomTeamDashboardUI.AddRedPlayer(redPlayerContext.name.ToString());
                 ui.SetReady(redPlayerContext.bReady);
             }
-            foreach (PlayerContext bluePlayerContext in bluePlayers)
+            foreach (PlayerRoomContext bluePlayerContext in bluePlayers)
             {
                 var ui = roomTeamDashboardUI.AddBluePlayer(bluePlayerContext.name.ToString());
                 ui.SetReady(bluePlayerContext.bReady);
