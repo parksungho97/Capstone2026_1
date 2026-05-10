@@ -1,35 +1,86 @@
+using Fusion;
 using UnityEngine;
 
-public class RespawnManager : MonoBehaviour
+public class RespawnManager : NetworkBehaviour
 {
-    public RespawnArea respawnArea;
-    public LayerMask groundLayer;
-    public LayerMask obstacleLayer;
+    [Header("Respawn Points")]
+    [SerializeField] private RespawnPoint[] respawnPoints;
 
-    public float checkRadius = 1.0f;
-    public int maxTry = 30;
+    [Header("Safety Check")]
+    [SerializeField] private LayerMask obstacleLayer;
+    [SerializeField] private float checkRadius = 0.6f;
+    [SerializeField] private Vector3 checkOffset = Vector3.up * 0.5f;
 
-    public Vector3 GetSafePosition()
+    public Vector3 GetRandomSafeRespawnPosition()
     {
-        for (int i = 0; i < maxTry; i++)
+        if (respawnPoints == null || respawnPoints.Length == 0)
         {
-            Vector3 randomPos = respawnArea.GetRandomPoint();
+            Debug.LogWarning("[RespawnManager] RespawnPoint가 없습니다.");
+            return Vector3.zero;
+        }
 
-            // 1. 바닥 찾기
-            if (Physics.Raycast(randomPos, Vector3.down, out RaycastHit hit, 50f, groundLayer))
+        int startIndex = Random.Range(0, respawnPoints.Length);
+
+        for (int i = 0; i < respawnPoints.Length; i++)
+        {
+            int index = (startIndex + i) % respawnPoints.Length;
+
+            if (respawnPoints[index] == null)
+                continue;
+
+            Vector3 position = respawnPoints[index].transform.position;
+
+            if (IsSpawnPointSafe(position))
             {
-                Vector3 groundPos = hit.point;
-
-                // 2. 장애물 검사
-                if (!Physics.CheckSphere(groundPos, checkRadius, obstacleLayer))
-                {
-                    return groundPos;
-                }
+                return position;
             }
         }
 
-        // 실패 시 fallback
-        Debug.LogWarning("안전한 스폰 위치 못 찾음");
-        return respawnArea.transform.position;
+        Debug.LogWarning("[RespawnManager] 안전한 리스폰 포인트를 찾지 못했습니다. 첫 번째 포인트를 사용합니다.");
+        return respawnPoints[0].transform.position;
+    }
+
+    private bool IsSpawnPointSafe(Vector3 position)
+    {
+        Vector3 checkPosition = position + checkOffset;
+
+        bool hasObstacle = Physics.CheckSphere(
+            checkPosition,
+            checkRadius,
+            obstacleLayer
+        );
+
+        return !hasObstacle;
+    }
+
+    public void RespawnPlayer(NetworkObject playerObject)
+    {
+        if (!Object.HasStateAuthority) return;
+        if (playerObject == null) return;
+
+        Vector3 respawnPosition = GetRandomSafeRespawnPosition();
+
+        playerObject.transform.position = respawnPosition;
+
+        PlayerHealth playerHealth = playerObject.GetComponent<PlayerHealth>();
+        if (playerHealth != null)
+        {
+            playerHealth.ResetStat();
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (respawnPoints == null) return;
+
+        Gizmos.color = Color.green;
+
+        foreach (RespawnPoint point in respawnPoints)
+        {
+            if (point == null) continue;
+
+            Vector3 checkPosition = point.transform.position + checkOffset;
+            Gizmos.DrawWireSphere(checkPosition, checkRadius);
+        }
     }
 }
