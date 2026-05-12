@@ -19,17 +19,29 @@ public class HotKeyItemUI : MonoBehaviour
 
     public void Initialize()
     {
+        Debug.Log($"[HotKeyItemUI] Initialize 호출됨 / key: {keyCode}");
+
         Clear();
 
         if (keyText != null)
         {
             keyText.text = KeyCodeToDisplayText(keyCode);
         }
+        else
+        {
+            Debug.LogWarning($"[HotKeyItemUI] keyText NULL / key: {keyCode}");
+        }
 
         if (button != null)
         {
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(OnClickSlot);
+
+            Debug.Log($"[HotKeyItemUI] 버튼 연결 성공 / key: {keyCode}");
+        }
+        else
+        {
+            Debug.LogError($"[HotKeyItemUI] button NULL / key: {keyCode}");
         }
     }
 
@@ -44,6 +56,8 @@ public class HotKeyItemUI : MonoBehaviour
             itemIcon.sprite = sprite;
             itemIcon.enabled = sprite != null;
         }
+
+        Debug.Log($"[HotKeyItemUI] 아이템 설정됨 / key: {keyCode}, item: {itemName}");
     }
 
     public void Clear()
@@ -66,7 +80,16 @@ public class HotKeyItemUI : MonoBehaviour
 
     private void OnClickSlot()
     {
-        if (!hasItem) return;
+        Debug.Log($"[HotKeyItemUI] OnClickSlot 호출됨 / key: {keyCode}");
+
+        if (!hasItem)
+        {
+            Debug.LogWarning($"[HotKeyItemUI] {keyCode} 핫키에 아이템 없음");
+            return;
+        }
+
+        Debug.Log($"[HotKeyItemUI] ActionClicked Invoke 호출 / key: {keyCode}");
+
         ActionClicked?.Invoke(keyCode);
     }
 
