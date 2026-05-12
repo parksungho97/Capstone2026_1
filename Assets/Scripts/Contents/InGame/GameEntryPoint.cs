@@ -18,6 +18,8 @@ public class GameEntryPoint : NetworkBehaviour
     [SerializeField] private NetworkObject voices;
     [SerializeField] private PlayerStatUIController playerStatUIController;
     [SerializeField] private VoiceNPCStateManager voiceNPCStateManager;
+    [SerializeField] private ItemManager itemManager;
+    [SerializeField] private Inventory inventory;
 
     public override async void Spawned()
     {
@@ -59,6 +61,10 @@ public class GameEntryPoint : NetworkBehaviour
         playerStatUIController.Initialize(playerHealth);
 
         voiceNPCStateManager.AddTargetChaseState(newPlayer.gameObject);
+
+        ItemCollector itemCollector = newPlayer.GetComponentInChildren<ItemCollector>();
+        Debug.Assert(itemCollector != null, "ItemCollector가 없습니다.");
+        itemCollector.Initialize(itemManager, inventory);
     }
 }
 

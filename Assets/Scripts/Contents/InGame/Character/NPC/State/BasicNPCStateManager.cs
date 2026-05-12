@@ -22,6 +22,7 @@ public class NpcIdle : State<NpcContext>
 
     public override void Exit(NpcContext npcContext)
     {
+        npcMove.StopMove();
     }
 
     public override void Update(NpcContext npcContext)

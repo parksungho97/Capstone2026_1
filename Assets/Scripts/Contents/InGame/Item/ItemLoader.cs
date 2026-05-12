@@ -16,13 +16,4 @@ public class ItemLoader : MonoBehaviour
         itemManager.RegistItem(0, item0);
         itemUseSystem.Register(item0, new HpItemUse(10.0f));
     }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            Item item = itemManager.Get(0);
-            itemUseSystem.Use(item, gameObject);
-        }
-    }
 }

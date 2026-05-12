@@ -62,10 +62,13 @@ public class Inventory : MonoBehaviour
         return true; // 모든 수량 추가 성공
     }
 
-    // 수량 제거
-    public void UseItem(Item item, int count = 1)
+    public bool UseItem(Item item, int count = 1)
     {
         Debug.Assert(count > 0);
+
+        // 총 수량 체크
+        if (GetTotalCount(item) < count)
+            return false;
 
         int remaining = count;
 
@@ -88,7 +91,7 @@ public class Inventory : MonoBehaviour
             }
         }
 
-        Debug.Assert(remaining == 0, $"Inventory: {item.Name} 수량 부족");
+        return true;
     }
 
     public Item GetItem(int slotIndex)

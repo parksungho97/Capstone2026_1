@@ -11,11 +11,6 @@ public class VoiceClipSender : NetworkBehaviour
 
     private List<byte> _receiveBuffer = new();
 
-    public void Initialize(VoiceClipManager manager)
-    {
-        voiceClipManager = manager;
-    }
-
     public void SendVoice(float[] data)
     {
         // 샘플레이트 다운샘플 (44100 → 16000)

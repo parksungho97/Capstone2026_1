@@ -4,11 +4,20 @@ using UnityEngine;
 
 public class ItemCollector : MonoBehaviour
 {
-    [SerializeField] private ItemManager itemManager;
-    [SerializeField] private Inventory inventory;
+    public void Initialize(ItemManager itemManager, Inventory inventory)
+    {
+        this.itemManager = itemManager;
+        this.inventory = inventory;
+    }
 
     public void AcquireItemOne()
     {
+        if (itemManager == null)
+        {
+            Debug.Log("ItemCollector: ItemManager Is Null");
+            return;
+        }
+
         if (itemsInRange.Count == 0)
         {
             Debug.Log("주변에 획득 가능한 아이템이 없습니다.");
@@ -18,10 +27,12 @@ public class ItemCollector : MonoBehaviour
         int randomIndex = Random.Range(0, itemsInRange.Count);
         ItemInstance targetInstance = System.Linq.Enumerable.ElementAt(itemsInRange, randomIndex);
 
-        if (targetInstance == null) return;
+        if (targetInstance == null) 
+            return;
 
         Item itemData = itemManager.Get(targetInstance.ItemId);
-        if (itemData == null) return;
+        if (itemData == null) 
+            return;
 
         bool isAdded = inventory.AddItem(itemData, 1);
 
@@ -36,10 +47,7 @@ public class ItemCollector : MonoBehaviour
     {
         ItemInstance itemInstance = other.GetComponent<ItemInstance>();
         if (itemInstance)
-        {
             itemsInRange.Add(itemInstance);
-            AcquireItemOne();
-        }
     }
 
     public void OnTriggerExit(Collider other)
@@ -50,4 +58,7 @@ public class ItemCollector : MonoBehaviour
     }
 
     private HashSet<ItemInstance> itemsInRange = new HashSet<ItemInstance>();
+
+    private ItemManager itemManager;
+    private Inventory inventory;
 }

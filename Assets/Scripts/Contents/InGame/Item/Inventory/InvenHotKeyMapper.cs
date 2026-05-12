@@ -4,28 +4,27 @@ using UnityEngine;
 
 public class ItemHotKey : HotKeySlot
 {
-    public ItemHotKey(Item item, ItemUseSystem itemUseSystem, GameObject gameObject)
+    public ItemHotKey(Item item, ItemUser itemUser)
     {
         Name = item.Name;
         Icon = item.Icon;
         this.item = item;
-        this.itemUseSystem = itemUseSystem;
-        this.gameObject = gameObject;
+        this.itemUser = itemUser;
     }
     public override void Execute()
     {
-        //itemUseSystem.Use(item, gameObject);
+        itemUser.UseItem(item);
     }
 
     private Item item;
-    private ItemUseSystem itemUseSystem;
-    private GameObject gameObject;
+    private ItemUser itemUser;
 }
 
 public class InvenHotKeyMapper : MonoBehaviour
 {
     [SerializeField] private InventoryUIMapper inventoryUIMapper;
     [SerializeField] private HotKey hotKey;
+    [SerializeField] private ItemUser itemUser;
 
     private void Start()
     {
@@ -40,7 +39,7 @@ public class InvenHotKeyMapper : MonoBehaviour
             if(putItem != null)
             {
                 Debug.Log("HotKeyClicked");
-                ItemHotKey itemHotKey = new ItemHotKey(putItem, null, null);
+                ItemHotKey itemHotKey = new ItemHotKey(putItem, itemUser);
                 hotKey.SetSlot(hotKeyType, itemHotKey);
                 putItem = null;
             }

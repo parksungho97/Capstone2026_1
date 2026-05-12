@@ -36,6 +36,11 @@ public class NpcMove : MonoBehaviour
         navMeshAgent.SetDestination(destination);
     }
 
+    public void StopMove()
+    {
+        navMeshAgent.ResetPath();
+    }
+
     private NavMeshAgent navMeshAgent;
     public Vector3 CenterPos { get; set; }
     

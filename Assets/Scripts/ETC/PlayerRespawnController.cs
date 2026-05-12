@@ -1,47 +1,76 @@
 using System.Collections;
+using Fusion;
 using UnityEngine;
 
-public class PlayerRespawnController : MonoBehaviour
+public class PlayerRespawnController : NetworkBehaviour
 {
-    public PlayerHealth playerHealth;
-    public RespawnManager respawnManager;
+    [Header("References")]
+    [SerializeField] private PlayerHealth playerHealth;
+    [SerializeField] private RespawnManager respawnManager;
+
+    [Header("Respawn Time")]
+    [SerializeField] private float baseRespawnDelay = 12f;
+    [SerializeField] private float extraDelayPerDeath = 4f;
 
     private int deathCount = 0;
-    private float baseDelay = 12f;
-    private float extraDelay = 4f;
+    private bool isRespawning = false;
 
-    private bool isDead = false;
-
-    private void Update()
+    public override void Spawned()
     {
-        if (!isDead && playerHealth.CurrentHP <= 0)
+        ResolveReferences();
+    }
+
+    private void ResolveReferences()
+    {
+        if (playerHealth == null)
         {
-            isDead = true;
+            playerHealth = GetComponent<PlayerHealth>();
+        }
+
+        if (respawnManager == null)
+        {
+            respawnManager = FindObjectOfType<RespawnManager>();
+        }
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (!Object.HasStateAuthority)
+            return;
+
+        ResolveReferences();
+
+        if (playerHealth == null)
+            return;
+
+        if (respawnManager == null)
+            return;
+
+        if (!isRespawning && playerHealth.CurrentHP <= 0)
+        {
             StartCoroutine(RespawnRoutine());
         }
     }
-    private void Awake()
-    {
-        if (playerHealth == null)
-            playerHealth = GetComponent<PlayerHealth>();
 
-        if (respawnManager == null)
-            respawnManager = FindObjectOfType<RespawnManager>();
-    }
     private IEnumerator RespawnRoutine()
     {
-        float delay = baseDelay + deathCount * extraDelay;
+        isRespawning = true;
 
-        Debug.Log($"리스폰 대기 시간: {delay}초");
+        float respawnDelay = baseRespawnDelay + deathCount * extraDelayPerDeath;
 
-        yield return new WaitForSeconds(delay);
+        Debug.Log($"[Respawn] 리스폰 대기 시간: {respawnDelay}초");
 
-        Vector3 spawnPos = respawnManager.GetSafePosition();
+        yield return new WaitForSeconds(respawnDelay);
 
-        transform.position = spawnPos;
+        Vector3 respawnPosition = respawnManager.GetRandomSafeRespawnPosition();
+
+        transform.position = respawnPosition;
+
         playerHealth.ResetStat();
 
         deathCount++;
-        isDead = false;
+        isRespawning = false;
+
+        Debug.Log($"[Respawn] 리스폰 완료 / Death Count: {deathCount}");
     }
 }
