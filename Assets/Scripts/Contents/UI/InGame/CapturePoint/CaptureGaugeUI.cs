@@ -7,24 +7,33 @@ public enum EGuageColor : byte
     Red,
     Blue
 }
+
 public class CaptureGaugeUI : MonoBehaviour
 {
     [Header("Gauge Image")]
     [SerializeField] private Image gaugeFillImage;
 
-    private Color neutralColor = Color.white;
-    private Color redTeamColor = Color.red;
-    private Color blueTeamColor = Color.blue;
+    [Header("Team Colors")]
+
+    // 흰색에 가까운 연한 시멘트톤 + 약간 투명
+    [SerializeField] private Color neutralColor = new Color(0.93f, 0.93f, 0.93f, 0.85f);
+
+    // 부드러운 연핑크 레드톤 + 약간 투명
+    [SerializeField] private Color redTeamColor = new Color(1f, 0.72f, 0.72f, 0.9f);
+
+    // 부드러운 스카이블루톤 + 약간 투명
+    [SerializeField] private Color blueTeamColor = new Color(0.72f, 0.86f, 1f, 0.9f);
 
     /// <summary>
     /// 점령 게이지 상태 반영
-    /// progress는 0~1
     /// </summary>
     public void SetGauge(float progress, float maxProgress, EGuageColor team)
     {
-        float clampedProgress = progress / maxProgress;
-        gaugeFillImage.fillAmount = clampedProgress;
+        if (gaugeFillImage == null) return;
 
+        float clampedProgress = Mathf.Clamp01(progress / maxProgress);
+
+        gaugeFillImage.fillAmount = clampedProgress;
         gaugeFillImage.color = GetTeamColor(team);
     }
 
@@ -48,6 +57,9 @@ public class CaptureGaugeUI : MonoBehaviour
         gaugeFillImage.color = GetTeamColor(team);
     }
 
+    /// <summary>
+    /// 팀별 색상 반환
+    /// </summary>
     private Color GetTeamColor(EGuageColor team)
     {
         switch (team)

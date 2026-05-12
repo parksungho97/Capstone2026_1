@@ -3306,6 +3306,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7254987557504505902}
   - component: {fileID: 2808308212810100433}
+  - component: {fileID: 5828788713266073880}
   m_Layer: 5
   m_Name: StatBars
   m_TagString: Untagged
@@ -3349,6 +3350,21 @@ MonoBehaviour:
   playerHealth: {fileID: 0}
   hpVisibleUI: {fileID: 1216496375000193404}
   armorVisibleUI: {fileID: 1158350190951223465}
+--- !u!114 &5828788713266073880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5024059815153670208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8db5bb8bd2d3014980890e428fd7f22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerHealth: {fileID: 0}
+  hpVisibleUI: {fileID: 6274204808516268281}
+  armorVisibleUI: {fileID: 837586396783520537}
 --- !u!1 &5052088172431591679
 GameObject:
   m_ObjectHideFlags: 0
@@ -4000,6 +4016,7 @@ GameObject:
   - component: {fileID: 6854557074037810805}
   - component: {fileID: 3640017715014396366}
   - component: {fileID: 1216496375000193404}
+  - component: {fileID: 6274204808516268281}
   m_Layer: 5
   m_Name: HPBar_BG
   m_TagString: Untagged
@@ -4066,6 +4083,22 @@ MonoBehaviour:
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 0.5
 --- !u!114 &1216496375000193404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5578311764920825195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb8517bd5e227ce4c9639c24f1771e9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fillImage: {fileID: 5766674406611514861}
+  offStateTargets: []
+  onColor: {r: 1, g: 0, b: 0, a: 1}
+  offColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+--- !u!114 &6274204808516268281
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6396,6 +6429,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gaugeFillImage: {fileID: 9063058389840014803}
+  neutralColor: {r: 0.93, g: 0.93, b: 0.93, a: 0.85}
+  redTeamColor: {r: 1, g: 0.72, b: 0.72, a: 0.9}
+  blueTeamColor: {r: 0.72, g: 0.86, b: 1, a: 0.9}
 --- !u!1 &7588469833042245286
 GameObject:
   m_ObjectHideFlags: 0
@@ -6487,6 +6523,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gaugeFillImage: {fileID: 7182323612929344752}
+  neutralColor: {r: 0.93, g: 0.93, b: 0.93, a: 0.85}
+  redTeamColor: {r: 1, g: 0.72, b: 0.72, a: 0.9}
+  blueTeamColor: {r: 0.72, g: 0.86, b: 1, a: 0.9}
 --- !u!1 &7675991832800050173
 GameObject:
   m_ObjectHideFlags: 0
@@ -6866,6 +6905,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gaugeFillImage: {fileID: 1030424846735470782}
+  neutralColor: {r: 0.93, g: 0.93, b: 0.93, a: 0.85}
+  redTeamColor: {r: 1, g: 0.72, b: 0.72, a: 0.9}
+  blueTeamColor: {r: 0.72, g: 0.86, b: 1, a: 0.9}
 --- !u!1 &8138634256334515948
 GameObject:
   m_ObjectHideFlags: 0
@@ -7091,6 +7133,7 @@ GameObject:
   - component: {fileID: 9207901167003602211}
   - component: {fileID: 1073763828988143019}
   - component: {fileID: 1158350190951223465}
+  - component: {fileID: 837586396783520537}
   m_Layer: 5
   m_Name: ArmorBar_BG
   m_TagString: Untagged
@@ -7157,6 +7200,22 @@ MonoBehaviour:
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 0.5
 --- !u!114 &1158350190951223465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8259811144843700329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb8517bd5e227ce4c9639c24f1771e9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fillImage: {fileID: 1938050737326735549}
+  offStateTargets: []
+  onColor: {r: 0, g: 0, b: 1, a: 1}
+  offColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+--- !u!114 &837586396783520537
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
