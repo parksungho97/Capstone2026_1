@@ -19,8 +19,6 @@ public class HotKeyItemUI : MonoBehaviour
 
     public void Initialize()
     {
-        Debug.Log($"[HotKeyItemUI] Initialize 호출됨 / key: {keyCode}");
-
         Clear();
 
         if (keyText != null)
@@ -36,8 +34,6 @@ public class HotKeyItemUI : MonoBehaviour
         {
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(OnClickSlot);
-
-            Debug.Log($"[HotKeyItemUI] 버튼 연결 성공 / key: {keyCode}");
         }
         else
         {
@@ -80,16 +76,6 @@ public class HotKeyItemUI : MonoBehaviour
 
     private void OnClickSlot()
     {
-        Debug.Log($"[HotKeyItemUI] OnClickSlot 호출됨 / key: {keyCode}");
-
-        if (!hasItem)
-        {
-            Debug.LogWarning($"[HotKeyItemUI] {keyCode} 핫키에 아이템 없음");
-            return;
-        }
-
-        Debug.Log($"[HotKeyItemUI] ActionClicked Invoke 호출 / key: {keyCode}");
-
         ActionClicked?.Invoke(keyCode);
     }
 

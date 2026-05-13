@@ -10,8 +10,6 @@ public class HotKeyUI : MonoBehaviour
 
     public void Initialize(int keyCount, KeyCode[] keyCodes)
     {
-        Debug.Log($"[HotKeyUI] Initialize 호출됨 / 리스트 수: {hotKeyItemUIList.Count}");
-
         for (int i = 0; i < hotKeyItemUIList.Count; i++)
         {
             if (hotKeyItemUIList[i] == null)
@@ -23,8 +21,6 @@ public class HotKeyUI : MonoBehaviour
             hotKeyItemUIList[i].Initialize();
             hotKeyItemUIList[i].ActionClicked -= OnClickHotKey;
             hotKeyItemUIList[i].ActionClicked += OnClickHotKey;
-
-            Debug.Log($"[HotKeyUI] 핫키 슬롯 초기화 완료 / index: {i}, key: {hotKeyItemUIList[i].GetKeyCode()}");
         }
     }
 
@@ -73,13 +69,6 @@ public class HotKeyUI : MonoBehaviour
 
     private void OnClickHotKey(KeyCode keyCode)
     {
-        Debug.Log($"[HotKeyUI] 핫키 클릭 전달됨 / key: {keyCode}");
-
-        if (ActionHotKeyClicked == null)
-        {
-            Debug.LogWarning("[HotKeyUI] ActionHotKeyClicked 구독자 없음");
-        }
-
         ActionHotKeyClicked?.Invoke(keyCode);
     }
 }

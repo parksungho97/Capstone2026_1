@@ -15,7 +15,7 @@ public class Inventory : MonoBehaviour
     private SlotItemMapping[] _mappings;
 
     public event Action<int, Item, int> OnSlotUpdate; // slotIndex, item, count
-    public event Action<int> OnSlotRemove; // slotIndex
+    public event Action<int, Item> OnSlotRemove; // slotIndex
 
     private void Start()
     {
@@ -83,7 +83,7 @@ public class Inventory : MonoBehaviour
             {
                 _slotManager.RemoveSlot(i);
                 _mappings[i] = default;
-                OnSlotRemove?.Invoke(i);
+                OnSlotRemove?.Invoke(i, item);
             }
             else
             {

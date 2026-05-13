@@ -57,6 +57,12 @@ public class ItemCollector : MonoBehaviour
             itemsInRange.Remove(itemInstance);
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+            AcquireItemOne();
+    }
+
     private HashSet<ItemInstance> itemsInRange = new HashSet<ItemInstance>();
 
     private ItemManager itemManager;

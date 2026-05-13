@@ -11,7 +11,7 @@ public abstract class HotKeySlot
 
 public enum EHotKeyType : byte
 {
-    K1, K2, K3, K4
+    K1, K2, K3, K4, Error
 }
 
 public class HotKey : MonoBehaviour
@@ -48,8 +48,18 @@ public class HotKey : MonoBehaviour
         for (KeyCode keyCode = KeyCode.Alpha1; keyCode < KeyCode.Alpha4; ++keyCode)
         {
             if (Input.GetKeyDown(keyCode))
-                hotKeySlots[keyCode - KeyCode.Alpha1].Execute();
+                hotKeySlots[keyCode - KeyCode.Alpha1]?.Execute();
         }
+    }
+
+    public void SwapSlot(EHotKeyType typeA, EHotKeyType typeB)
+    {
+        HotKeySlot temp = hotKeySlots[(int)typeA];
+        hotKeySlots[(int)typeA] = hotKeySlots[(int)typeB];
+        hotKeySlots[(int)typeB] = temp;
+
+        SetSlot(typeA, hotKeySlots[(int)typeA]);
+        SetSlot(typeB, hotKeySlots[(int)typeB]);
     }
 
     private HotKeySlot[] hotKeySlots = new HotKeySlot[4];

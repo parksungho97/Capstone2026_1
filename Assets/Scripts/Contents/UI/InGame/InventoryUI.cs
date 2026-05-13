@@ -8,6 +8,7 @@ public class InventoryUI : MonoBehaviour
     [SerializeField] private List<InventoryItemUI> slotUIList = new List<InventoryItemUI>();
 
     public Action<int> ActionSlotClicked;
+    public Action ActionDisabled;
 
     private void Awake()
     {
@@ -17,6 +18,11 @@ public class InventoryUI : MonoBehaviour
             slotUIList[i].Initialize(index);
             slotUIList[i].ActionClicked += OnClickSlot;
         }
+    }
+
+    private void OnDisable()
+    {
+        ActionDisabled?.Invoke();
     }
 
     public int AddItemUI(string name, Sprite sprite, int count)
@@ -67,5 +73,30 @@ public class InventoryUI : MonoBehaviour
         }
 
         return true;
+    }
+
+    public void SwapItemUI(int indexA, int indexB)
+    {
+        if (!IsValidIndex(indexA) || !IsValidIndex(indexB)) return;
+
+        // 데이터 임시 저장
+        (string name, Sprite sprite, int count, bool hasItem) tempA = (
+            slotUIList[indexA].GetItemName(),
+            slotUIList[indexA].GetItemSprite(),
+            slotUIList[indexA].GetItemCount(),
+            slotUIList[indexA].HasItem()
+        );
+
+        // A → B
+        if (slotUIList[indexB].HasItem())
+            slotUIList[indexA].SetItem(slotUIList[indexB].GetItemName(), slotUIList[indexB].GetItemSprite(), slotUIList[indexB].GetItemCount());
+        else
+            slotUIList[indexA].Clear();
+
+        // B → A
+        if (tempA.hasItem)
+            slotUIList[indexB].SetItem(tempA.name, tempA.sprite, tempA.count);
+        else
+            slotUIList[indexB].Clear();
     }
 }

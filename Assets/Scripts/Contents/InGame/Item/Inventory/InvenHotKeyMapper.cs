@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 public class ItemHotKey : HotKeySlot
 {
@@ -28,10 +29,25 @@ public class InvenHotKeyMapper : MonoBehaviour
 
     private void Start()
     {
-        inventoryUIMapper.ActionItemClicked += (Item item) =>
+        inventoryUIMapper.LinkedInventoryUI.ActionDisabled += Clear;
+
+        inventoryUIMapper.LinkedInventoryUI.ActionSlotClicked += (int uiSlot) =>
         {
-            Debug.Log("ItemClicked");
-            putItem = item;
+            Item item = null;
+            int slotIndex = -1;
+
+            inventoryUIMapper.TryGetMappingItemSlot(uiSlot, out item, out slotIndex);
+
+            if (putItem != null)
+            {
+                inventoryUIMapper.SwapSlot(putUISlot, uiSlot);
+                Clear();
+            }
+            else
+            {
+                putItem = item;
+                putUISlot = uiSlot;
+            }
         };
 
         hotKey.ActionHotKeyClick += (EHotKeyType hotKeyType) =>
@@ -41,14 +57,44 @@ public class InvenHotKeyMapper : MonoBehaviour
                 Debug.Log("HotKeyClicked");
                 ItemHotKey itemHotKey = new ItemHotKey(putItem, itemUser);
                 hotKey.SetSlot(hotKeyType, itemHotKey);
-                putItem = null;
+
+                itemHotKeyMappings.Add(putItem, hotKeyType);
+                Clear();
+            }
+            else
+            {
+                if (prevHotKeyType == EHotKeyType.Error)
+                    prevHotKeyType = hotKeyType;
+                else
+                {
+                    hotKey.SwapSlot(prevHotKeyType, hotKeyType);
+                    Clear();
+                }
+            }
+        };
+
+        inventoryUIMapper.LinkedInventory.OnSlotRemove += (int slotIndex, Item item) =>
+        {
+            if (itemHotKeyMappings.TryGetValue(item, out EHotKeyType hotKeyType))
+            {
+                hotKey.SetSlot(hotKeyType, null);
+                itemHotKeyMappings.Remove(item);
             }
         };
     }
 
-    private void Update()
+    private void Clear()
     {
+        putItem = null;
+        putUISlot = -1;
+        prevHotKeyType = EHotKeyType.Error;
     }
 
     private Item putItem = null;
+    private int putUISlot = -1;
+
+    private EHotKeyType prevHotKeyType = EHotKeyType.Error;
+
+    private Dictionary<Item, EHotKeyType> itemHotKeyMappings = new();
+
 }

@@ -6,7 +6,6 @@ public class PlayerIdle : State<PlayerContext>
     public override void Enter(PlayerContext context)
     {
         // 기본 애니메이션 재생
-        Debug.Log("Idle");
         context.Animator.SetBool("IsMove", false);
     }
 
@@ -23,7 +22,6 @@ public class PlayerWalk : State<PlayerContext>
 {
     public override void Enter(PlayerContext context)
     {
-        Debug.Log("Walk");
         context.Animator.SetBool("IsMove", true);
     }
 
@@ -41,7 +39,6 @@ public class PlayerInteract : State<PlayerContext>
 {
     public override void Enter(PlayerContext context)
     {
-        Debug.Log("Interact");
         context.Animator.SetBool("IsMove", false);
         context.PlayerMovement.SetMovePossible(false);
     }
