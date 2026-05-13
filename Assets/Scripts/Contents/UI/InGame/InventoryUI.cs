@@ -15,7 +15,15 @@ public class InventoryUI : MonoBehaviour
         for (int i = 0; i < slotUIList.Count; i++)
         {
             int index = i;
+
+            if (slotUIList[i] == null)
+            {
+                Debug.LogWarning($"[InventoryUI] slotUIList[{i}]가 비어있습니다.");
+                continue;
+            }
+
             slotUIList[i].Initialize(index);
+            slotUIList[i].ActionClicked -= OnClickSlot;
             slotUIList[i].ActionClicked += OnClickSlot;
         }
     }
@@ -42,12 +50,14 @@ public class InventoryUI : MonoBehaviour
     public void UpdateItemUI(int index, string name, Sprite sprite, int count)
     {
         if (!IsValidIndex(index)) return;
+
         slotUIList[index].UpdateItem(name, sprite, count);
     }
 
     public void RemoveItem(int index)
     {
         if (!IsValidIndex(index)) return;
+
         slotUIList[index].Clear();
     }
 
@@ -57,6 +67,39 @@ public class InventoryUI : MonoBehaviour
             rootObject.SetActive(visible);
         else
             gameObject.SetActive(visible);
+
+        if (visible)
+        {
+            RefreshAllSlots();
+        }
+    }
+
+    /// <summary>
+    /// 현재 slotUIList가 가지고 있는 데이터를 기준으로 UI를 다시 반영
+    /// </summary>
+    public void RefreshAllSlots()
+    {
+        for (int i = 0; i < slotUIList.Count; i++)
+        {
+            if (!IsValidIndex(i)) continue;
+
+            InventoryItemUI slot = slotUIList[i];
+
+            if (slot.HasItem())
+            {
+                slot.SetItem(
+                    slot.GetItemName(),
+                    slot.GetItemSprite(),
+                    slot.GetItemCount()
+                );
+            }
+            else
+            {
+                slot.Clear();
+            }
+        }
+
+        Debug.Log("[InventoryUI] 전체 슬롯 UI 갱신 완료");
     }
 
     private void OnClickSlot(int index)
@@ -72,6 +115,12 @@ public class InventoryUI : MonoBehaviour
             return false;
         }
 
+        if (slotUIList[index] == null)
+        {
+            Debug.LogWarning($"[InventoryUI] slotUIList[{index}]가 비어있습니다.");
+            return false;
+        }
+
         return true;
     }
 
@@ -79,7 +128,6 @@ public class InventoryUI : MonoBehaviour
     {
         if (!IsValidIndex(indexA) || !IsValidIndex(indexB)) return;
 
-        // 데이터 임시 저장
         (string name, Sprite sprite, int count, bool hasItem) tempA = (
             slotUIList[indexA].GetItemName(),
             slotUIList[indexA].GetItemSprite(),
@@ -87,16 +135,28 @@ public class InventoryUI : MonoBehaviour
             slotUIList[indexA].HasItem()
         );
 
-        // A → B
         if (slotUIList[indexB].HasItem())
-            slotUIList[indexA].SetItem(slotUIList[indexB].GetItemName(), slotUIList[indexB].GetItemSprite(), slotUIList[indexB].GetItemCount());
+        {
+            slotUIList[indexA].SetItem(
+                slotUIList[indexB].GetItemName(),
+                slotUIList[indexB].GetItemSprite(),
+                slotUIList[indexB].GetItemCount()
+            );
+        }
         else
+        {
             slotUIList[indexA].Clear();
+        }
 
-        // B → A
         if (tempA.hasItem)
+        {
             slotUIList[indexB].SetItem(tempA.name, tempA.sprite, tempA.count);
+        }
         else
+        {
             slotUIList[indexB].Clear();
+        }
+
+        RefreshAllSlots();
     }
 }
