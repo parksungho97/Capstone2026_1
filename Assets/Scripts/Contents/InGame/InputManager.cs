@@ -12,12 +12,14 @@ public enum EInputButton
     D = 3,
     Space = 4,
     I = 5,
+    Q = 6,
+    Attack = 7,
     End,
 }
 
 public struct NetworkInputData : INetworkInput
 {
-    public NetworkButtons buttons; // 점프, 공격 등 버튼 상태 저장용
+    public NetworkButtons buttons;
     public Vector3 mousePosition;
 }
 
@@ -27,8 +29,8 @@ public class InputManager : NetworkBehaviour, INetworkRunnerCallbacks
     {
         base.Spawned();
         Runner.AddCallbacks(this);
-
     }
+
     void INetworkRunnerCallbacks.OnInput(NetworkRunner runner, NetworkInput input)
     {
         var data = new NetworkInputData();
@@ -45,97 +47,32 @@ public class InputManager : NetworkBehaviour, INetworkRunnerCallbacks
             data.buttons.Set(EInputButton.Space, true);
         if (Input.GetKey(KeyCode.I))
             data.buttons.Set(EInputButton.I, true);
+        if (Input.GetKey(KeyCode.Q))
+            data.buttons.Set(EInputButton.Q, true);
+        if (Input.GetMouseButton(0))
+            data.buttons.Set(EInputButton.Attack, true);
+
         data.mousePosition = Input.mousePosition;
 
-        input.Set(data); // Fusion 시스템에 입력을 전달!
-
-    }
-    void INetworkRunnerCallbacks.OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
-    {
+        input.Set(data);
     }
 
-    void INetworkRunnerCallbacks.OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
-    {
-
-    }
-
-    void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
-    {
-
-    }
-
-    void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player)
-    {
-
-    }
-
-    void INetworkRunnerCallbacks.OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
-    {
-
-    }
-
-    void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
-    {
-
-    }
-
-    void INetworkRunnerCallbacks.OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
-    {
-
-    }
-
-    void INetworkRunnerCallbacks.OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
-    {
-
-    }
-
-    void INetworkRunnerCallbacks.OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
-    {
-
-    }
-
-    void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data)
-    {
-
-    }
-
-    void INetworkRunnerCallbacks.OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
-    {
-
-    }
-
-    void INetworkRunnerCallbacks.OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
-    {
-
-    }
-
-    void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner)
-    {
-
-    }
-
-    void INetworkRunnerCallbacks.OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
-    {
-
-    }
-
-    void INetworkRunnerCallbacks.OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
-    {
-
-    }
-
-    void INetworkRunnerCallbacks.OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
-    {
-
-    }
-
-    void INetworkRunnerCallbacks.OnSceneLoadDone(NetworkRunner runner)
-    {
-
-    }
-
-    void INetworkRunnerCallbacks.OnSceneLoadStart(NetworkRunner runner)
-    {
-
-    }
+    void INetworkRunnerCallbacks.OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
+    void INetworkRunnerCallbacks.OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
+    void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
+    void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
+    void INetworkRunnerCallbacks.OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
+    void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
+    void INetworkRunnerCallbacks.OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
+    void INetworkRunnerCallbacks.OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
+    void INetworkRunnerCallbacks.OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
+    void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
+    void INetworkRunnerCallbacks.OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
+    void INetworkRunnerCallbacks.OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
+    void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) { }
+    void INetworkRunnerCallbacks.OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
+    void INetworkRunnerCallbacks.OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
+    void INetworkRunnerCallbacks.OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
+    void INetworkRunnerCallbacks.OnSceneLoadDone(NetworkRunner runner) { }
+    void INetworkRunnerCallbacks.OnSceneLoadStart(NetworkRunner runner) { }
 }

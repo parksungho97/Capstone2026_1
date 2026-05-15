@@ -11,9 +11,11 @@ public class PlayerController : NetworkBehaviour
         move = player.GetComponent<PlayerMovement>();
         Debug.Assert(move);
 
-
         captureInteractor = player.GetComponent<CaptureInteractor>();
         Debug.Assert(captureInteractor);
+
+        animationState = player.GetComponent<PlayerAnimationState>();
+        Debug.Assert(animationState);
     }
 
     public override void Spawned()
@@ -30,6 +32,8 @@ public class PlayerController : NetworkBehaviour
             return;
 
         Vector3 moveDegree = Vector3.zero;
+        bool bMove = false;
+
         if (GetInput<NetworkInputData>(out NetworkInputData data))
         {
             if (data.buttons.IsSet(EInputButton.W))
@@ -41,9 +45,26 @@ public class PlayerController : NetworkBehaviour
             if (data.buttons.IsSet(EInputButton.D))
                 moveDegree += new Vector3(1f, 0.0f, 0.0f);
 
-            moveDegree = moveDegree * Runner.DeltaTime;
-            move.Move(moveDegree);
+            bool blockMoveAndRotate =
+                animationState.IsAttacking &&
+                animationState.CurrentWeapon != 1;
 
+            animationState.SetMoveDirection(
+                !blockMoveAndRotate && moveDegree.sqrMagnitude > 0.0001f
+                    ? moveDegree.normalized
+                    : Vector3.zero
+            );
+
+            if (!blockMoveAndRotate)
+            {
+                moveDegree = moveDegree * Runner.DeltaTime;
+                move.Move(moveDegree);
+                bMove = true;
+            }
+            else
+            {
+                bMove = false;
+            }
 
             EPlayerTeam playerTeam = TeamInfo.Instance.GetTeam(Runner.LocalPlayer.PlayerId);
             ERequestType requestType = playerTeam == EPlayerTeam.Red ? ERequestType.Red : ERequestType.Blue;
@@ -52,12 +73,21 @@ public class PlayerController : NetworkBehaviour
             {
                 captureInteractor.TryStartActivateCapturePoint(requestType);
             }
+
             if (data.buttons.WasReleased(previousButtons, EInputButton.Space))
             {
                 captureInteractor.TryStopActivateCapturePoint(requestType);
             }
 
-            previousButtons = data.buttons;
+            if (data.buttons.WasPressed(previousButtons, EInputButton.Q))
+            {
+                animationState.NextWeapon();
+            }
+
+            if (data.buttons.WasPressed(previousButtons, EInputButton.Attack))
+            {
+                animationState.StartAttack(Runner);
+            }
 
             if (cameraController.GetMouseWorldPosition(data.mousePosition, out Vector3 mouseWorldPosition))
             {
@@ -65,11 +95,21 @@ public class PlayerController : NetworkBehaviour
                 lookDir.y = 0f;
 
                 if (lookDir.sqrMagnitude > 0.0001f)
-                    move.RotateTo(lookDir.normalized, Runner.DeltaTime);
+                {
+                    Vector3 aimDir = lookDir.normalized;
+                    animationState.SetAimDirection(aimDir);
+
+                    if (!blockMoveAndRotate)
+                    {
+                        move.RotateTo(aimDir, Runner.DeltaTime);
+                    }
+                }
             }
+
+            previousButtons = data.buttons;
         }
 
-        if (moveDegree == Vector3.zero)
+        if (!bMove)
             move.MoveEnd();
     }
 
@@ -77,6 +117,7 @@ public class PlayerController : NetworkBehaviour
     private PlayerMovement move;
     private CameraController cameraController;
     private CaptureInteractor captureInteractor;
+    private PlayerAnimationState animationState;
 
     [Networked] private NetworkButtons previousButtons { get; set; }
 }
