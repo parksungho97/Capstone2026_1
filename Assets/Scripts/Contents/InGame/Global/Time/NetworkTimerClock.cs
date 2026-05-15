@@ -3,10 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class NetworkTimerClockUI : NetworkBehaviour
+public class NetworkTimerClock : NetworkBehaviour
 {
-
-
     [Header("Default Setting")]
     [SerializeField] private float defaultDurationSeconds = 60f;
 
@@ -18,7 +16,21 @@ public class NetworkTimerClockUI : NetworkBehaviour
     [Networked] public float TotalDurationSeconds { get; private set; }
     [Networked] public NetworkBool IsRunning { get; private set; }
 
+    public override void FixedUpdateNetwork()
+    {
+        // 상태 권한(서버/호스트)이 있는 쪽에서만 만료 체크
+        if (Object.HasStateAuthority && IsRunning)
+        {
+            if (IsExpired())
+            {
+                IsRunning = false;
+                Timer = TickTimer.None;
 
+                Debug.Log("타이머 종료! 다음 로직 실행");
+                // RPC 호출이나 다음 게임 상태로 전환
+            }
+        }
+    }
     /*
      사용방법.
     * Spawned() 이후에 접근하는 게 안전함
@@ -38,7 +50,6 @@ public class NetworkTimerClockUI : NetworkBehaviour
             Timer = TickTimer.None;
             IsRunning = false;
         }
-  
     }
 
 
@@ -159,9 +170,4 @@ public class NetworkTimerClockUI : NetworkBehaviour
         if (Runner == null || !Runner.IsRunning) return false;
         return Timer.Expired(Runner);
     }
-
-
-
-
-
 }
