@@ -21,6 +21,9 @@ public class GameEntryPoint : NetworkBehaviour
     [SerializeField] private ItemManager itemManager;
     [SerializeField] private Inventory inventory;
 
+    [Header("Spawn")]
+    [SerializeField] private PlayerSpawnPointManager spawnPointManager;
+
     public override async void Spawned()
     {
         base.Spawned();
@@ -34,6 +37,7 @@ public class GameEntryPoint : NetworkBehaviour
         Debug.Assert(viewContext);
         Debug.Assert(playerStatUIController);
         Debug.Assert(voiceNPCStateManager);
+        Debug.Assert(spawnPointManager);
 
         gameMode.Initialize(capturePointManager);
         gameMode.ActionGameEnded += (EResultType resultType) =>
@@ -41,15 +45,18 @@ public class GameEntryPoint : NetworkBehaviour
             Debug.Log($"Game Ended! Result: {resultType}");
         };
 
-        var newPlayer = await Runner.SpawnAsync(player, position: Vector3.zero,
-            rotation: Quaternion.identity,
+        Transform spawnPoint = spawnPointManager.GetRandomSpawnPoint();
+
+        var newPlayer = await Runner.SpawnAsync(player, position: spawnPoint.position,
+            rotation: spawnPoint.rotation,
             inputAuthority: Runner.LocalPlayer);
 
         cameraController.SetTarget(newPlayer.transform);
 
-        var newPlayerController = await Runner.SpawnAsync(playerController, position: Vector3.zero,
-            rotation: Quaternion.identity,
+        var newPlayerController = await Runner.SpawnAsync(playerController, position: spawnPoint.position,
+            rotation: spawnPoint.rotation,
             inputAuthority: Runner.LocalPlayer);
+
         newPlayerController.GetComponent<PlayerController>().Initalize(newPlayer.gameObject, cameraController);
 
         AudioListener audioListener = newPlayer.AddComponent<AudioListener>();
@@ -67,4 +74,3 @@ public class GameEntryPoint : NetworkBehaviour
         itemCollector.Initialize(itemManager, inventory);
     }
 }
-
