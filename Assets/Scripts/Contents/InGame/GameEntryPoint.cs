@@ -2,8 +2,10 @@ using Fusion;
 using Network;
 using Photon.Voice.Fusion;
 using Photon.Voice.Unity;
+using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
+using static Unity.Collections.AllocatorManager;
 
 public class GameEntryPoint : NetworkBehaviour
 {
@@ -23,6 +25,8 @@ public class GameEntryPoint : NetworkBehaviour
 
     [Header("Spawn")]
     [SerializeField] private PlayerSpawnPointManager spawnPointManager;
+    [SerializeField] private NetworkTimerClock timer;
+    [SerializeField] private float minute = 15;
 
     public override async void Spawned()
     {
@@ -39,7 +43,7 @@ public class GameEntryPoint : NetworkBehaviour
         Debug.Assert(voiceNPCStateManager);
         Debug.Assert(spawnPointManager);
 
-        gameMode.Initialize(capturePointManager);
+        gameMode.Initialize(capturePointManager, timer);
         gameMode.ActionGameEnded += (EResultType resultType) =>
         {
             Debug.Log($"Game Ended! Result: {resultType}");
@@ -63,7 +67,7 @@ public class GameEntryPoint : NetworkBehaviour
         audioListener.enabled = true;
 
         viewContext.Initalize(newPlayer.gameObject);
-        
+
         PlayerHealth playerHealth = newPlayer.GetComponent<PlayerHealth>();
         playerStatUIController.Initialize(playerHealth);
 
@@ -72,5 +76,27 @@ public class GameEntryPoint : NetworkBehaviour
         ItemCollector itemCollector = newPlayer.GetComponentInChildren<ItemCollector>();
         Debug.Assert(itemCollector != null, "ItemCollector가 없습니다.");
         itemCollector.Initialize(itemManager, inventory);
+
+        if (Object.HasStateAuthority)
+            StartCoroutine(WaitAndStartTimer());
+    }
+
+    private IEnumerator WaitAndStartTimer()
+    {
+        if (timer == null)
+        {
+            Debug.LogError("Timer 레퍼런스가 인스펙터에 할당되지 않았습니다!");
+            yield break;
+        }
+
+        while (!timer.Object || !timer.Object.IsValid)
+        {
+            yield return null;
+        }
+
+        // 3. 아주 짧은 프레임 대기 (Fusion의 내부 상태 전파를 위해)
+        yield return new WaitForSeconds(0.1f);
+
+        timer.SetMinutes(minute);
     }
 }
