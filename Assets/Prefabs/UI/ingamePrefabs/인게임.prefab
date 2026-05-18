@@ -3311,6 +3311,7 @@ GameObject:
   - component: {fileID: 9060215553793970178}
   - component: {fileID: 2836475011108795687}
   - component: {fileID: 2227789167925272840}
+  - component: {fileID: 8201617055070143147}
   m_Layer: 5
   m_Name: StatBars
   m_TagString: Untagged
@@ -3429,6 +3430,21 @@ MonoBehaviour:
   playerHealth: {fileID: 0}
   hpVisibleUI: {fileID: 1175850294013210737}
   armorVisibleUI: {fileID: 36145673111582005}
+--- !u!114 &8201617055070143147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5024059815153670208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8db5bb8bd2d3014980890e428fd7f22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerHealth: {fileID: 0}
+  hpVisibleUI: {fileID: 6840425590183724041}
+  armorVisibleUI: {fileID: 8768887067143370068}
 --- !u!1 &5052088172431591679
 GameObject:
   m_ObjectHideFlags: 0
@@ -4085,6 +4101,7 @@ GameObject:
   - component: {fileID: 1980523877330528641}
   - component: {fileID: 7119966775141197158}
   - component: {fileID: 1175850294013210737}
+  - component: {fileID: 6840425590183724041}
   m_Layer: 5
   m_Name: HPBar_BG
   m_TagString: Untagged
@@ -4231,6 +4248,22 @@ MonoBehaviour:
   onColor: {r: 1, g: 0, b: 0, a: 1}
   offColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
 --- !u!114 &1175850294013210737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5578311764920825195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb8517bd5e227ce4c9639c24f1771e9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fillImage: {fileID: 5766674406611514861}
+  offStateTargets: []
+  onColor: {r: 1, g: 0, b: 0, a: 1}
+  offColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+--- !u!114 &6840425590183724041
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -7282,6 +7315,7 @@ GameObject:
   - component: {fileID: 4504799909274800052}
   - component: {fileID: 4808455570715284960}
   - component: {fileID: 36145673111582005}
+  - component: {fileID: 8768887067143370068}
   m_Layer: 5
   m_Name: ArmorBar_BG
   m_TagString: Untagged
@@ -7428,6 +7462,22 @@ MonoBehaviour:
   onColor: {r: 0, g: 0, b: 1, a: 1}
   offColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
 --- !u!114 &36145673111582005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8259811144843700329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb8517bd5e227ce4c9639c24f1771e9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fillImage: {fileID: 1938050737326735549}
+  offStateTargets: []
+  onColor: {r: 0, g: 0, b: 1, a: 1}
+  offColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+--- !u!114 &8768887067143370068
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
