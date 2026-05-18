@@ -11,8 +11,10 @@ public class PlayerController : NetworkBehaviour
         move = player.GetComponent<PlayerMovement>();
         Debug.Assert(move);
 
-        captureInteractor = player.GetComponent<CaptureInteractor>();
+        captureInteractor = player.GetComponent<CapturePointInteracter>();
         Debug.Assert(captureInteractor);
+        EPlayerTeam playerTeam = TeamInfo.Instance.GetTeam(Runner.LocalPlayer.PlayerId);
+        captureInteractor.SetTeam(playerTeam == EPlayerTeam.Red ? ECaptureState.Red : ECaptureState.Blue);
 
         animationState = player.GetComponent<PlayerAnimationState>();
         Debug.Assert(animationState);
@@ -66,18 +68,11 @@ public class PlayerController : NetworkBehaviour
                 bMove = false;
             }
 
-            EPlayerTeam playerTeam = TeamInfo.Instance.GetTeam(Runner.LocalPlayer.PlayerId);
-            ERequestType requestType = playerTeam == EPlayerTeam.Red ? ERequestType.Red : ERequestType.Blue;
-
             if (data.buttons.WasPressed(previousButtons, EInputButton.Space))
-            {
-                captureInteractor.TryStartActivateCapturePoint(requestType);
-            }
+                captureInteractor.TryStartCapture();
 
             if (data.buttons.WasReleased(previousButtons, EInputButton.Space))
-            {
-                captureInteractor.TryStopActivateCapturePoint(requestType);
-            }
+                captureInteractor.TryStopCapture();
 
             if (data.buttons.WasPressed(previousButtons, EInputButton.Q))
             {
@@ -116,7 +111,7 @@ public class PlayerController : NetworkBehaviour
     private GameObject player;
     private PlayerMovement move;
     private CameraController cameraController;
-    private CaptureInteractor captureInteractor;
+    private CapturePointInteracter captureInteractor;
     private PlayerAnimationState animationState;
 
     [Networked] private NetworkButtons previousButtons { get; set; }

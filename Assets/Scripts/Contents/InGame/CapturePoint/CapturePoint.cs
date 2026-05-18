@@ -19,8 +19,8 @@ public class CapturePoint : NetworkBehaviour
     {
         Debug.Assert(captureState != ECaptureState.None);
         mState = captureState;
-    }
 
+    }
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void ClearStateRpc()
     {

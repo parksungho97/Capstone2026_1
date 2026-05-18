@@ -21,7 +21,7 @@ public class PlayerStateManager : MonoBehaviour
     {
         Animator animator = GetComponent<Animator>();
         PlayerMovement playerMovement = GetComponent<PlayerMovement>();
-        CaptureInteractor captureInteractor = GetComponent<CaptureInteractor>();
+        CapturePointInteracter captureInteractor = GetComponent<CapturePointInteracter>();
         Debug.Assert(animator);
         Debug.Assert(playerMovement);
         Debug.Assert(captureInteractor);

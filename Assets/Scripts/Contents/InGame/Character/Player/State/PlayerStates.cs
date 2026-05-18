@@ -72,16 +72,16 @@ public class IsWalk : StateTransition
 
 public class IsInteract : StateTransition
 {
-    public IsInteract(CaptureInteractor captureInteractor, bool bCompareValue)
+    public IsInteract(CapturePointInteracter captureInteracter, bool bCompareValue)
     {
-        this.captureInteractor = captureInteractor;
+        this.captureInteracter = captureInteracter;
         this.bCompareValue = bCompareValue;
     }
     public override bool ShouldTransition()
     {
-        return captureInteractor.bAlreadyStartActivate == bCompareValue;
+        return captureInteracter.IsCapturing == bCompareValue;
     }
 
-    private CaptureInteractor captureInteractor;
+    private CapturePointInteracter captureInteracter;
     private bool bCompareValue;
 }

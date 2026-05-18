@@ -14,7 +14,6 @@ public class GameEntryPoint : NetworkBehaviour
     [SerializeField] private PlayerController playerController;
     [SerializeField] private InputManager inputManager;
 
-    [SerializeField] private CapturePointManager capturePointManager;
     [SerializeField] private CGameMode gameMode;
     [SerializeField] private ViewContext viewContext;
     [SerializeField] private NetworkObject voices;
@@ -36,14 +35,13 @@ public class GameEntryPoint : NetworkBehaviour
         Debug.Assert(cameraController);
         Debug.Assert(player);
         Debug.Assert(playerController);
-        Debug.Assert(capturePointManager);
         Debug.Assert(gameMode);
         Debug.Assert(viewContext);
         Debug.Assert(playerStatUIController);
         Debug.Assert(voiceNPCStateManager);
         Debug.Assert(spawnPointManager);
 
-        gameMode.Initialize(capturePointManager, timer);
+        gameMode.Initialize(timer);
         gameMode.ActionGameEnded += (EResultType resultType) =>
         {
             Debug.Log($"Game Ended! Result: {resultType}");
