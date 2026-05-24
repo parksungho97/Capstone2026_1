@@ -45,9 +45,7 @@ public class PlayerController : NetworkBehaviour
             if (data.buttons.IsSet(EInputButton.D))
                 moveDegree += new Vector3(1f, 0.0f, 0.0f);
 
-            bool blockMoveAndRotate =
-                animationState.IsAttacking &&
-                animationState.CurrentWeapon != 1;
+            bool blockMoveAndRotate = false;
 
             animationState.SetMoveDirection(
                 !blockMoveAndRotate && moveDegree.sqrMagnitude > 0.0001f
