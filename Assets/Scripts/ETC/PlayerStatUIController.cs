@@ -4,13 +4,13 @@ using Fusion;
 public class PlayerStatUIController : MonoBehaviour
 {
     [Header("Stat Reference")]
-    [SerializeField] private PlayerHealth playerHealth;
+    [SerializeField] private CharacterHealth playerHealth;
 
     [Header("UI Reference")]
     [SerializeField] private StatVisibleUI hpVisibleUI;
     [SerializeField] private StatVisibleUI armorVisibleUI;
 
-    public void Initialize(PlayerHealth playerHealth)
+    public void Initialize(CharacterHealth playerHealth)
     {
         this.playerHealth = playerHealth;
         Debug.Assert(this.playerHealth);
@@ -19,7 +19,7 @@ public class PlayerStatUIController : MonoBehaviour
     {
         if (playerHealth == null)
         {
-            PlayerHealth[] all = FindObjectsOfType<PlayerHealth>();
+            CharacterHealth[] all = FindObjectsOfType<CharacterHealth>();
 
             foreach (var ph in all)
             {

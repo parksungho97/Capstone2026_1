@@ -7,7 +7,7 @@ public class VoiceClipManager : MonoBehaviour
     {
         clips.Add(clip);
 
-        Debug.Log($"AddClip: {clips.Count}");
+        //Debug.Log($"AddClip: {clips.Count}");
     }
 
     public AudioClip GetRandomClipOrNull()

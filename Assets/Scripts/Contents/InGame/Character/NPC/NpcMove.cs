@@ -11,7 +11,6 @@ public class NpcMove : MonoBehaviour
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         CenterPos = transform.position;
-        Debug.Log($"CenterPos: {CenterPos}");
     }
 
     public bool IsReach()

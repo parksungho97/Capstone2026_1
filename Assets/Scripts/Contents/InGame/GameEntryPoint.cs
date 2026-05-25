@@ -11,22 +11,22 @@ public class GameEntryPoint : NetworkBehaviour
 {
     [SerializeField] private CameraController cameraController;
     [SerializeField] private NetworkObject player;
-    [SerializeField] private PlayerController playerController;
     [SerializeField] private InputManager inputManager;
 
-    [SerializeField] private CapturePointManager capturePointManager;
     [SerializeField] private CGameMode gameMode;
     [SerializeField] private ViewContext viewContext;
     [SerializeField] private NetworkObject voices;
     [SerializeField] private PlayerStatUIController playerStatUIController;
     [SerializeField] private VoiceNPCStateManager voiceNPCStateManager;
-    [SerializeField] private ItemManager itemManager;
-    [SerializeField] private Inventory inventory;
 
     [Header("Spawn")]
     [SerializeField] private PlayerSpawnPointManager spawnPointManager;
     [SerializeField] private NetworkTimerClock timer;
     [SerializeField] private float minute = 15;
+
+    [Header("Item")]
+    [SerializeField] private ItemManager itemManager;
+    [SerializeField] private InventoryUIMapper inventoryUIMapper;
 
     public override async void Spawned()
     {
@@ -35,15 +35,14 @@ public class GameEntryPoint : NetworkBehaviour
 
         Debug.Assert(cameraController);
         Debug.Assert(player);
-        Debug.Assert(playerController);
-        Debug.Assert(capturePointManager);
         Debug.Assert(gameMode);
         Debug.Assert(viewContext);
         Debug.Assert(playerStatUIController);
         Debug.Assert(voiceNPCStateManager);
         Debug.Assert(spawnPointManager);
+        Debug.Assert(inventoryUIMapper);
 
-        gameMode.Initialize(capturePointManager, timer);
+        gameMode.Initialize(timer);
         gameMode.ActionGameEnded += (EResultType resultType) =>
         {
             Debug.Log($"Game Ended! Result: {resultType}");
@@ -56,26 +55,22 @@ public class GameEntryPoint : NetworkBehaviour
             inputAuthority: Runner.LocalPlayer);
 
         cameraController.SetTarget(newPlayer.transform);
+        newPlayer.GetComponent<PlayerController>().Initalize(cameraController);
 
-        var newPlayerController = await Runner.SpawnAsync(playerController, position: spawnPoint.position,
-            rotation: spawnPoint.rotation,
-            inputAuthority: Runner.LocalPlayer);
+        InventoryController inventoryController = newPlayer.GetComponent<InventoryController>();
+        Debug.Assert(inventoryController);
+        inventoryUIMapper.LinkInventoryController(inventoryController);
 
-        newPlayerController.GetComponent<PlayerController>().Initalize(newPlayer.gameObject, cameraController);
 
         AudioListener audioListener = newPlayer.AddComponent<AudioListener>();
         audioListener.enabled = true;
 
         viewContext.Initalize(newPlayer.gameObject);
 
-        PlayerHealth playerHealth = newPlayer.GetComponent<PlayerHealth>();
+        CharacterHealth playerHealth = newPlayer.GetComponent<CharacterHealth>();
         playerStatUIController.Initialize(playerHealth);
 
-        voiceNPCStateManager.AddTargetChaseState(newPlayer.gameObject);
-
-        ItemCollector itemCollector = newPlayer.GetComponentInChildren<ItemCollector>();
-        Debug.Assert(itemCollector != null, "ItemCollector가 없습니다.");
-        itemCollector.Initialize(itemManager, inventory);
+        //voiceNPCStateManager.AddTargetChaseState(newPlayer.gameObject);
 
         if (Object.HasStateAuthority)
             StartCoroutine(WaitAndStartTimer());
@@ -99,4 +94,6 @@ public class GameEntryPoint : NetworkBehaviour
 
         timer.SetMinutes(minute);
     }
+
+    //private Inventory inv;
 }

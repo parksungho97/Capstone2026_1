@@ -17,6 +17,10 @@ public class InventoryItemUI : MonoBehaviour
     private bool hasItem;
 
     public Action<int> ActionClicked;
+    public Action<int> ActionDoubleClicked;
+
+    private float lastClickTime;
+    private const float doubleClickThreshold = 0.3f;
 
     public void Initialize(int index)
     {
@@ -48,7 +52,7 @@ public class InventoryItemUI : MonoBehaviour
             countText.text = count >= 1 ? $"x{count}" : "";
         }
         Debug.Log(countText.text);
-        Debug.Log($"[InventoryItemUI] ¾ÆÀÌÅÛ ¼³Á¤µÊ / index: {slotIndex}, item: {itemName}, count: {itemCount}");
+        Debug.Log($"[InventoryItemUI] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ / index: {slotIndex}, item: {itemName}, count: {itemCount}");
     }
 
     public void UpdateItem(string name, Sprite sprite, int count)
@@ -97,6 +101,11 @@ public class InventoryItemUI : MonoBehaviour
 
     private void OnClickSlot()
     {
-        ActionClicked?.Invoke(slotIndex);
+        float now = Time.unscaledTime;
+        if (now - lastClickTime <= doubleClickThreshold)
+            ActionDoubleClicked?.Invoke(slotIndex);
+        else
+            ActionClicked?.Invoke(slotIndex);
+        lastClickTime = now;
     }
 }
