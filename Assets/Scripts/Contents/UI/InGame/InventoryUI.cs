@@ -8,6 +8,7 @@ public class InventoryUI : MonoBehaviour
     [SerializeField] private List<InventoryItemUI> slotUIList = new List<InventoryItemUI>();
 
     public Action<int> ActionSlotClicked;
+    public Action<int> ActionSlotDoubleClicked;
     public Action ActionDisabled;
     public Action OnBecameVisible;
 
@@ -26,6 +27,8 @@ public class InventoryUI : MonoBehaviour
             slotUIList[i].Initialize(index);
             slotUIList[i].ActionClicked -= OnClickSlot;
             slotUIList[i].ActionClicked += OnClickSlot;
+            slotUIList[i].ActionDoubleClicked -= OnDoubleClickSlot;
+            slotUIList[i].ActionDoubleClicked += OnDoubleClickSlot;
         }
     }
 
@@ -101,6 +104,11 @@ public class InventoryUI : MonoBehaviour
     private void OnClickSlot(int index)
     {
         ActionSlotClicked?.Invoke(index);
+    }
+
+    private void OnDoubleClickSlot(int index)
+    {
+        ActionSlotDoubleClicked?.Invoke(index);
     }
 
     private bool IsValidIndex(int index)

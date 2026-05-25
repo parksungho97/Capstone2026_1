@@ -24,6 +24,8 @@ public class LobbyEntryPoint : MonoBehaviour
             roomListUIManager.ClearRooms();
             foreach (CRoomInfo roomInfo in roomInfos)
             {
+                if (roomInfo.roomState == ERoomState.InGame)
+                    continue;
                 roomListUIManager.AddRoom(roomInfo.roomSession, roomInfo.roomName, roomInfo.playerCount, roomInfo.maxPlayerCount);
             }
         };

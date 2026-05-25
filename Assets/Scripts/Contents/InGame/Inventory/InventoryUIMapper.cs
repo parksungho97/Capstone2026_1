@@ -39,6 +39,19 @@ public class InventoryUIMapper : MonoBehaviour
         OnControllerLinked?.Invoke();
     }
 
+    public bool TryGetEquipmentByUiSlot(int uiSlotIndex, out int storeSlotIndex)
+    {
+        foreach (var kvp in equipmentUiSlots)
+        {
+            if (kvp.Value != uiSlotIndex) continue;
+            storeSlotIndex = kvp.Key;
+            return true;
+        }
+
+        storeSlotIndex = -1;
+        return false;
+    }
+
     public bool TryGetConsumptionByUiSlot(int uiSlotIndex, out int consumptionId, out string name, out Sprite icon, out int count)
     {
         foreach (var kvp in consumptionUiSlots)

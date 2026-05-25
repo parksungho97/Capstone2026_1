@@ -561,6 +561,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5659626534878db43b6e257276f9e34f, type: 3}
       insertIndex: -1
       addedObject: {fileID: -1771427423767313395}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5659626534878db43b6e257276f9e34f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 644700208701429355}
   m_SourcePrefab: {fileID: 100100000, guid: 5659626534878db43b6e257276f9e34f, type: 3}
 --- !u!4 &112493039935944063 stripped
 Transform:
@@ -862,7 +865,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37c9b5ac520b90d4b97245ca7a8f6869, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 15
+  moveSpeed: 3
   turnSpeed: 15
   _bMove: 0
 --- !u!114 &1987929451324610142
@@ -969,7 +972,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 447739b80000d194b8dc27f6555c2243, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultWeaponId: 1
+  defaultWeaponId: 0
 --- !u!114 &-1771427423767313395
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -980,6 +983,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa6c0f969a3023c4699747020c576dbe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slotLimit: 9
+--- !u!114 &644700208701429355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7106837159742798860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40d6b000b32846a4fb8287d3a2008b23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!4 &7632297427691873974 stripped

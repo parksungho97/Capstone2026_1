@@ -14,9 +14,8 @@ public class HitComponent : MonoBehaviour
 
     public void Hit(int damage, Vector3 knockbackDir, float knockbackForce)
     {
-        if (rb != null)
-            rb.AddForce(knockbackDir.normalized * knockbackForce, ForceMode.Impulse);
-        
+        rb.AddForce(knockbackDir.normalized * knockbackForce, ForceMode.Impulse);
+
         health.RPC_ServeHP(damage);
     }
 }

@@ -22,6 +22,9 @@ public class PlayerController : NetworkBehaviour
 
         playerAttack = GetComponent<CharacterAttack>();
         Debug.Assert(playerAttack);
+
+        extraWeaponSlot = GetComponent<ExtraWeaponSlot>();
+        Debug.Assert(extraWeaponSlot);
     }
 
     public override void FixedUpdateNetwork()
@@ -47,10 +50,10 @@ public class PlayerController : NetworkBehaviour
             if (data.buttons.WasReleased(previousButtons, EInputButton.Space))
                 captureInteractor.TryStopCapture();
 
-            //if (data.buttons.WasPressed(previousButtons, EInputButton.Q))
-            //{
-            //    animationState.NextWeapon();
-            //}
+            if (data.buttons.WasPressed(previousButtons, EInputButton.Q))
+            {
+                extraWeaponSlot.Swap();
+            }
 
             if (data.buttons.WasPressed(previousButtons, EInputButton.Attack))
             {
@@ -85,6 +88,7 @@ public class PlayerController : NetworkBehaviour
     private CameraController cameraController;
     private CapturePointInteracter captureInteractor;
     private CharacterAttack playerAttack;
+    private ExtraWeaponSlot extraWeaponSlot;
 
     [Networked] private NetworkButtons previousButtons { get; set; }
 }

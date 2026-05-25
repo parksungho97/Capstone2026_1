@@ -57,5 +57,4 @@ public class EquipmentSlot : MonoBehaviour
     }
 
     private EquipmentStore equipmentStore;
-
 }
