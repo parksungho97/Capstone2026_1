@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class EquipmentComponent : MonoBehaviour
+public class EquipmentSlot : MonoBehaviour
 {
     private void Start()
     {

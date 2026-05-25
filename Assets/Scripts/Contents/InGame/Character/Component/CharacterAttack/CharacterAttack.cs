@@ -41,7 +41,7 @@ public class CharacterAttack : MonoBehaviour
 
     private void Start()
     {
-        equipmentComponent = GetComponent<EquipmentComponent>();
+        equipmentComponent = GetComponent<EquipmentSlot>();
         attacker = GetComponent<Attacker>();
         magazine = GetComponent<Magazine>();
 
@@ -90,7 +90,7 @@ public class CharacterAttack : MonoBehaviour
         }
     }
 
-    private EquipmentComponent equipmentComponent;
+    private EquipmentSlot equipmentComponent;
     private Attacker attacker;
     private Magazine magazine;
     public AttackContext AttackContext { get; private set; }

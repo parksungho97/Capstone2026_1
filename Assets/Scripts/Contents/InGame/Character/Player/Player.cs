@@ -5,7 +5,7 @@ public class Player : MonoBehaviour
     [SerializeField] private int defaultWeaponId = 0;
     private void Start()
     {
-        equipmentComponent = GetComponent<EquipmentComponent>();
+        equipmentComponent = GetComponent<EquipmentSlot>();
         Debug.Assert(equipmentComponent);
 
         Debug.Assert(EquipmentManager.Instance.TryGet(defaultWeaponId, out EquipmentData weaponData));
@@ -19,6 +19,6 @@ public class Player : MonoBehaviour
         magazine.SetAttackInstance(1);
     }
 
-    private EquipmentComponent equipmentComponent;
+    private EquipmentSlot equipmentComponent;
     private Magazine magazine;
 }

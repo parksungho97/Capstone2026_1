@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: 0.Potion
   m_EditorClassIdentifier: 
   consumptionId: 0
-  hpAmount: 10
+  time: 5
+  hpAmount: 50

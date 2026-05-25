@@ -13,6 +13,10 @@ public class CharacterHealth : NetworkBehaviour
     [Networked] public int MaxArmor { get; private set; }
     [Networked] public int CurrentArmor { get; private set; }
 
+    [Networked] private float recoveryRemaining { get; set; }
+    [Networked] private float recoveryRate { get; set; }
+    [Networked] private float recoveryAccumulator { get; set; }
+
     public override void Spawned()
     {
         Debug.Log($"[PlayerHealth] Spawned / Authority: {Object.HasStateAuthority}");
@@ -120,5 +124,43 @@ public class CharacterHealth : NetworkBehaviour
     {
         CurrentHP = MaxHP;
         CurrentArmor = MaxArmor;
+    }
+
+    /// <summary>
+    /// duration초에 걸쳐 amount만큼 HP/Armor를 회복
+    /// </summary>
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_RecoverOverTime(int amount, float duration)
+    {
+        if (amount <= 0 || duration <= 0f) return;
+        recoveryRemaining = amount;
+        recoveryRate = amount / duration;
+        recoveryAccumulator = 0f;
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (!Object.HasStateAuthority || recoveryRemaining <= 0f) return;
+
+        float delta = Mathf.Min(recoveryRate * Runner.DeltaTime, recoveryRemaining);
+        recoveryAccumulator += delta;
+        recoveryRemaining -= delta;
+
+        int whole = Mathf.FloorToInt(recoveryAccumulator);
+        if (whole <= 0) return;
+
+        recoveryAccumulator -= whole;
+
+        int remaining = whole;
+        if (CurrentHP < MaxHP)
+        {
+            int gain = Mathf.Min(MaxHP - CurrentHP, remaining);
+            CurrentHP += gain;
+            remaining -= gain;
+        }
+        if (remaining > 0 && CurrentArmor < MaxArmor)
+        {
+            CurrentArmor = Mathf.Min(CurrentArmor + remaining, MaxArmor);
+        }
     }
 }

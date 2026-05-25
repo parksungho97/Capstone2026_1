@@ -26,8 +26,7 @@ public class GameEntryPoint : NetworkBehaviour
 
     [Header("Item")]
     [SerializeField] private ItemManager itemManager;
-    //[SerializeField] private InventoryUIMapper inventoryUIMapper;
-    //[SerializeField] private InvenHotKeyMapper invenHotKeyMapper;
+    [SerializeField] private InventoryUIMapper inventoryUIMapper;
 
     public override async void Spawned()
     {
@@ -41,6 +40,7 @@ public class GameEntryPoint : NetworkBehaviour
         Debug.Assert(playerStatUIController);
         Debug.Assert(voiceNPCStateManager);
         Debug.Assert(spawnPointManager);
+        Debug.Assert(inventoryUIMapper);
 
         gameMode.Initialize(timer);
         gameMode.ActionGameEnded += (EResultType resultType) =>
@@ -57,12 +57,10 @@ public class GameEntryPoint : NetworkBehaviour
         cameraController.SetTarget(newPlayer.transform);
         newPlayer.GetComponent<PlayerController>().Initalize(cameraController);
 
-        //CharacterInventory characterInventory = newPlayer.GetComponent<CharacterInventory>();
-        //characterInventory.Initalize(itemManager, itemUseSystem);
-        //inv = characterInventory.Inventory;
+        InventoryController inventoryController = newPlayer.GetComponent<InventoryController>();
+        Debug.Assert(inventoryController);
+        inventoryUIMapper.LinkInventoryController(inventoryController);
 
-        //inventoryUIMapper.Initalize(characterInventory);
-        //invenHotKeyMapper.Initalize(characterInventory);
 
         AudioListener audioListener = newPlayer.AddComponent<AudioListener>();
         audioListener.enabled = true;

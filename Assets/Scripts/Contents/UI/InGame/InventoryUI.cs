@@ -9,6 +9,7 @@ public class InventoryUI : MonoBehaviour
 
     public Action<int> ActionSlotClicked;
     public Action ActionDisabled;
+    public Action OnBecameVisible;
 
     private void Awake()
     {
@@ -18,7 +19,7 @@ public class InventoryUI : MonoBehaviour
 
             if (slotUIList[i] == null)
             {
-                Debug.LogWarning($"[InventoryUI] slotUIList[{i}]°¡ ºñ¾îÀÖ½À´Ï´Ù.");
+                Debug.LogWarning($"[InventoryUI] slotUIList[{i}]ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ö½ï¿½ï¿½Ï´ï¿½.");
                 continue;
             }
 
@@ -43,7 +44,6 @@ public class InventoryUI : MonoBehaviour
             return i;
         }
 
-        Debug.LogWarning("[InventoryUI] ºó ½½·ÔÀÌ ¾ø½À´Ï´Ù.");
         return -1;
     }
 
@@ -71,12 +71,10 @@ public class InventoryUI : MonoBehaviour
         if (visible)
         {
             RefreshAllSlots();
+            OnBecameVisible?.Invoke();
         }
     }
 
-    /// <summary>
-    /// ÇöÀç slotUIList°¡ °¡Áö°í ÀÖ´Â µ¥ÀÌÅÍ¸¦ ±âÁØÀ¸·Î UI¸¦ ´Ù½Ã ¹Ý¿µ
-    /// </summary>
     public void RefreshAllSlots()
     {
         for (int i = 0; i < slotUIList.Count; i++)
@@ -98,8 +96,6 @@ public class InventoryUI : MonoBehaviour
                 slot.Clear();
             }
         }
-
-        Debug.Log("[InventoryUI] ÀüÃ¼ ½½·Ô UI °»½Å ¿Ï·á");
     }
 
     private void OnClickSlot(int index)
@@ -111,13 +107,13 @@ public class InventoryUI : MonoBehaviour
     {
         if (index < 0 || index >= slotUIList.Count)
         {
-            Debug.LogWarning($"[InventoryUI] Àß¸øµÈ ÀÎµ¦½º: {index}");
+            Debug.LogWarning($"[InventoryUI] ï¿½ß¸ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½: {index}");
             return false;
         }
 
         if (slotUIList[index] == null)
         {
-            Debug.LogWarning($"[InventoryUI] slotUIList[{index}]°¡ ºñ¾îÀÖ½À´Ï´Ù.");
+            Debug.LogWarning($"[InventoryUI] slotUIList[{index}]ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ö½ï¿½ï¿½Ï´ï¿½.");
             return false;
         }
 

@@ -3,14 +3,14 @@ using UnityEngine;
 public class Magazine : MonoBehaviour
 {
     private int currentProjectileId = -1;
-    private EquipmentComponent equipmentComponent;
+    private EquipmentSlot equipmentComponent;
     private ConsumptionStore consumptionStore;
 
     public int CurrentProjectileId => currentProjectileId;
 
     private void Start()
     {
-        equipmentComponent = GetComponent<EquipmentComponent>();
+        equipmentComponent = GetComponent<EquipmentSlot>();
         consumptionStore = GetComponent<ConsumptionStore>();
         Debug.Assert(equipmentComponent != null);
         Debug.Assert(consumptionStore != null);

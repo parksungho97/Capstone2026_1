@@ -54,6 +54,8 @@ public class PlayerController : NetworkBehaviour
 
             if (data.buttons.WasPressed(previousButtons, EInputButton.Attack))
             {
+                if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+                    return;
                 playerAttack.Attack();
             }
 
