@@ -1,100 +1,101 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using static UnityEditor.Progress;
+//using System.Collections.Generic;
+//using UnityEngine;
 
-public class ItemHotKey : HotKeySlot
-{
-    public ItemHotKey(Item item, ItemUser itemUser)
-    {
-        Name = item.Name;
-        Icon = item.Icon;
-        this.item = item;
-        this.itemUser = itemUser;
-    }
-    public override void Execute()
-    {
-        itemUser.UseItem(item);
-    }
+//public class ItemHotKey : HotKeySlot
+//{
+//    public ItemHotKey(ItemId itemId, string name, Sprite icon, CharacterInventory characterInventory)
+//    {
+//        Name = name;
+//        Icon = icon;
+//        this.itemId = itemId;
+//        this.characterInventory = characterInventory;
+//    }
 
-    private Item item;
-    private ItemUser itemUser;
-}
+//    public override void Execute()
+//    {
+//        characterInventory.UseItem(itemId);
+//    }
 
-public class InvenHotKeyMapper : MonoBehaviour
-{
-    [SerializeField] private InventoryUIMapper inventoryUIMapper;
-    [SerializeField] private HotKey hotKey;
-    [SerializeField] private ItemUser itemUser;
+//    private ItemId itemId;
+//    private CharacterInventory characterInventory;
+//}
 
-    private void Start()
-    {
-        inventoryUIMapper.LinkedInventoryUI.ActionDisabled += Clear;
+//public class InvenHotKeyMapper : MonoBehaviour
+//{
+//    [SerializeField] private InventoryUIMapper inventoryUIMapper;
+//    [SerializeField] private HotKey hotKey;
 
-        inventoryUIMapper.LinkedInventoryUI.ActionSlotClicked += (int uiSlot) =>
-        {
-            Item item = null;
-            int slotIndex = -1;
+//    public CharacterInventory CharacterInven { get; private set; }
 
-            inventoryUIMapper.TryGetMappingItemSlot(uiSlot, out item, out slotIndex);
+//    public void Initalize(CharacterInventory characterInventory)
+//    {
+//        CharacterInven = characterInventory;
 
-            if (putItem != null)
-            {
-                inventoryUIMapper.SwapSlot(putUISlot, uiSlot);
-                Clear();
-            }
-            else
-            {
-                putItem = item;
-                putUISlot = uiSlot;
-            }
-        };
+//        inventoryUIMapper.LinkedInventoryUI.ActionDisabled += Clear;
 
-        hotKey.ActionHotKeyClick += (EHotKeyType hotKeyType) =>
-        {
-            if(putItem != null)
-            {
-                Debug.Log("HotKeyClicked");
-                ItemHotKey itemHotKey = new ItemHotKey(putItem, itemUser);
-                hotKey.SetSlot(hotKeyType, itemHotKey);
+//        inventoryUIMapper.LinkedInventoryUI.ActionSlotClicked += (int uiSlot) =>
+//        {
+//            bool found = inventoryUIMapper.TryGetMappingItemSlot(uiSlot, out ItemId itemId, out int slotIndex);
 
-                itemHotKeyMappings.Add(putItem, hotKeyType);
-                Clear();
-            }
-            else
-            {
-                if (prevHotKeyType == EHotKeyType.Error)
-                    prevHotKeyType = hotKeyType;
-                else
-                {
-                    hotKey.SwapSlot(prevHotKeyType, hotKeyType);
-                    Clear();
-                }
-            }
-        };
+//            if (hasPutItem)
+//            {
+//                inventoryUIMapper.SwapSlot(putUISlot, uiSlot);
+//                Clear();
+//            }
+//            else if (found)
+//            {
+//                putItemId = itemId;
+//                hasPutItem = true;
+//                putUISlot = uiSlot;
+//            }
+//        };
 
-        inventoryUIMapper.LinkedInventory.OnSlotRemove += (int slotIndex, Item item) =>
-        {
-            if (itemHotKeyMappings.TryGetValue(item, out EHotKeyType hotKeyType))
-            {
-                hotKey.SetSlot(hotKeyType, null);
-                itemHotKeyMappings.Remove(item);
-            }
-        };
-    }
+//        hotKey.ActionHotKeyClick += (EHotKeyType hotKeyType) =>
+//        {
+//            if (hasPutItem)
+//            {
+//                ItemData item = CharacterInven.ItemManager.Get(putItemId);
+//                ItemHotKey itemHotKey = new ItemHotKey(putItemId, item.Name, item.Icon, CharacterInven);
+//                hotKey.SetSlot(hotKeyType, itemHotKey);
 
-    private void Clear()
-    {
-        putItem = null;
-        putUISlot = -1;
-        prevHotKeyType = EHotKeyType.Error;
-    }
+//                itemHotKeyMappings[putItemId] = hotKeyType;
+//                Clear();
+//            }
+//            else
+//            {
+//                if (prevHotKeyType == EHotKeyType.Error)
+//                    prevHotKeyType = hotKeyType;
+//                else
+//                {
+//                    hotKey.SwapSlot(prevHotKeyType, hotKeyType);
+//                    Clear();
+//                }
+//            }
+//        };
 
-    private Item putItem = null;
-    private int putUISlot = -1;
+//        CharacterInven.Inventory.OnSlotRemove += (int slotIndex, ItemId itemId) =>
+//        {
+//            if (itemHotKeyMappings.TryGetValue(itemId, out EHotKeyType hotKeyType))
+//            {
+//                hotKey.SetSlot(hotKeyType, null);
+//                itemHotKeyMappings.Remove(itemId);
+//            }
+//        };
+//    }
 
-    private EHotKeyType prevHotKeyType = EHotKeyType.Error;
+//    private void Clear()
+//    {
+//        hasPutItem = false;
+//        putItemId = default;
+//        putUISlot = -1;
+//        prevHotKeyType = EHotKeyType.Error;
+//    }
 
-    private Dictionary<Item, EHotKeyType> itemHotKeyMappings = new();
+//    private bool hasPutItem = false;
+//    private ItemId putItemId;
+//    private int putUISlot = -1;
 
-}
+//    private EHotKeyType prevHotKeyType = EHotKeyType.Error;
+
+//    private Dictionary<ItemId, EHotKeyType> itemHotKeyMappings = new();
+//}

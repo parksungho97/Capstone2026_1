@@ -1,80 +1,77 @@
-using System;
-using System.Collections.Generic;
-using UnityEngine;
+//using System.Collections.Generic;
+//using UnityEngine;
 
-public class InventoryUIMapper : MonoBehaviour
-{
-    [SerializeField] private Inventory inventory;
-    [SerializeField] private InventoryUI inventoryUI;
-    
-    public bool TryGetMappingItemSlot(int uiSlot, out Item item, out int slotIndex)
-    {
-        item = null;
-        slotIndex = -1;
-        if (uiSlotToInvenSlot.TryGetValue(uiSlot, out int s))
-        {
-            item = LinkedInventory.GetItem(s);
-            slotIndex = s;
-            return true;
-        }
-        return false;
-    }
+//public class InventoryUIMapper : MonoBehaviour
+//{
+//    [SerializeField] private InventoryUI inventoryUI;
 
-    private void Start()
-    {
-        Debug.Assert(inventory);
-        Debug.Assert(inventoryUI);
+//    public CharacterInventory CharacterInven {  get; private set; }
 
-        LinkedInventory.OnSlotUpdate += (int slotIndex, Item item, int count) =>
-        {
-            if (invenSlotToUISlot.TryGetValue(slotIndex, out int uiSlot))
-                inventoryUI.UpdateItemUI(uiSlot, item.Name, item.Icon, count);
-            else
-            {
-                int newUISlot = inventoryUI.AddItemUI(item.Name, item.Icon, count);
-                invenSlotToUISlot[slotIndex] = newUISlot;
-                uiSlotToInvenSlot[newUISlot] = slotIndex;
-            }
-        };
+//    public bool TryGetMappingItemSlot(int uiSlot, out ItemId itemId, out int slotIndex)
+//    {
+//        itemId = default;
+//        slotIndex = -1;
+//        if (uiSlotToInvenSlot.TryGetValue(uiSlot, out int s))
+//        {
+//            itemId = CharacterInven.Inventory.GetItem(s);
+//            slotIndex = s;
+//            return true;
+//        }
+//        return false;
+//    }
 
-        LinkedInventory.OnSlotRemove += (int slotIndex, Item item) =>
-        {
-            Debug.Assert(invenSlotToUISlot.TryGetValue(slotIndex, out int uiSlot));
+//    public void Initalize(CharacterInventory characterInventory)
+//    {
+//        CharacterInven = characterInventory;
 
-            inventoryUI.RemoveItem(uiSlot);
-            uiSlotToInvenSlot.Remove(uiSlot);
-            invenSlotToUISlot.Remove(slotIndex);
-        };
-    }
+//        CharacterInven.Inventory.OnSlotUpdate += (int slotIndex, ItemId itemId, int count) =>
+//        {
+//            ItemData item = CharacterInven.ItemManager.Get(itemId);
+//            if (invenSlotToUISlot.TryGetValue(slotIndex, out int uiSlot))
+//                inventoryUI.UpdateItemUI(uiSlot, item.Name, item.Icon, count);
+//            else
+//            {
+//                int newUISlot = inventoryUI.AddItemUI(item.Name, item.Icon, count);
+//                invenSlotToUISlot[slotIndex] = newUISlot;
+//                uiSlotToInvenSlot[newUISlot] = slotIndex;
+//            }
+//        };
 
-    public void SwapSlot(int uiSlotA, int uiSlotB)
-    {
-        if (uiSlotA == uiSlotB)
-            return;
+//        CharacterInven.Inventory.OnSlotRemove += (int slotIndex, ItemId itemId) =>
+//        {
+//            Debug.Assert(invenSlotToUISlot.TryGetValue(slotIndex, out int uiSlot));
 
-        inventoryUI.SwapItemUI(uiSlotA, uiSlotB);
+//            inventoryUI.RemoveItem(uiSlot);
+//            uiSlotToInvenSlot.Remove(uiSlot);
+//            invenSlotToUISlot.Remove(slotIndex);
+//        };
+//    }
 
-        // uiSlot → invenSlot 스왑
-        uiSlotToInvenSlot.TryGetValue(uiSlotA, out int invenSlotA);
-        uiSlotToInvenSlot.TryGetValue(uiSlotB, out int invenSlotB);
+//    public void SwapSlot(int uiSlotA, int uiSlotB)
+//    {
+//        if (uiSlotA == uiSlotB)
+//            return;
 
-        bool hasA = uiSlotToInvenSlot.ContainsKey(uiSlotA);
-        bool hasB = uiSlotToInvenSlot.ContainsKey(uiSlotB);
+//        inventoryUI.SwapItemUI(uiSlotA, uiSlotB);
 
-        if (hasA) uiSlotToInvenSlot[uiSlotB] = invenSlotA;
-        else uiSlotToInvenSlot.Remove(uiSlotB);
+//        uiSlotToInvenSlot.TryGetValue(uiSlotA, out int invenSlotA);
+//        uiSlotToInvenSlot.TryGetValue(uiSlotB, out int invenSlotB);
 
-        if (hasB) uiSlotToInvenSlot[uiSlotA] = invenSlotB;
-        else uiSlotToInvenSlot.Remove(uiSlotA);
+//        bool hasA = uiSlotToInvenSlot.ContainsKey(uiSlotA);
+//        bool hasB = uiSlotToInvenSlot.ContainsKey(uiSlotB);
 
-        // invenSlot → uiSlot 스왑
-        if (hasA) invenSlotToUISlot[invenSlotA] = uiSlotB;
-        if (hasB) invenSlotToUISlot[invenSlotB] = uiSlotA;
-    }
+//        if (hasA) uiSlotToInvenSlot[uiSlotB] = invenSlotA;
+//        else uiSlotToInvenSlot.Remove(uiSlotB);
 
-    public Inventory LinkedInventory { get { return inventory; } }
-    public InventoryUI LinkedInventoryUI { get { return inventoryUI; } }
+//        if (hasB) uiSlotToInvenSlot[uiSlotA] = invenSlotB;
+//        else uiSlotToInvenSlot.Remove(uiSlotA);
 
-    private Dictionary<int, int> invenSlotToUISlot = new();
-    private Dictionary<int, int> uiSlotToInvenSlot = new();
-}
+//        if (hasA) invenSlotToUISlot[invenSlotA] = uiSlotB;
+//        if (hasB) invenSlotToUISlot[invenSlotB] = uiSlotA;
+//    }
+
+//    public InventoryUI LinkedInventoryUI { get { return inventoryUI; } }
+
+//    private Dictionary<int, int> invenSlotToUISlot = new();
+//    private Dictionary<int, int> uiSlotToInvenSlot = new();
+//}

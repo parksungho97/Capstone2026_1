@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 308d80dc3bccd7e41b4d7e09e3f1c3c4, type: 3}
+  m_Name: 0.PipeAttack
+  m_EditorClassIdentifier: 
+  id: 0
+  data:
+    Prefab: {fileID: -1205818650260235087, guid: bcfc6301c3662b148b8475e96ab1031c, type: 3}
+    Damage: 20
+    KnockbackForce: 10
+    SpawnOffset: {x: 0, y: 2, z: 3}
+    ActivationTime: 0
+    Duration: 0.1

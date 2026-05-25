@@ -14,6 +14,7 @@ public enum EInputButton
     I = 5,
     Q = 6,
     Attack = 7,
+    Z,
     End,
 }
 
@@ -49,6 +50,8 @@ public class InputManager : NetworkBehaviour, INetworkRunnerCallbacks
             data.buttons.Set(EInputButton.I, true);
         if (Input.GetKey(KeyCode.Q))
             data.buttons.Set(EInputButton.Q, true);
+        if (Input.GetKey(KeyCode.Z))
+            data.buttons.Set(EInputButton.Z, true);
         if (Input.GetMouseButton(0))
             data.buttons.Set(EInputButton.Attack, true);
 

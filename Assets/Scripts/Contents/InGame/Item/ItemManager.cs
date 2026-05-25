@@ -1,36 +1,52 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public struct ItemId : System.IEquatable<ItemId>
+{
+    public int Value;
+
+    public ItemId(int value) { Value = value; }
+
+    public bool Equals(ItemId other) => Value == other.Value;
+    public override bool Equals(object obj) => obj is ItemId other && Equals(other);
+    public override int GetHashCode() => Value.GetHashCode();
+    public static bool operator ==(ItemId a, ItemId b) => a.Value == b.Value;
+    public static bool operator !=(ItemId a, ItemId b) => a.Value != b.Value;
+    public override string ToString() => Value.ToString();
+}
+
+
 public class ItemManager : MonoBehaviour
 {
     public static ItemManager Instance { get; private set; }
 
+    [SerializeField] private ItemMappings itemMappings;
+    [SerializeField] private List<ItemSO> itemSOs;
+
+    private Dictionary<ItemId, ItemData> map = new();
+
     private void Awake()
     {
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        foreach (var so in itemSOs)
+            so.Load(this, itemMappings);
     }
 
-    public void RegistItem(int id, Item item)
+    public void Register(ItemId id, ItemData data)
     {
-        if (_items.ContainsKey(id))
-        {
-            Debug.LogWarning($"ItemLoader: {id} 이미 등록됨");
-            return;
-        }
-        _items[id] = item;
+        map[id] = data;
     }
 
-    public Item Get(int id)
+    public bool TryGet(ItemId id, out ItemData data)
+        => map.TryGetValue(id, out data);
+
+    public ItemData Get(ItemId id)
     {
-        Debug.Assert(_items.ContainsKey(id), $"ItemLoader: {id} 아이템 없음");
-        return _items[id];
+        TryGet(id, out ItemData data);
+        return data;
     }
-
-    private Dictionary<int, Item> _items = new();
 }
