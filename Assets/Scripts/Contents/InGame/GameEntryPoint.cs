@@ -60,8 +60,8 @@ public class GameEntryPoint : NetworkBehaviour
         inventoryUIMapper.LinkInventoryController(inventoryController);
 
 
-        //AudioListener audioListener = newPlayer.AddComponent<AudioListener>();
-        //audioListener.enabled = true;
+        AudioListener audioListener = newPlayer.AddComponent<AudioListener>();
+        audioListener.enabled = true;
 
         viewContext.Initalize(newPlayer.gameObject);
 
