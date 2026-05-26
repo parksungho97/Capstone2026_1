@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 2432920282914316060}
   - component: {fileID: -6880639991214439475}
   - component: {fileID: 5669932406093206510}
+  - component: {fileID: 850010370272652508}
   m_Layer: 0
   m_Name: NPC
   m_TagString: Untagged
@@ -342,6 +343,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   wanderRadius: 10
+--- !u!114 &850010370272652508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 77286735445477815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54946005b22b42d43be38e54caaa06e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5282960857625873925
 GameObject:
   m_ObjectHideFlags: 0
@@ -527,6 +540,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: fec21e3b58e285149b47cf155b424e8f, type: 3}
       propertyPath: m_Name
       value: Meshy_AI_Character_output
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: fec21e3b58e285149b47cf155b424e8f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: fec21e3b58e285149b47cf155b424e8f, type: 3}
       propertyPath: m_Controller

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class HitComponent : MonoBehaviour
@@ -5,6 +6,8 @@ public class HitComponent : MonoBehaviour
     [SerializeField] private Rigidbody rb;
 
     [SerializeField] private CharacterHealth health;
+
+    public Action ActionHitted;
 
     private void Start()
     {
@@ -17,5 +20,7 @@ public class HitComponent : MonoBehaviour
         rb.AddForce(knockbackDir.normalized * knockbackForce, ForceMode.Impulse);
 
         health.RPC_ServeHP(damage);
+
+        ActionHitted?.Invoke();
     }
 }

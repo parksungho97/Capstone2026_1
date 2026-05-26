@@ -8,14 +8,15 @@ public class WeaponData : EquipmentData
     public IReadOnlyList<int> AttackIds { get; }
     public int AttackPower { get; }
 
-    public WeaponData(EAttackType attackType, IReadOnlyList<int> attackIds, int attackPower)
+    public WeaponData(int id, EAttackType attackType, IReadOnlyList<int> attackIds, int attackPower)
     {
+        Id = id;
         AttackType = attackType;
         AttackIds = new List<int>(attackIds);
         AttackPower = attackPower;
     }
 
-    public override Equipment Generate() => new Weapon(AttackType, AttackIds, AttackPower);
+    public override Equipment Generate() => new Weapon(Id, AttackType, AttackIds, AttackPower);
 }
 
 
@@ -27,5 +28,5 @@ public class WeaponSO : EquipmentSO
     [SerializeField] private int attackPower;
 
     public override void Load(EquipmentManager manager)
-        => manager.Register(equipId, new WeaponData(attackType, attackIds, attackPower));
+        => manager.Register(equipId, new WeaponData(equipId, attackType, attackIds, attackPower));
 }

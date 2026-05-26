@@ -171,7 +171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21dea3e0d876d18468e402ad0cb48f68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemIds: 01000000
+  itemIds: 03000000
 --- !u!4 &184222252
 Transform:
   m_ObjectHideFlags: 0
@@ -653,6 +653,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 244985a83aec3974698877a49378c049, type: 2}
   - {fileID: 11400000, guid: c0bfd3baa137e014f841679febf0cd2d, type: 2}
   - {fileID: 11400000, guid: 6766c947cc7d76b4caff2aa66c8ce698, type: 2}
+  - {fileID: 11400000, guid: c96906a1be7cfc74a8a5a595ad97292c, type: 2}
 --- !u!1 &805317603
 GameObject:
   m_ObjectHideFlags: 0
@@ -899,6 +900,14 @@ PrefabInstance:
     - target: {fileID: 9043345543447589474, guid: c621ead16e7ba03489a4723c51f91281, type: 3}
       propertyPath: SortKey
       value: 3498784094
+      objectReference: {fileID: 0}
+    - target: {fileID: 9095254718630095927, guid: c621ead16e7ba03489a4723c51f91281, type: 3}
+      propertyPath: defaultMaxHP
+      value: 33
+      objectReference: {fileID: 0}
+    - target: {fileID: 9095254718630095927, guid: c621ead16e7ba03489a4723c51f91281, type: 3}
+      propertyPath: defaultMaxArmor
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1385,12 +1394,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   viewBuildComputeShader: {fileID: 7200000, guid: 17601f641f097624e87ef42cf28c738f, type: 3}
   _fogColor: {r: 0, g: 0, b: 0, a: 1}
-  _fogOpacity: 0.7
+  _fogOpacity: 0.95
   gridX: 4096
   gridY: 4096
   worldX: 400
   worldY: 400
-  playerTag: Player
+  playerTag: Character
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -1520,6 +1529,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1503247014}
   - component: {fileID: 1503247013}
+  - component: {fileID: 1503247015}
+  - component: {fileID: 1503247016}
   m_Layer: 0
   m_Name: InventoryLinkSystem
   m_TagString: Untagged
@@ -1556,6 +1567,32 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1503247015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1503247012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 692cc21a1da334f43ae15b425c969f51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventoryUIMapper: {fileID: 1751334621}
+--- !u!114 &1503247016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1503247012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5a429b89ff46644d8a30f2ffc0cc47f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponSlotUI: {fileID: 1658968281}
 --- !u!1 &1513423245
 GameObject:
   m_ObjectHideFlags: 0
@@ -1815,6 +1852,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 71b74d92dfa008b4c953b1c73ff66284, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1658968281 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5486320143611143201, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
+  m_PrefabInstance: {fileID: 1658968279}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0488ede558e25df40aa25eb4d33927b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &1658968284 stripped
@@ -2529,6 +2577,7 @@ MonoBehaviour:
   minute: 15
   itemManager: {fileID: 754111422}
   inventoryUIMapper: {fileID: 1751334621}
+  weaponSlotUIBinder: {fileID: 1503247016}
 --- !u!114 &2028998725
 MonoBehaviour:
   m_ObjectHideFlags: 0

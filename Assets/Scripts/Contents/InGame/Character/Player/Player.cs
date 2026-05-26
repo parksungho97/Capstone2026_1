@@ -1,8 +1,11 @@
+using System;
 using Fusion;
 using UnityEngine;
 
 public class Player : NetworkBehaviour
 {
+    public static event Action<Player> OnNetworkSpawned;
+
     [SerializeField] private int defaultWeaponId = 0;
 
     public override void Spawned()
@@ -30,6 +33,8 @@ public class Player : NetworkBehaviour
 
         animtor = GetComponent<Animator>();
         Debug.Assert(animtor);
+
+        OnNetworkSpawned?.Invoke(this);
     }
 
     public override void FixedUpdateNetwork()

@@ -11,6 +11,7 @@ public class EquipmentSlot : MonoBehaviour
     public Action<Weapon> ActionWeaponEquip;
     public Helmet Helmet { get; private set; }
     public Weapon Weapon { get; private set; }
+    public int WeaponId => Weapon?.Id ?? -1;
 
     public void SetHelmet(Helmet helmet) => Helmet = helmet;
     public void SetWeapon(Weapon weapon)

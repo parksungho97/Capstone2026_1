@@ -40,8 +40,8 @@ public class NpcDie : State<NpcContext>
 
     public override void Enter(NpcContext context)
     {
-        if (animator)
-            animator.SetTrigger("Die");
+        //if (animator)
+        //    animator.SetTrigger("Die");
     }
 
     public override void Update(NpcContext context) { }

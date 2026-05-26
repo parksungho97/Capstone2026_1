@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemId:
     Value: 1
-  itemName: "\uCD1D\uC54C"
+  itemName: Bullet
   icon: {fileID: 21300000, guid: 35b3efc62fb16734c99440484d7eec82, type: 3}
-  desc: "\uCD1D\uC54C"
+  desc: Bullet
   type: 1
   typeValue: 1
   mesh: {fileID: 7612784544473548660, guid: 01237cf3a3022d54a829e75d81f0d5e5, type: 3}

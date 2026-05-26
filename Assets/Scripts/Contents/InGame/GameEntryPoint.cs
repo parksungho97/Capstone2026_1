@@ -26,6 +26,7 @@ public class GameEntryPoint : NetworkBehaviour
     [Header("Item")]
     [SerializeField] private ItemManager itemManager;
     [SerializeField] private InventoryUIMapper inventoryUIMapper;
+    [SerializeField] private WeaponSlotUIBinder weaponSlotUIBinder;
 
     public override async void Spawned()
     {
@@ -58,6 +59,9 @@ public class GameEntryPoint : NetworkBehaviour
         InventoryController inventoryController = newPlayer.GetComponent<InventoryController>();
         Debug.Assert(inventoryController);
         inventoryUIMapper.LinkInventoryController(inventoryController);
+
+        if (weaponSlotUIBinder != null)
+            weaponSlotUIBinder.Link(newPlayer.GetComponent<EquipmentSlot>());
 
 
         AudioListener audioListener = newPlayer.AddComponent<AudioListener>();

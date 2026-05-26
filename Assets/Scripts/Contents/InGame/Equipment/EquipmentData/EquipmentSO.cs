@@ -3,6 +3,7 @@ using UnityEngine;
 
 public abstract class EquipmentData
 {
+    public int Id { get; protected set; }
     public abstract Equipment Generate();
 }
 

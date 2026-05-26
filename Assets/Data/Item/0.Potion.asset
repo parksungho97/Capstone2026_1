@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemId:
     Value: 0
-  itemName: "\uD3EC\uC158"
+  itemName: Potion
   icon: {fileID: 21300000, guid: 2a26ddb392d5aeb45824140ebee50f91, type: 3}
-  desc: "\uD3EC\uC158"
+  desc: Potion
   type: 1
   typeValue: 0
   mesh: {fileID: -1948423400586059757, guid: 687f9559644557d4ba5b955087ff2032, type: 3}

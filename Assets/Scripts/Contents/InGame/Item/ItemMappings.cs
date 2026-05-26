@@ -33,4 +33,18 @@ public class ItemMappings : MonoBehaviour
         typeValue = -1;
         return false;
     }
+
+    public bool TryGetItemByTypeValue(EItemMapType type, int typeValue, out ItemId itemId)
+    {
+        foreach (var kvp in map)
+        {
+            if (kvp.Value.type == type && kvp.Value.typeValue == typeValue)
+            {
+                itemId = kvp.Key;
+                return true;
+            }
+        }
+        itemId = default;
+        return false;
+    }
 }

@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d8cdd10e11b0acb42b0997b029dc6418, type: 3}
-  m_Name: 2.Helmet
+  m_Name: 4.Pipe
   m_EditorClassIdentifier: 
   itemId:
-    Value: 2
-  itemName: Helmet
-  icon: {fileID: 21300000, guid: b8636efeb8fa41a4481cc7d1cf540040, type: 3}
-  desc: Helmet
+    Value: 4
+  itemName: Pipe
+  icon: {fileID: 21300000, guid: 9ad6e2f6bab70c14399a68157d8d86ad, type: 3}
+  desc: Pipe
   type: 0
-  typeValue: 2
-  mesh: {fileID: 5461320835613783329, guid: ed1f04647e033ea4b87b9cc96c3bc934, type: 3}
-  material: {fileID: 2100000, guid: f8dd24549abec1a48aaa6cfc956b73b1, type: 2}
+  typeValue: 0
+  mesh: {fileID: 0}
+  material: {fileID: 0}
