@@ -53,7 +53,6 @@ public class GameEntryPoint : NetworkBehaviour
             rotation: spawnPoint.rotation,
             inputAuthority: Runner.LocalPlayer);
         cameraController.SetTarget(newPlayer.transform);
-        return;
         newPlayer.GetComponent<PlayerController>().Initalize(cameraController);
 
         InventoryController inventoryController = newPlayer.GetComponent<InventoryController>();
@@ -61,8 +60,8 @@ public class GameEntryPoint : NetworkBehaviour
         inventoryUIMapper.LinkInventoryController(inventoryController);
 
 
-        AudioListener audioListener = newPlayer.AddComponent<AudioListener>();
-        audioListener.enabled = true;
+        //AudioListener audioListener = newPlayer.AddComponent<AudioListener>();
+        //audioListener.enabled = true;
 
         viewContext.Initalize(newPlayer.gameObject);
 
