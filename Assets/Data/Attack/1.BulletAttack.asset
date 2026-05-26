@@ -15,9 +15,9 @@ MonoBehaviour:
   id: 1
   data:
     Prefab: {fileID: -5363727392999545191, guid: 467cf0749878d4d4d9f681f5e720adaa, type: 3}
-    Damage: 50
+    Damage: 17
     KnockbackForce: 5
     SpawnOffset: {x: 0, y: 2, z: 3}
-    Speed: 10
+    Speed: 30
     MaxDistance: 30
-    Cooldown: 0.1
+    Cooldown: 0.5

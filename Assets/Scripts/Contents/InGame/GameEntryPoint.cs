@@ -90,6 +90,4 @@ public class GameEntryPoint : NetworkBehaviour
 
         timer.SetMinutes(minute);
     }
-
-    //private Inventory inv;
 }

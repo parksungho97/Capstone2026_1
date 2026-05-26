@@ -71,12 +71,12 @@ public class PlayerAttackState : State<PlayerContext>
 {
     public override void Enter(PlayerContext context)
     {
-        context.Movement.SetMovePossible(false);
+        //context.Movement.SetMovePossible(false);
     }
 
     public override void Exit(PlayerContext context)
     {
-        context.Movement.SetMovePossible(true);
+        //context.Movement.SetMovePossible(true);
     }
 
     public override void Update(PlayerContext context) { }

@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: 2.Helmet
   m_EditorClassIdentifier: 
   consumptionId: 2
-  armorAmount: 10
+  armorAmount: 33
