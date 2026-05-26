@@ -1,4 +1,3 @@
-using Fusion;
 using UnityEngine;
 
 public class NpcContext
@@ -11,10 +10,12 @@ public class NpcIdle : State<NpcContext>
     public NpcIdle(NpcMove npcMove)
     {
         this.npcMove = npcMove;
-        Debug.Assert(npcMove);
     }
 
-    public override void Enter(NpcContext npcContext) { }
+    public override void Enter(NpcContext npcContext)
+    {
+        npcMove.SetRandomDestination();
+    }
 
     public override void Exit(NpcContext npcContext)
     {
@@ -26,7 +27,6 @@ public class NpcIdle : State<NpcContext>
         if (npcMove.IsReach())
             npcMove.SetRandomDestination();
     }
-
     private NpcMove npcMove;
 }
 
@@ -73,12 +73,10 @@ public class AnimationEnd : StateTransition
     private Animator animator;
 }
 
-public class BasicNPCStateManager : NetworkBehaviour
+public class BasicNPCStateManager : MonoBehaviour
 {
-    public override void Spawned()
+    private void Start()
     {
-        base.Spawned();
-
         npcContext = new NpcContext();
         stateMachine = new StateMachine<NpcContext>(npcContext);
 
@@ -94,10 +92,8 @@ public class BasicNPCStateManager : NetworkBehaviour
         stateMachine.AddTransition(die, null, new AnimationEnd(animator));
     }
 
-    public override void FixedUpdateNetwork()
+    private void Update()
     {
-        base.FixedUpdateNetwork();
-
         if (!isDead && characterHealth.CurrentHP <= 0)
         {
             isDead = true;

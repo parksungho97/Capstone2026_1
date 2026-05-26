@@ -15,7 +15,9 @@ MonoBehaviour:
   itemId:
     Value: 2
   itemName: "\uD5EC\uBA67"
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: b8636efeb8fa41a4481cc7d1cf540040, type: 3}
   desc: "\uD5EC\uBA67"
   type: 0
   typeValue: 2
+  mesh: {fileID: 0}
+  material: {fileID: 0}

@@ -42,6 +42,7 @@ public class PlayerWalk : State<PlayerContext>
             viewDir = context.Movement.transform.forward;
 
         Vector3 localMove = Quaternion.Inverse(Quaternion.LookRotation(viewDir)) * moveDir.normalized;
+
         // 여기서 다른 애니메이션을 재생하던지 값을 세팅해주던지.
         //context.Animator.SetFloat("MoveX", localMove.x);
         //context.Animator.SetFloat("MoveZ", localMove.z);
@@ -104,18 +105,17 @@ public class PlayerDead : State<PlayerContext>
 
 public class IsWalk : StateTransition
 {
-    public IsWalk(Movement movement, bool bCompareValue)
+    public IsWalk(PlayerController pc, bool bCompareValue)
     {
-        Debug.Assert(movement);
-        this.mMovement = movement;
+        this.pc = pc;
         this.bCompareValue = bCompareValue;
     }
     public override bool ShouldTransition()
     {
-        return mMovement.bMove == bCompareValue;
+        return pc.bMove == bCompareValue;
     }
 
-    private Movement mMovement;
+    private PlayerController pc;
     private bool bCompareValue;
 }
 

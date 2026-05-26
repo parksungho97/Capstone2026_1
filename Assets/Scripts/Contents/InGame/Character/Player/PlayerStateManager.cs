@@ -3,14 +3,20 @@ using UnityEngine;
 
 public class PlayerContext
 {
-    public PlayerContext(Animator animator, Movement movement)
+    public PlayerContext(Animator animator, Movement movement, VoicePlayer voicePlayer, PlayerController playerController)
     {
         Animator = animator;
         Movement = movement;
+        VoicePlayer = voicePlayer;
+        PlayerController = playerController;
     }
 
     public Animator Animator { get; private set; }
     public Movement Movement { get; private set; }
+
+    public VoicePlayer VoicePlayer { get; private set; }
+
+    public PlayerController PlayerController { get; private set;  }
 }
 
 [RequireComponent(typeof(Animator))]
@@ -23,12 +29,16 @@ public class PlayerStateManager : MonoBehaviour
         Movement movement = GetComponent<Movement>();
         CapturePointInteracter captureInteractor = GetComponent<CapturePointInteracter>();
         CharacterAttack characterAttack = GetComponent<CharacterAttack>();
+        VoicePlayer voicePlayer = GetComponent<VoicePlayer>();
+        PlayerController playerController = GetComponent<PlayerController>();
         Debug.Assert(animator);
         Debug.Assert(movement);
         Debug.Assert(captureInteractor);
         Debug.Assert(characterAttack);
+        Debug.Assert(voicePlayer);
+        Debug.Assert(playerController);
 
-        playerContext = new PlayerContext(animator, movement);
+        playerContext = new PlayerContext(animator, movement, voicePlayer, playerController);
 
         stateMachine = new StateMachine<PlayerContext>(playerContext);
 
@@ -37,8 +47,8 @@ public class PlayerStateManager : MonoBehaviour
         playerInteract = new PlayerInteract();
         playerAttackState = new PlayerAttackState();
 
-        isWalk = new IsWalk(movement, true);
-        isNotWalk = new IsWalk(movement, false);
+        isWalk = new IsWalk(playerController, true);
+        isNotWalk = new IsWalk(playerController, false);
         isInteract = new IsInteract(captureInteractor, true);
         isNotInteract = new IsInteract(captureInteractor, false);
         onAttack = new OnAttackStateTransition(characterAttack);

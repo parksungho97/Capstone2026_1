@@ -31,57 +31,60 @@ public class PlayerController : NetworkBehaviour
     {
         base.FixedUpdateNetwork();
 
-        Vector3 moveDegree = Vector3.zero;
-
-        if (GetInput<NetworkInputData>(out NetworkInputData data))
+        if (Object.HasInputAuthority)
         {
-            if (data.buttons.IsSet(EInputButton.W))
-                move.Move(new Vector3(0.0f, 0.0f, 1f));
-            if (data.buttons.IsSet(EInputButton.S))
-                move.Move(new Vector3(0.0f, 0.0f, -1f));
-            if (data.buttons.IsSet(EInputButton.A))
-                move.Move(new Vector3(-1f, 0.0f, 0.0f));
-            if (data.buttons.IsSet(EInputButton.D))
-                move.Move(new Vector3(1f, 0.0f, 0.0f));
+            bool hasMovedThisTick = false;
 
-            if (data.buttons.WasPressed(previousButtons, EInputButton.Space))
-                captureInteractor.TryStartCapture();
-
-            if (data.buttons.WasReleased(previousButtons, EInputButton.Space))
-                captureInteractor.TryStopCapture();
-
-            if (data.buttons.WasPressed(previousButtons, EInputButton.Q))
+            if (GetInput<NetworkInputData>(out NetworkInputData data))
             {
-                extraWeaponSlot.Swap();
-            }
+                Vector3 moveDegree = Vector3.zero;
 
-            if (data.buttons.WasPressed(previousButtons, EInputButton.Attack))
-            {
-                if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
-                    return;
-                playerAttack.Attack();
-            }
+                if (data.buttons.IsSet(EInputButton.W)) moveDegree += new Vector3(0.0f, 0.0f, 1f);
+                if (data.buttons.IsSet(EInputButton.S)) moveDegree += new Vector3(0.0f, 0.0f, -1f);
+                if (data.buttons.IsSet(EInputButton.A)) moveDegree += new Vector3(-1f, 0.0f, 0.0f);
+                if (data.buttons.IsSet(EInputButton.D)) moveDegree += new Vector3(1f, 0.0f, 0.0f);
 
-            if (data.buttons.WasPressed(previousButtons, EInputButton.Z))
-            {
-                itemCollector.AcquireOne();
-            }
-
-            if (cameraController.GetMouseWorldPosition(data.mousePosition, out Vector3 mouseWorldPosition))
-            {
-                Vector3 lookDir = mouseWorldPosition - transform.position;
-                lookDir.y = 0f;
-
-                if (lookDir.sqrMagnitude > 0.0001f)
+                if (moveDegree != Vector3.zero)
                 {
-                    Vector3 aimDir = lookDir.normalized;
-                    move.RotateTo(aimDir);
+                    move.Move(moveDegree); // 대각선 이동 속도 균일을 위해 normalized 권장
+                    hasMovedThisTick = true;
                 }
+
+                if (data.buttons.WasPressed(previousButtons, EInputButton.Space)) captureInteractor.TryStartCapture();
+                if (data.buttons.WasReleased(previousButtons, EInputButton.Space)) captureInteractor.TryStopCapture();
+                if (data.buttons.WasPressed(previousButtons, EInputButton.Q)) extraWeaponSlot.Swap();
+                if (data.buttons.WasPressed(previousButtons, EInputButton.Attack))
+                {
+                    if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+                        playerAttack.Attack();
+                }
+                if (data.buttons.WasPressed(previousButtons, EInputButton.Z)) itemCollector.AcquireOne();
+
+                previousButtons = data.buttons;
             }
 
-            previousButtons = data.buttons;
+            bMove = hasMovedThisTick;
         }
 
+        move.MoveUpdate();
+    }
+
+    private void Update()
+    {
+        if (!Object.HasInputAuthority) 
+            return;
+
+        if (cameraController.GetMouseWorldPosition(Input.mousePosition, out Vector3 mouseWorldPosition))
+        {
+            Vector3 lookDir = mouseWorldPosition - transform.position;
+            lookDir.y = 0f;
+
+            if (lookDir.sqrMagnitude > 0.0001f)
+            {
+                Vector3 aimDir = lookDir.normalized;
+                move.RotateTo(aimDir);
+            }
+        }
     }
 
     private Movement move;
@@ -91,4 +94,5 @@ public class PlayerController : NetworkBehaviour
     private ExtraWeaponSlot extraWeaponSlot;
 
     [Networked] private NetworkButtons previousButtons { get; set; }
+    [Networked] public bool bMove { get; set; }
 }

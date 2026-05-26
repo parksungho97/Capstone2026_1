@@ -1,46 +1,26 @@
 using Fusion;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class NpcPlayVoice : State<NpcContext>
 {
-    public NpcPlayVoice(VoiceClipManager voiceClipManager, AudioSource npcAudioSource)
+    public NpcPlayVoice(VoicePlayer voicePlayer, NpcMove npcMove)
     {
-        this.voiceClipManager = voiceClipManager;
-        this.npcAudioSource = npcAudioSource;
+        this.voicePlayer = voicePlayer;
+        this.npcMove = npcMove;
     }
 
     public override void Enter(NpcContext context)
     {
-        AudioClip clip = voiceClipManager.GetRandomClipOrNull();
-        if (clip != null)
-        {
-            bOriginLooped = npcAudioSource.loop;
-            npcAudioSource.loop = false;
-
-            Debug.Log("PlaySound");
-            npcAudioSource.PlayOneShot(clip);
-        }
+        npcMove.StopMove();
+        voicePlayer.PlayRandom();
     }
 
-    public override void Exit(NpcContext context)
-    {
-        npcAudioSource.loop = bOriginLooped;
-        bSoundEnd = false;
-    }
+    public override void Exit(NpcContext context) { }
 
-    public override void Update(NpcContext context)
-    {
-        bSoundEnd = !npcAudioSource.isPlaying;
-    }
+    public override void Update(NpcContext context) { }
 
-    private VoiceClipManager voiceClipManager;
-    private AudioSource npcAudioSource;
-
-    private bool bOriginLooped = false;
-
-    public bool bSoundEnd { get; private set; }
+    private VoicePlayer voicePlayer;
+    private NpcMove npcMove;
 }
 public class NpcChaseTarget : State<NpcContext>
 {
@@ -110,8 +90,8 @@ public class TimeOut : StateTransition
 
     public override bool ShouldTransition()
     {
-        elapsed += UnityEngine.Time.deltaTime;
-        Debug.Log($"{elapsed}");
+        elapsed += Time.deltaTime;
+        
         if (elapsed >= duration)
         {
             elapsed = 0f;
@@ -145,17 +125,17 @@ public class ReachPosition : StateTransition
 
 public class VoiceEnd : StateTransition
 {
-    public VoiceEnd(NpcPlayVoice npcPlayVoice, float duration = 4.0f)
+    public VoiceEnd(VoicePlayer voicePlayer, float duration = 4.0f)
     {
-        this.npcPlayVoice = npcPlayVoice;
+        this.voicePlayer = voicePlayer;
         this.duration = duration;
     }
 
     public override bool ShouldTransition()
     {
-        if (bWaitState == false)
+        if (!bWaitState)
         {
-            if (npcPlayVoice.bSoundEnd)
+            if (!voicePlayer.IsPlaying)
                 bWaitState = true;
         }
 
@@ -166,7 +146,6 @@ public class VoiceEnd : StateTransition
             {
                 time = 0f;
                 bWaitState = false;
-
                 return true;
             }
         }
@@ -174,7 +153,7 @@ public class VoiceEnd : StateTransition
         return false;
     }
 
-    private NpcPlayVoice npcPlayVoice;
+    private VoicePlayer voicePlayer;
 
     private bool bWaitState = false;
 
@@ -185,7 +164,6 @@ public class VoiceEnd : StateTransition
 [RequireComponent(typeof(NpcMove))]
 public class VoiceNPCStateManager : NetworkBehaviour
 {
-    [SerializeField] private VoiceClipManager voiceClipManager;
     [SerializeField] private Chaser chaser;
 
     public override void Spawned()
@@ -199,30 +177,30 @@ public class VoiceNPCStateManager : NetworkBehaviour
         stateMachine = new StateMachine<NpcContext>(npcContext);
 
         NpcMove npcMove = GetComponent<NpcMove>();
-        AudioSource audioSource = GetComponent<AudioSource>();
+        VoicePlayer voicePlayer = GetComponent<VoicePlayer>();
         characterHealth = GetComponent<CharacterHealth>();
         Npc npc = GetComponent<Npc>();
         Animator animator = GetComponent<Animator>();
 
         Debug.Assert(npcMove);
-        Debug.Assert(audioSource);
+        Debug.Assert(voicePlayer);
         Debug.Assert(chaser);
-        Debug.Assert(voiceClipManager);
 
         idle = new NpcIdle(npcMove);
         die = new NpcDie(npc, animator);
-        npcPlayVoiceFirst = new NpcPlayVoice(voiceClipManager, audioSource);
-        npcPlayVoiceSecond = new NpcPlayVoice(voiceClipManager, audioSource);
+        npcPlayVoiceFirst = new NpcPlayVoice(voicePlayer, npcMove);
+        npcPlayVoiceSecond = new NpcPlayVoice(voicePlayer, npcMove);
         chaseTarget = new NpcChaseTarget(npcMove, chaser);
         back = new NpcBack(npcMove, npcMove.CenterPos);
 
-        stateMachine.SetState(idle);
-        stateMachine.AddTransition(die, null, new AnimationEnd(animator));
         stateMachine.AddTransition(idle, npcPlayVoiceFirst, new MeetTarget(chaser));
-        stateMachine.AddTransition(npcPlayVoiceFirst, npcPlayVoiceSecond, new VoiceEnd(npcPlayVoiceFirst, 4.0f));
-        stateMachine.AddTransition(npcPlayVoiceSecond, chaseTarget, new VoiceEnd(npcPlayVoiceSecond, 0.0f));
+        stateMachine.AddTransition(npcPlayVoiceFirst, npcPlayVoiceSecond, new VoiceEnd(voicePlayer, 4.0f));
+        stateMachine.AddTransition(npcPlayVoiceSecond, chaseTarget, new VoiceEnd(voicePlayer, 0.0f));
         stateMachine.AddTransition(chaseTarget, back, new TimeOut(1.0f));
         stateMachine.AddTransition(back, idle, new ReachPosition(gameObject.transform, npcMove.CenterPos));
+        stateMachine.AddTransition(die, null, new AnimationEnd(animator));
+
+        stateMachine.SetState(idle);
     }
 
     public override void FixedUpdateNetwork()

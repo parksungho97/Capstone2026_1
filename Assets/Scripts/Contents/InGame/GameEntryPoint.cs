@@ -17,7 +17,6 @@ public class GameEntryPoint : NetworkBehaviour
     [SerializeField] private ViewContext viewContext;
     [SerializeField] private NetworkObject voices;
     [SerializeField] private PlayerStatUIController playerStatUIController;
-    [SerializeField] private VoiceNPCStateManager voiceNPCStateManager;
 
     [Header("Spawn")]
     [SerializeField] private PlayerSpawnPointManager spawnPointManager;
@@ -31,6 +30,7 @@ public class GameEntryPoint : NetworkBehaviour
     public override async void Spawned()
     {
         base.Spawned();
+
         Debug.Log("GameScene");
 
         Debug.Assert(cameraController);
@@ -38,7 +38,6 @@ public class GameEntryPoint : NetworkBehaviour
         Debug.Assert(gameMode);
         Debug.Assert(viewContext);
         Debug.Assert(playerStatUIController);
-        Debug.Assert(voiceNPCStateManager);
         Debug.Assert(spawnPointManager);
         Debug.Assert(inventoryUIMapper);
 

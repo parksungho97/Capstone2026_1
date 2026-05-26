@@ -1,16 +1,11 @@
 using Fusion;
 using UnityEngine;
+using static Unity.Collections.Unicode;
 
-// 1. ������ �ֱ⿡ ���߱� ���� NetworkBehaviour�� �����մϴ�.
-public class Movement : NetworkBehaviour
+public class Movement : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 3.0f;
     [SerializeField] private float turnSpeed = 15.0f;
-
-    // 2. �ٸ� �÷��̾� ȭ�鿡���� �� ĳ���Ͱ� �Ȱ� �ִ��� �� �� �ֵ��� [Networked]�� �ٿ��ݴϴ�.
-    // ���� "�� ȭ��"������ üũ�ϸ� �ȴٸ� �׳� �Ϲ� bool�� �μŵ� ������, 
-    // ��Ƽ�÷��̾� �ִϸ��̼� ����ȭ�� ���� ��Ʈ��ũ ������ ����� ���� ���� ��õ�մϴ�.
-    [Networked] public bool bMove { get; private set; }
 
     public bool bMovePossible { get; set; } = true;
 
@@ -37,21 +32,11 @@ public class Movement : NetworkBehaviour
         bMovePossible = possible;
     }
 
-    // 3. LateUpdate�� ������ �����, ���� ���� ������Ʈ�� FixedUpdateNetwork�� �����մϴ�.
-    public override void FixedUpdateNetwork()
+    public void MoveUpdate()
     {
-        // ȣ��Ʈ�� Ŭ���̾�Ʈ ��� �������� �ʱ�ȭ
-        bMove = false;
-
         if (bMovePossible && mPendingMove != Vector3.zero)
-        {
-            // [�߿�] ����Ƽ�� Time.deltaTime ��� ������ Runner.DeltaTime�� ��� 
-            // ��Ʈ��ũ �������� �и��ų� �ѹ�� �� ���� ����� ��Ȯ�����ϴ�.
-            transform.position += mPendingMove * moveSpeed * Runner.DeltaTime;
-            bMove = true;
-        }
+            transform.position += mPendingMove * moveSpeed * Time.deltaTime;
         mPendingMove = Vector3.zero;
-
 
         if (bMovePossible && mPendingLookDir.sqrMagnitude > 0.0001f)
         {
@@ -59,7 +44,7 @@ public class Movement : NetworkBehaviour
             transform.rotation = Quaternion.Slerp(
                 transform.rotation,
                 targetRot,
-                turnSpeed * mPendingTurnCoeff * Runner.DeltaTime // ȸ������ Runner.DeltaTime ����
+                turnSpeed * mPendingTurnCoeff * Time.deltaTime
             );
         }
         mPendingLookDir = Vector3.zero;

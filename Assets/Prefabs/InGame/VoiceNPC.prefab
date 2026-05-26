@@ -282,7 +282,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bee3901eb11fdf4e85ffe3fa65f7e4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  voiceClipManager: {fileID: 0}
   chaser: {fileID: 947733327678561791}
 --- !u!82 &2789916468867102997
 AudioSource:
