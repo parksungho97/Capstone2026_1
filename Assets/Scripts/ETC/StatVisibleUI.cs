@@ -22,6 +22,7 @@ public class StatVisibleUI : MonoBehaviour
         }
 
         float ratio = Mathf.Clamp01((float)currentState / maxState);
+        Debug.Log(ratio);
         fillImage.fillAmount = ratio;
     }
 

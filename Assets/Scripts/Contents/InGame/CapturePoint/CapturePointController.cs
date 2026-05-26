@@ -1,50 +1,104 @@
 using Fusion;
 using UnityEngine;
 
+// State machine for a capture point.
+//   Default  → uses jjhConqueror (capturing requires 2 per team)
+//   Captured → uses jjhRebel    (uncapturing requires only 1)
+// Callers always invoke RequestCaptureRpc / ReleaseCaptureRpc regardless of state.
 [RequireComponent(typeof(CapturePoint))]
-[RequireComponent(typeof(Activater))]
-[RequireComponent(typeof(SphereCollider))]
+[RequireComponent(typeof(Conqueror))]
+[RequireComponent(typeof(Rebel))]
 public class CapturePointController : NetworkBehaviour
 {
-    // 거점 활성화를 담당하는 컴포넌트
-    //private void Start()
-    //{
-    //    CapturePoint = GetComponent<CapturePoint>();
-    //    Activater = GetComponent<Activater>();
+    // Networked gauge values for UI / other clients to read.
+    [Networked] public float RedGauge { get; private set; }
+    [Networked] public float BlueGauge { get; private set; }
+    [Networked] public float RebelGauge { get; private set; }
 
-    //    Debug.Assert(CapturePoint);
-    //    Debug.Assert(Activater);
-    //}
+    public CapturePoint CapturePoint => mCapturePoint;
 
     public override void Spawned()
     {
         base.Spawned();
-        CapturePoint = GetComponent<CapturePoint>();
-        Activater = GetComponent<Activater>();
+        mCapturePoint = GetComponent<CapturePoint>();
+        mConqueror = GetComponent<Conqueror>();
+        mRebel = GetComponent<Rebel>();
 
-        Debug.Assert(CapturePoint);
-        Debug.Assert(Activater);
+        if (Object.HasStateAuthority)
+        {
+            mConqueror.OnCapture += OnConquerorCapture;
+            mRebel.OnUncapture += OnRebelUncapture;
+        }
     }
 
-    // 호스트에서 매 프레임 돌면서 활성화 가능한 거점이 있는지 확인하고 자동으로 활성화 시켜줌
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        if (mConqueror != null) mConqueror.OnCapture -= OnConquerorCapture;
+        if (mRebel != null) mRebel.OnUncapture -= OnRebelUncapture;
+    }
+
+    // ── Public capture interface ────────────────────────────────────────────
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RequestCaptureRpc(int requesterId, ECaptureState team)
+    {
+        if (IsCaptured())
+        {
+            if (team != mCapturePoint.GetCaptureState())
+                mRebel.AddRequest(requesterId);
+            else
+                mRebel.ClearRequest();
+        }
+        else
+            mConqueror.AddRequest(requesterId, team);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void ReleaseCaptureRpc(int requesterId)
+    {
+        if (IsCaptured())
+            mRebel.RemoveRequest(requesterId);
+        else
+            mConqueror.RemoveRequest(requesterId);
+    }
+
+    // ── Network tick ────────────────────────────────────────────────────────
+
     public override void FixedUpdateNetwork()
     {
-        if (!Object.HasStateAuthority)
-            return;
+        if (!Object.HasStateAuthority) return;
 
-        EActivateSuccessType successType = Activater.IsActivatePossible();
+        float dt = Runner.DeltaTime;
 
-        if (successType == EActivateSuccessType.Notyet)
-            return;
+        if (IsCaptured())
+            mRebel.Tick(dt);
+        else
+            mConqueror.Tick(dt);
 
-        if (successType == EActivateSuccessType.Red)
-            CapturePoint.SetCaptureStateRpc(ECaptureState.Red);
-        else if (successType == EActivateSuccessType.Blue)
-            CapturePoint.SetCaptureStateRpc(ECaptureState.Blue);
-
-        Activater.ClearState();
+        RedGauge = mConqueror.GetRedGauge();
+        BlueGauge = mConqueror.GetBlueGauge();
+        RebelGauge = mRebel.GetGauge();
     }
 
-    public CapturePoint CapturePoint { get; private set; }
-    public Activater Activater { get; private set; }
+    // ── Event handlers ──────────────────────────────────────────────────────
+
+    private void OnConquerorCapture(ECaptureState team)
+    {
+        mCapturePoint.SetCaptureStateRpc(team);
+        mConqueror.Clear();
+    }
+
+    private void OnRebelUncapture()
+    {
+        mCapturePoint.ClearStateRpc();
+        mRebel.Clear();
+    }
+
+    // ── Helpers ─────────────────────────────────────────────────────────────
+
+    private bool IsCaptured() => mCapturePoint.GetCaptureState() != ECaptureState.None;
+
+    private CapturePoint mCapturePoint;
+    private Conqueror mConqueror;
+    private Rebel mRebel;
 }

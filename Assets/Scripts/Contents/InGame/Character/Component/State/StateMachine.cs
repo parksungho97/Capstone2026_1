@@ -29,7 +29,13 @@ public class StateMachine<T>
     {
         currentState?.Exit(context);
         currentState = newState;
-        currentState.Enter(context);
+        currentState?.Enter(context);
+
+        if (currentState == null)
+        {
+            currentTransitions = new List<(StateTransition, State<T>)>();
+            return;
+        }
 
         if (!transitions.ContainsKey(currentState))
             transitions[currentState] = new List<(StateTransition, State<T>)>();

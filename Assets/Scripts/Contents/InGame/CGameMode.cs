@@ -9,16 +9,14 @@ public enum EResultType : byte
     Draw
 }
 
-// 이름 중복 방지 위해 CGameMode로 명명
 public class CGameMode : NetworkBehaviour
 {
     public Action<EResultType> ActionGameEnded;
-    public void Initialize(CapturePointManager capturePointManager, NetworkTimerClock networkTimerClock)
+    public void Initialize(NetworkTimerClock networkTimerClock)
     {
-        this.capturePointManager = capturePointManager;
         this.networkTimerClock = networkTimerClock;
 
-        ActionGameEnded+= (resultType) =>
+        ActionGameEnded += (resultType) =>
         {
             Debug.Log($"Game Ended with result: {resultType}");
         };
@@ -31,20 +29,10 @@ public class CGameMode : NetworkBehaviour
         if (bGameEnded == true)
             return;
 
-        bool bAllCaptured = capturePointManager.IsAllCaptured(out ECaptureState[] captureStates);
-
-        int redCount = 0;
-        int blueCount = 0;
-        foreach (ECaptureState captureState in captureStates)
-        {
-            if (captureState == ECaptureState.Red)
-                redCount++;
-            else if (captureState == ECaptureState.Blue)
-                blueCount++;
-        }
-
-        if (networkTimerClock.IsExpired() || bAllCaptured)
-            EndGame(redCount, blueCount);
+        // TODO: query jjhCapturePointController array to determine per-team capture counts
+        // and end the game when all points are captured.
+        if (networkTimerClock.IsExpired())
+            EndGame(0, 0);
     }
 
     private void EndGame(int redCount, int blueCount)
@@ -59,7 +47,6 @@ public class CGameMode : NetworkBehaviour
             ActionGameEnded?.Invoke(EResultType.Draw);
     }
 
-    private CapturePointManager capturePointManager;
     private NetworkTimerClock networkTimerClock;
     private bool bGameEnded = false;
 

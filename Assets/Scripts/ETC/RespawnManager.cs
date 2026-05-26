@@ -62,10 +62,10 @@ public class RespawnManager : NetworkBehaviour
 
         playerObject.transform.position = respawnPosition;
 
-        PlayerHealth playerHealth = playerObject.GetComponent<PlayerHealth>();
+        CharacterHealth playerHealth = playerObject.GetComponent<CharacterHealth>();
         if (playerHealth != null)
         {
-            playerHealth.ResetStat();
+            playerHealth.RPC_ResetStat();
         }
     }
 

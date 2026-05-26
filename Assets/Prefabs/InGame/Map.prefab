@@ -11874,13 +11874,7 @@ PrefabInstance:
       addedObject: {fileID: 6071581242467802016}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f471f1e1f80b744abe7d276d47a5d8a, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6700109768858733008}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f471f1e1f80b744abe7d276d47a5d8a, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 5244067248552575747}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f471f1e1f80b744abe7d276d47a5d8a, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6365226127563750435}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f471f1e1f80b744abe7d276d47a5d8a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3826023282654603996}
@@ -11907,20 +11901,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fb97b769add5964f9ec1c8b8b357fb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6700109768858733008
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1998832926074973246}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd49a01d2cd27554e87a2d6a840ce3df, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mTimeThreshold: 0.1
-  mDecayDelay: 3
 --- !u!135 &5244067248552575747
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -11942,18 +11922,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.011771884
   m_Center: {x: 0.000009329325, y: -0.002254863, z: -0.000014619827}
---- !u!114 &6365226127563750435
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1998832926074973246}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 680e0000c84919e42addb2824dba0ff6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &3826023282654603996
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11972,8 +11940,8 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 6071581242467802016}
-  - {fileID: 6700109768858733008}
-  - {fileID: 6365226127563750435}
+  - {fileID: 0}
+  - {fileID: 0}
   ForceRemoteRenderTimeframe: 0
 --- !u!1001 &1705176439684364939
 PrefabInstance:
@@ -12202,13 +12170,7 @@ PrefabInstance:
       addedObject: {fileID: 5825697606425538642}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8d8d29712bdeda040a2c95fe0f2369db, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3222296873641034287}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8d8d29712bdeda040a2c95fe0f2369db, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 4229028084306163014}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8d8d29712bdeda040a2c95fe0f2369db, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8445143151021633728}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8d8d29712bdeda040a2c95fe0f2369db, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2867861444365984624}
@@ -12256,20 +12218,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fb97b769add5964f9ec1c8b8b357fb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3222296873641034287
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1956404281454191776}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd49a01d2cd27554e87a2d6a840ce3df, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mTimeThreshold: 0.1
-  mDecayDelay: 3
 --- !u!135 &4229028084306163014
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -12291,18 +12239,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.01330879
   m_Center: {x: 0.00000952959, y: 0.0038193916, z: -0.000010684727}
---- !u!114 &8445143151021633728
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1956404281454191776}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 680e0000c84919e42addb2824dba0ff6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &2867861444365984624
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12321,8 +12257,8 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 5825697606425538642}
-  - {fileID: 3222296873641034287}
-  - {fileID: 8445143151021633728}
+  - {fileID: 0}
+  - {fileID: 0}
   ForceRemoteRenderTimeframe: 0
 --- !u!1001 &1736744032337224743
 PrefabInstance:
@@ -15795,13 +15731,7 @@ PrefabInstance:
       addedObject: {fileID: 9203359685874189551}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1398930bbf4558242bbdaa002f995e45, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 277665059550177995}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1398930bbf4558242bbdaa002f995e45, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 3580409166188857359}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1398930bbf4558242bbdaa002f995e45, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7313974475717663617}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1398930bbf4558242bbdaa002f995e45, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7617085594410615540}
@@ -15849,20 +15779,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fb97b769add5964f9ec1c8b8b357fb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &277665059550177995
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4324357565859032402}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd49a01d2cd27554e87a2d6a840ce3df, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mTimeThreshold: 0.1
-  mDecayDelay: 3
 --- !u!135 &3580409166188857359
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -15884,18 +15800,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.012989081
   m_Center: {x: 0.0000100708, y: -0.0034814572, z: -0.000010075569}
---- !u!114 &7313974475717663617
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4324357565859032402}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 680e0000c84919e42addb2824dba0ff6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &7617085594410615540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15914,8 +15818,8 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 9203359685874189551}
-  - {fileID: 277665059550177995}
-  - {fileID: 7313974475717663617}
+  - {fileID: 0}
+  - {fileID: 0}
   ForceRemoteRenderTimeframe: 0
 --- !u!1001 &3579753024571839917
 PrefabInstance:

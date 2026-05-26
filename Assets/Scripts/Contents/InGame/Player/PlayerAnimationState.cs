@@ -11,9 +11,9 @@ public class PlayerAnimationState : NetworkBehaviour
     [Networked] private TickTimer AttackTimer { get; set; }
 
     [Header("Attack Duration")]
-    [SerializeField] private float pipeAttackDuration = 1.5f;
-    [SerializeField] private float pistolAttackDuration = 0.8f;
-    [SerializeField] private float shotGunAttackDuration = 1.09f;
+    [SerializeField] private float pipeAttackDuration = 1.0f;
+    [SerializeField] private float pistolAttackDuration = 0.7f;
+    [SerializeField] private float shotGunAttackDuration = 1.2f;
 
     public void SetMoveDirection(Vector3 direction)
     {
