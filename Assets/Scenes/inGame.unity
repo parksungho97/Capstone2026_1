@@ -122,26 +122,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &50708565 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5024059815153670208, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
-  m_PrefabInstance: {fileID: 1658968279}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &50708566
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 50708565}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8db5bb8bd2d3014980890e428fd7f22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerHealth: {fileID: 0}
-  hpVisibleUI: {fileID: 1658968288}
-  armorVisibleUI: {fileID: 280550264}
 --- !u!1 &184222249
 GameObject:
   m_ObjectHideFlags: 0
@@ -1829,9 +1809,6 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5024059815153670208, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 50708566}
     - targetCorrespondingSourceObject: {fileID: 5578311764920825195, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1658968288}
@@ -2299,6 +2276,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hotKeyManager: {fileID: 353955219}
   hotKeyUI: {fileID: 1248194396}
+--- !u!114 &1929650967 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2808308212810100433, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
+  m_PrefabInstance: {fileID: 1658968279}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8db5bb8bd2d3014980890e428fd7f22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1948694317
 GameObject:
   m_ObjectHideFlags: 0
@@ -2589,7 +2577,7 @@ MonoBehaviour:
   gameMode: {fileID: 1392825103}
   viewContext: {fileID: 1352932869}
   voices: {fileID: 1976954540}
-  playerStatUIController: {fileID: 50708566}
+  playerStatUIController: {fileID: 1929650967}
   spawnPointManager: {fileID: 1719020302}
   timer: {fileID: 1007881243}
   minute: 15

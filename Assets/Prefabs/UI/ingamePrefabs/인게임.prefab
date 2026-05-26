@@ -3306,12 +3306,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7254987557504505902}
   - component: {fileID: 2808308212810100433}
-  - component: {fileID: 5828788713266073880}
-  - component: {fileID: 9166112734217615217}
-  - component: {fileID: 9060215553793970178}
-  - component: {fileID: 2836475011108795687}
-  - component: {fileID: 2227789167925272840}
-  - component: {fileID: 8201617055070143147}
   m_Layer: 5
   m_Name: StatBars
   m_TagString: Untagged
@@ -3355,96 +3349,6 @@ MonoBehaviour:
   playerHealth: {fileID: 0}
   hpVisibleUI: {fileID: 1216496375000193404}
   armorVisibleUI: {fileID: 1158350190951223465}
---- !u!114 &5828788713266073880
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5024059815153670208}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8db5bb8bd2d3014980890e428fd7f22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerHealth: {fileID: 0}
-  hpVisibleUI: {fileID: 6274204808516268281}
-  armorVisibleUI: {fileID: 837586396783520537}
---- !u!114 &9166112734217615217
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5024059815153670208}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8db5bb8bd2d3014980890e428fd7f22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerHealth: {fileID: 0}
-  hpVisibleUI: {fileID: 1656028092089445875}
-  armorVisibleUI: {fileID: 5546102469375693343}
---- !u!114 &9060215553793970178
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5024059815153670208}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8db5bb8bd2d3014980890e428fd7f22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerHealth: {fileID: 0}
-  hpVisibleUI: {fileID: 1980523877330528641}
-  armorVisibleUI: {fileID: 4504799909274800052}
---- !u!114 &2836475011108795687
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5024059815153670208}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8db5bb8bd2d3014980890e428fd7f22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerHealth: {fileID: 0}
-  hpVisibleUI: {fileID: 7119966775141197158}
-  armorVisibleUI: {fileID: 4808455570715284960}
---- !u!114 &2227789167925272840
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5024059815153670208}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8db5bb8bd2d3014980890e428fd7f22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerHealth: {fileID: 0}
-  hpVisibleUI: {fileID: 1175850294013210737}
-  armorVisibleUI: {fileID: 36145673111582005}
---- !u!114 &8201617055070143147
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5024059815153670208}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8db5bb8bd2d3014980890e428fd7f22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerHealth: {fileID: 0}
-  hpVisibleUI: {fileID: 6840425590183724041}
-  armorVisibleUI: {fileID: 8768887067143370068}
 --- !u!1 &5052088172431591679
 GameObject:
   m_ObjectHideFlags: 0
