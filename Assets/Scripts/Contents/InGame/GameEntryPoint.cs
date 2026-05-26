@@ -23,6 +23,9 @@ public class GameEntryPoint : NetworkBehaviour
     [SerializeField] private ItemManager itemManager;
     [SerializeField] private Inventory inventory;
 
+    //추가
+    [SerializeField] private RespawnUIController respawnUIController;
+
     [Header("Spawn")]
     [SerializeField] private PlayerSpawnPointManager spawnPointManager;
     [SerializeField] private NetworkTimerClock timer;
@@ -55,6 +58,8 @@ public class GameEntryPoint : NetworkBehaviour
             rotation: spawnPoint.rotation,
             inputAuthority: Runner.LocalPlayer);
 
+       
+
         cameraController.SetTarget(newPlayer.transform);
 
         var newPlayerController = await Runner.SpawnAsync(playerController, position: spawnPoint.position,
@@ -70,6 +75,15 @@ public class GameEntryPoint : NetworkBehaviour
 
         PlayerHealth playerHealth = newPlayer.GetComponent<PlayerHealth>();
         playerStatUIController.Initialize(playerHealth);
+
+        //추가: 리스폰 UI 초기화
+        PlayerRespawnController respawnController = newPlayer.GetComponent<PlayerRespawnController>();
+
+        if (respawnController != null && respawnUIController != null)
+        {
+            respawnUIController.Initialize(respawnController);
+        }//추가 끝
+
 
         voiceNPCStateManager.AddTargetChaseState(newPlayer.gameObject);
 
