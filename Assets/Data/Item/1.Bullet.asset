@@ -15,9 +15,9 @@ MonoBehaviour:
   itemId:
     Value: 1
   itemName: "\uCD1D\uC54C"
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 35b3efc62fb16734c99440484d7eec82, type: 3}
   desc: "\uCD1D\uC54C"
   type: 1
   typeValue: 1
-  mesh: {fileID: 868616049940978378, guid: f1cd6800d51724d4291ee22764292e86, type: 3}
-  material: {fileID: 2100000, guid: e84d2f5f320cc8f4493a38d7e103daaf, type: 2}
+  mesh: {fileID: 7612784544473548660, guid: 01237cf3a3022d54a829e75d81f0d5e5, type: 3}
+  material: {fileID: 2100000, guid: cd439f2bb53ac76429c6c99e3adfbe74, type: 2}

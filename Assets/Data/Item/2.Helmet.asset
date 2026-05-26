@@ -19,5 +19,5 @@ MonoBehaviour:
   desc: "\uD5EC\uBA67"
   type: 0
   typeValue: 2
-  mesh: {fileID: 0}
-  material: {fileID: 0}
+  mesh: {fileID: 5461320835613783329, guid: ed1f04647e033ea4b87b9cc96c3bc934, type: 3}
+  material: {fileID: 2100000, guid: f8dd24549abec1a48aaa6cfc956b73b1, type: 2}
