@@ -10,7 +10,6 @@ public class NpcMove : MonoBehaviour
     private void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
-        networkObject = GetComponent<NetworkObject>();
         voicePlayer = GetComponent<VoicePlayer>();
         Debug.Assert(navMeshAgent);
         Debug.Assert(voicePlayer);
@@ -46,6 +45,5 @@ public class NpcMove : MonoBehaviour
     }
 
     private NavMeshAgent navMeshAgent;
-    private NetworkObject networkObject;
     private VoicePlayer voicePlayer;
 }

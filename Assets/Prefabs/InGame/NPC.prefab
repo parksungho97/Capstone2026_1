@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 1333240100388563542}
   - component: {fileID: 9043345543447589474}
   - component: {fileID: 4372642342994691858}
-  - component: {fileID: 5669932406093206510}
   - component: {fileID: 6680791769552487268}
   - component: {fileID: 7003203189480188377}
   - component: {fileID: 4093250457193427681}
@@ -21,6 +20,7 @@ GameObject:
   - component: {fileID: 9095254718630095927}
   - component: {fileID: 2432920282914316060}
   - component: {fileID: -6880639991214439475}
+  - component: {fileID: 5669932406093206510}
   m_Layer: 0
   m_Name: NPC
   m_TagString: Untagged
@@ -140,19 +140,6 @@ NavMeshAgent:
   m_BaseOffset: 0.5
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &5669932406093206510
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 77286735445477815}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d097824387406e2438deb360a3187af7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  wanderRadius: 10
 --- !u!114 &6680791769552487268
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -342,6 +329,19 @@ MonoBehaviour:
   footStepClips:
   - {fileID: 8300000, guid: 387f86e66f8380e429965f9a18bb1744, type: 3}
   - {fileID: 8300000, guid: 19d0da907a1847e4d8a6ae07750c227e, type: 3}
+--- !u!114 &5669932406093206510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 77286735445477815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d097824387406e2438deb360a3187af7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wanderRadius: 10
 --- !u!1 &5282960857625873925
 GameObject:
   m_ObjectHideFlags: 0
