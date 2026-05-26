@@ -46,14 +46,14 @@ public class GameEntryPoint : NetworkBehaviour
         {
             Debug.Log($"Game Ended! Result: {resultType}");
         };
-
+        
         Transform spawnPoint = spawnPointManager.GetRandomSpawnPoint();
 
         var newPlayer = await Runner.SpawnAsync(player, position: spawnPoint.position,
             rotation: spawnPoint.rotation,
             inputAuthority: Runner.LocalPlayer);
-
         cameraController.SetTarget(newPlayer.transform);
+        return;
         newPlayer.GetComponent<PlayerController>().Initalize(cameraController);
 
         InventoryController inventoryController = newPlayer.GetComponent<InventoryController>();
@@ -68,8 +68,6 @@ public class GameEntryPoint : NetworkBehaviour
 
         CharacterHealth playerHealth = newPlayer.GetComponent<CharacterHealth>();
         playerStatUIController.Initialize(playerHealth);
-
-        //voiceNPCStateManager.AddTargetChaseState(newPlayer.gameObject);
 
         if (Object.HasStateAuthority)
             StartCoroutine(WaitAndStartTimer());

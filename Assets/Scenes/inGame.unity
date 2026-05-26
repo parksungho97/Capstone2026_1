@@ -1041,6 +1041,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cube
       objectReference: {fileID: 0}
+    - target: {fileID: 8757805262031897489, guid: dc56f9b9cc03c69478a348e72815fafb, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1146,6 +1150,10 @@ PrefabInstance:
     - target: {fileID: 4700391219029032607, guid: 5df815ff643b2be419de49f0d58cf78a, type: 3}
       propertyPath: m_Layer
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4700391219029032607, guid: 5df815ff643b2be419de49f0d58cf78a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6239716104538283488, guid: 5df815ff643b2be419de49f0d58cf78a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1604,6 +1612,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: "\uC778\uAC8C\uC784"
       objectReference: {fileID: 0}
+    - target: {fileID: 1951923057401625726, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1996683068957352110, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
       propertyPath: keyCode
       value: 49
@@ -1998,6 +2010,10 @@ PrefabInstance:
     - target: {fileID: 7766201045687097218, guid: 6f64d9343774b0049b6bd57f10b4674b, type: 3}
       propertyPath: m_Name
       value: PlayerSpawnSystem
+      objectReference: {fileID: 0}
+    - target: {fileID: 7766201045687097218, guid: 6f64d9343774b0049b6bd57f10b4674b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2499,7 +2515,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraController: {fileID: 1974256330}
-  player: {fileID: -7186377803845191763, guid: 3c1d2365dfa5d2b4c86822cf770348cd, type: 3}
+  player: {fileID: 3988700222298171970, guid: a15f12b82b369044387c48c5c9017b54, type: 3}
   inputManager: {fileID: 1907287722}
   gameMode: {fileID: 1392825103}
   viewContext: {fileID: 1352932869}
