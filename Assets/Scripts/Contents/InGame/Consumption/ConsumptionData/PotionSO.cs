@@ -15,7 +15,7 @@ public class Potion : ConsumptionData
 
     public override void Use(GameObject user)
     {
-        user.GetComponent<CharacterHealth>()?.RPC_RecoverOverTime(Time, HpAmount);
+        user.GetComponent<CharacterHealth>()?.RPC_RecoverOverTime(HpAmount, Time);
     }
 }
 

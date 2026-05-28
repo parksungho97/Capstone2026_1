@@ -81,14 +81,7 @@ public class GameEntryPoint : NetworkBehaviour
         if (respawnController != null && respawnUIController != null)
         {
             respawnUIController.Initialize(respawnController);
-        }//추가 끝
-
-
-        voiceNPCStateManager.AddTargetChaseState(newPlayer.gameObject);
-
-        ItemCollector itemCollector = newPlayer.GetComponentInChildren<ItemCollector>();
-        Debug.Assert(itemCollector != null, "ItemCollector가 없습니다.");
-        itemCollector.Initialize(itemManager, inventory);
+        }
 
         if (Object.HasStateAuthority)
             StartCoroutine(WaitAndStartTimer());

@@ -54,7 +54,6 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 2843208492066292281}
   - {fileID: 1375767653743897352}
   ForceRemoteRenderTimeframe: 0
 --- !u!33 &-7385066945339794218
@@ -119,10 +118,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eced1f64045addd4baef04022e45ff7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meshFilter: {fileID: -7385066945339794218}
-  meshRenderer: {fileID: -4566031568136358744}
-  _ItemIdValue: 0
-  _Count: 0
 --- !u!65 &35545227885469394
 BoxCollider:
   m_ObjectHideFlags: 0

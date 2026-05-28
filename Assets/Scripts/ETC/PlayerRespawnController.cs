@@ -132,7 +132,7 @@ public class PlayerRespawnController : NetworkBehaviour
 
         transform.position = respawnPosition;
 
-        playerHealth.ResetStat();
+        //playerHealth.ResetStat();
 
         deathCount++;
         isRespawning = false;
