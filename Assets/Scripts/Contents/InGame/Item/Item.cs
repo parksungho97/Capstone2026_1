@@ -1,17 +1,18 @@
+using Fusion;
 using UnityEngine;
 
-public class Item
+public class ItemData
 {
-    public Item(string name, Sprite icon, string desc, int maxCount = 1)
+    public ItemData(string name, Sprite icon, string desc, GameObject itemPrefab)
     {
         Name = name;
         Icon = icon;
         Desc = desc;
-        MaxCount = maxCount;
+        ItemPrefab = itemPrefab;
     }
 
-    public string Name { get; private set; }
-    public Sprite Icon { get; private set; }
-    public string Desc { get; private set; }
-    public int MaxCount { get; private set; }
+    public string Name { get; }
+    public Sprite Icon { get; }
+    public string Desc { get; }
+    public GameObject ItemPrefab { get; }
 }

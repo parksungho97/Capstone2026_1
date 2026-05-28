@@ -38,3 +38,5 @@ Assets/**/*.pdb.meta
 
 Assets/MapElements/
 Assets/MapElements.meta
+
+.claude/

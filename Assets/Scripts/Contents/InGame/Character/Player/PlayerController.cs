@@ -3,121 +3,96 @@ using UnityEngine;
 
 public class PlayerController : NetworkBehaviour
 {
-    public void Initalize(GameObject player, CameraController cameraController)
+    [SerializeField] private ItemCollector itemCollector;
+
+    public void Initalize(CameraController cameraController)
     {
-        this.player = player;
         this.cameraController = cameraController;
 
-        move = player.GetComponent<PlayerMovement>();
+        move = GetComponent<Movement>();
         Debug.Assert(move);
 
-        captureInteractor = player.GetComponent<CaptureInteractor>();
+        captureInteractor = GetComponent<CapturePointInteracter>();
         Debug.Assert(captureInteractor);
 
-        animationState = player.GetComponent<PlayerAnimationState>();
-        Debug.Assert(animationState);
-    }
+        EPlayerTeam playerTeam = TeamInfo.Instance.GetTeam(Runner.LocalPlayer.PlayerId);
+        captureInteractor.SetTeam(playerTeam == EPlayerTeam.Red ? ECaptureState.Red : ECaptureState.Blue);
 
-    public override void Spawned()
-    {
-        if (Object.HasStateAuthority)
-            Object.AssignInputAuthority(Runner.LocalPlayer);
+        Debug.Assert(itemCollector);
+
+        playerAttack = GetComponent<CharacterAttack>();
+        Debug.Assert(playerAttack);
+
+        extraWeaponSlot = GetComponent<ExtraWeaponSlot>();
+        Debug.Assert(extraWeaponSlot);
     }
 
     public override void FixedUpdateNetwork()
     {
         base.FixedUpdateNetwork();
 
-        if (Object.HasStateAuthority == false)
-            return;
-
-        Vector3 moveDegree = Vector3.zero;
-        bool bMove = false;
-
-        if (GetInput<NetworkInputData>(out NetworkInputData data))
+        if (Object.HasInputAuthority)
         {
-            if (data.buttons.IsSet(EInputButton.W))
-                moveDegree += new Vector3(0.0f, 0.0f, 1f);
-            if (data.buttons.IsSet(EInputButton.S))
-                moveDegree += new Vector3(0.0f, 0.0f, -1f);
-            if (data.buttons.IsSet(EInputButton.A))
-                moveDegree += new Vector3(-1f, 0.0f, 0.0f);
-            if (data.buttons.IsSet(EInputButton.D))
-                moveDegree += new Vector3(1f, 0.0f, 0.0f);
+            bool hasMovedThisTick = false;
 
-            bool blockMoveAndRotate =
-                animationState.IsAttacking &&
-                animationState.CurrentWeapon != 1;
-
-            animationState.SetMoveDirection(
-                !blockMoveAndRotate && moveDegree.sqrMagnitude > 0.0001f
-                    ? moveDegree.normalized
-                    : Vector3.zero
-            );
-
-            if (!blockMoveAndRotate)
+            if (GetInput<NetworkInputData>(out NetworkInputData data))
             {
-                moveDegree = moveDegree * Runner.DeltaTime;
-                move.Move(moveDegree);
-                bMove = true;
-            }
-            else
-            {
-                bMove = false;
-            }
+                Vector3 moveDegree = Vector3.zero;
 
-            EPlayerTeam playerTeam = TeamInfo.Instance.GetTeam(Runner.LocalPlayer.PlayerId);
-            ERequestType requestType = playerTeam == EPlayerTeam.Red ? ERequestType.Red : ERequestType.Blue;
+                if (data.buttons.IsSet(EInputButton.W)) moveDegree += new Vector3(0.0f, 0.0f, 1f);
+                if (data.buttons.IsSet(EInputButton.S)) moveDegree += new Vector3(0.0f, 0.0f, -1f);
+                if (data.buttons.IsSet(EInputButton.A)) moveDegree += new Vector3(-1f, 0.0f, 0.0f);
+                if (data.buttons.IsSet(EInputButton.D)) moveDegree += new Vector3(1f, 0.0f, 0.0f);
 
-            if (data.buttons.WasPressed(previousButtons, EInputButton.Space))
-            {
-                captureInteractor.TryStartActivateCapturePoint(requestType);
-            }
-
-            if (data.buttons.WasReleased(previousButtons, EInputButton.Space))
-            {
-                captureInteractor.TryStopActivateCapturePoint(requestType);
-            }
-
-            if (data.buttons.WasPressed(previousButtons, EInputButton.Q))
-            {
-                animationState.NextWeapon();
-            }
-
-            if (data.buttons.WasPressed(previousButtons, EInputButton.Attack))
-            {
-                animationState.StartAttack(Runner);
-            }
-
-            if (cameraController.GetMouseWorldPosition(data.mousePosition, out Vector3 mouseWorldPosition))
-            {
-                Vector3 lookDir = mouseWorldPosition - player.transform.position;
-                lookDir.y = 0f;
-
-                if (lookDir.sqrMagnitude > 0.0001f)
+                if (moveDegree != Vector3.zero)
                 {
-                    Vector3 aimDir = lookDir.normalized;
-                    animationState.SetAimDirection(aimDir);
-
-                    if (!blockMoveAndRotate)
-                    {
-                        move.RotateTo(aimDir, Runner.DeltaTime);
-                    }
+                    move.Move(moveDegree); // 대각선 이동 속도 균일을 위해 normalized 권장
+                    hasMovedThisTick = true;
                 }
+
+                if (data.buttons.WasPressed(previousButtons, EInputButton.Space)) captureInteractor.TryStartCapture();
+                if (data.buttons.WasReleased(previousButtons, EInputButton.Space)) captureInteractor.TryStopCapture();
+                if (data.buttons.WasPressed(previousButtons, EInputButton.Q)) extraWeaponSlot.Swap();
+                if (data.buttons.WasPressed(previousButtons, EInputButton.Attack))
+                {
+                    if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+                        playerAttack.Attack();
+                }
+                if (data.buttons.WasPressed(previousButtons, EInputButton.Z)) itemCollector.AcquireOne();
+
+                previousButtons = data.buttons;
             }
 
-            previousButtons = data.buttons;
+            bMove = hasMovedThisTick;
         }
 
-        if (!bMove)
-            move.MoveEnd();
+        move.MoveUpdate();
     }
 
-    private GameObject player;
-    private PlayerMovement move;
+    private void Update()
+    {
+        if (!Object.HasInputAuthority) 
+            return;
+
+        if (cameraController.GetMouseWorldPosition(Input.mousePosition, out Vector3 mouseWorldPosition))
+        {
+            Vector3 lookDir = mouseWorldPosition - transform.position;
+            lookDir.y = 0f;
+
+            if (lookDir.sqrMagnitude > 0.0001f)
+            {
+                Vector3 aimDir = lookDir.normalized;
+                move.RotateTo(aimDir);
+            }
+        }
+    }
+
+    private Movement move;
     private CameraController cameraController;
-    private CaptureInteractor captureInteractor;
-    private PlayerAnimationState animationState;
+    private CapturePointInteracter captureInteractor;
+    private CharacterAttack playerAttack;
+    private ExtraWeaponSlot extraWeaponSlot;
 
     [Networked] private NetworkButtons previousButtons { get; set; }
+    [Networked] public bool bMove { get; set; }
 }

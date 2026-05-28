@@ -1,168 +1,105 @@
-using Fusion;
 using System;
 using UnityEngine;
 
-public enum ERequestType : byte
+public enum jjhActivaterState
 {
-    Red,
-    Blue,
-    End
+    Default,
+    Increasing,
+    Holding,
+    Decreasing
 }
 
-public enum EActivateSuccessType : byte
+// Blind to team context. Caller decides when to set request and when to tick.
+public class Activater
 {
-    Notyet,
-    Red,
-    Blue,
-}
+    public event Action OnComplete;
 
-public struct ObjectId : INetworkStruct
-{
-    public ObjectId(GameObject gameObject)
-    {
-        Id = gameObject.GetInstanceID();
-    }
-    public int Id { get; private set; }
-}
+    public jjhActivaterState State { get; private set; }
+    public float Gauge { get; private set; }
 
-public class Activater : NetworkBehaviour
-{
-    public uint GetGreaterProgress()
-    {
-        return RedState.Progress > BlueState.Progress ? RedState.Progress : BlueState.Progress;
-    }
+    private readonly float mIncreaseRate;
+    private readonly float mDecreaseRate;
+    private readonly float mHoldDecayDelay;
+    private readonly bool mUseCheckpoints;
 
-    public ERequestType GetGreaterTeam()
+    private float mHoldTimer;
+    private float mDecayTarget;
+
+    public Activater(float increaseRate, float decreaseRate, float holdDecayDelay, bool useCheckpoints = true)
     {
-        return RedState.Progress > BlueState.Progress ? ERequestType.Red : ERequestType.Blue;
+        mIncreaseRate = increaseRate;
+        mDecreaseRate = decreaseRate;
+        mHoldDecayDelay = holdDecayDelay;
+        mUseCheckpoints = useCheckpoints;
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void StartActivateRpc(ObjectId id, ERequestType requestType)
+    // Call once per tick before Tick() to reflect current request presence.
+    public void SetRequest(bool hasRequest)
     {
-        Debug.Assert(requestType != ERequestType.End);
-
-        if (requestType == ERequestType.Red)
+        switch (State)
         {
-            if (RedActivateRequests.ContainsKey(id.Id))
-                return;
-            RedActivateRequests.Add(id.Id, id.Id);
+            case jjhActivaterState.Default:
+                if (hasRequest) State = jjhActivaterState.Increasing;
+                break;
+            case jjhActivaterState.Increasing:
+                if (!hasRequest) { mHoldTimer = 0f; State = jjhActivaterState.Holding; }
+                break;
+            case jjhActivaterState.Holding:
+                if (hasRequest) State = jjhActivaterState.Increasing;
+                break;
+            case jjhActivaterState.Decreasing:
+                if (hasRequest) State = jjhActivaterState.Increasing;
+                break;
         }
-        else
+    }
+
+    public void Tick(float dt)
+    {
+        switch (State)
         {
-            if (BlueActivateRequests.ContainsKey(id.Id))
-                return;
-            BlueActivateRequests.Add(id.Id, id.Id);
+            case jjhActivaterState.Increasing:
+                Gauge = Mathf.Min(Gauge + mIncreaseRate * dt, 100f);
+                if (Gauge >= 100f)
+                {
+                    State = jjhActivaterState.Default;
+                    OnComplete?.Invoke();
+                }
+                break;
+
+            case jjhActivaterState.Holding:
+                mHoldTimer += dt;
+                if (mHoldTimer >= mHoldDecayDelay)
+                {
+                    mDecayTarget = mUseCheckpoints ? ComputeDecayTarget(Gauge) : 0f;
+                    State = jjhActivaterState.Decreasing;
+                }
+                break;
+
+            case jjhActivaterState.Decreasing:
+                Gauge -= mDecreaseRate * dt;
+                if (Gauge <= mDecayTarget)
+                {
+                    Gauge = mDecayTarget;
+                    State = jjhActivaterState.Default;
+                }
+                break;
         }
-        Debug.Log("StartActivateRpc Success");
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void StopActivateRpc(ObjectId id)
+    public void Clear()
     {
-        if (RedActivateRequests.ContainsKey(id.Id))
-            RedActivateRequests.Remove(id.Id);
-        else if (BlueActivateRequests.ContainsKey(id.Id))
-            BlueActivateRequests.Remove(id.Id);
+        State = jjhActivaterState.Default;
+        Gauge = 0f;
+        mHoldTimer = 0f;
+        mDecayTarget = 0f;
     }
 
-    public EActivateSuccessType IsActivatePossible()
+    // Returns the nearest lower checkpoint: 0, 33, 66, or 99.
+    private static float ComputeDecayTarget(float gauge)
     {
-        return ActivateSuccessType;
+        if (gauge > 99f) return 99f;
+        if (gauge > 66f) return 66f;
+        if (gauge > 33f) return 33f;
+        return 0f;
     }
-
-    public uint GetRedProgress()
-    {
-        return RedState.Progress;
-    }
-
-    public uint GetBlueProgress()
-    {
-        return BlueState.Progress;
-    }
-
-    public void ClearState()
-    {
-        if (!Object.HasStateAuthority)
-            return;
-
-        RedActivateRequests.Clear();
-        BlueActivateRequests.Clear();
-
-        RedState = default;
-        BlueState = default;
-
-        ActivateSuccessType = EActivateSuccessType.Notyet;
-    }
-
-    public override void FixedUpdateNetwork()
-    {
-        if (!Object.HasStateAuthority)
-            return;
-
-        bool redActive = RedActivateRequests.Count > 0;
-        bool blueActive = BlueActivateRequests.Count > 0;
-        bool isStandoff = redActive && blueActive;
-
-        TeamActivateState red = RedState;
-        TeamActivateState blue = BlueState;
-
-        float dt = Runner.DeltaTime;
-
-        if (isStandoff)
-        {
-            // 양 팀 대치 중: 모든 타이머 동결
-            red = decayController.OnStandoff(red);
-            blue = decayController.OnStandoff(blue);
-        }
-        else
-        {
-            // Red 처리
-            if (redActive)
-                red = ActivateProgressHelper.Increase(decayController.OnActive(red), dt, mTimeThreshold);
-            else
-                red = decayController.ProcessIdle(red, dt);
-
-            // Blue 처리
-            if (blueActive)
-                blue = ActivateProgressHelper.Increase(decayController.OnActive(blue), dt, mTimeThreshold);
-            else
-                blue = decayController.ProcessIdle(blue, dt);
-        }
-
-        RedState = red;
-        BlueState = blue;
-
-        if (RedState.Progress >= 100)
-            ActivateSuccessType = EActivateSuccessType.Red;
-        else if (BlueState.Progress >= 100)
-            ActivateSuccessType = EActivateSuccessType.Blue;
-        else
-            ActivateSuccessType = EActivateSuccessType.Notyet;
-    }
-
-    private void Awake()
-    {
-        decayController = new ActivateDecayController(mDecayDelay, mTimeThreshold);
-    }
-
-    [Networked]
-    private NetworkDictionary<int, int> RedActivateRequests => default;
-
-    [Networked]
-    private NetworkDictionary<int, int> BlueActivateRequests => default;
-
-    [Networked]
-    private TeamActivateState RedState { get; set; }
-
-    [Networked]
-    private TeamActivateState BlueState { get; set; }
-
-    [Networked]
-    private EActivateSuccessType ActivateSuccessType { get; set; }
-
-    [SerializeField] private float mTimeThreshold = 0.1f;
-    [SerializeField] private float mDecayDelay = 3f;
-
-    private ActivateDecayController decayController;
 }

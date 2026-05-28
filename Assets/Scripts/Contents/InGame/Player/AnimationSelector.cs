@@ -13,7 +13,19 @@ public class PlayerAnimationSelector : MonoBehaviour
     }
 
     [SerializeField] private float crossFadeTime = 0.2f;
-    [SerializeField] private float attackFadeTime = 0.05f;
+    [SerializeField] private int upperBodyLayerIndex = 1;
+
+    [Header("Weapon Aim")]
+    [SerializeField] private float aimHoldTime = 2.0f;
+    [SerializeField] private float aimExitFadeTime = 1.5f;
+
+    private bool wasAttacking = false;
+
+    private bool isWeaponAimActive = false;
+    private float weaponAimTimer = 0f;
+
+    private bool isAimFadingOut = false;
+    private float aimFadeTimer = 0f;
 
     private string currentAnimName = "";
 
@@ -24,6 +36,8 @@ public class PlayerAnimationSelector : MonoBehaviour
 
         if (animationState == null)
             animationState = GetComponent<PlayerAnimationState>();
+
+        animator.SetLayerWeight(upperBodyLayerIndex, 0f);
     }
 
     private void Update()
@@ -35,29 +49,70 @@ public class PlayerAnimationSelector : MonoBehaviour
         Vector3 aimDir = animationState.AimDirection;
         WeaponType weapon = (WeaponType)animationState.CurrentWeapon;
 
-        string nextAnimName;
+        string moveAnim = SelectMoveAnimation(moveDir, aimDir);
+        string nextMoveAnimName = "Pipe_" + moveAnim;
 
-        if (animationState.IsAttacking)
+        if (currentAnimName != nextMoveAnimName)
         {
-            nextAnimName = GetAttackAnimationName(weapon, moveDir, aimDir);
-        }
-        else
-        {
-            string moveAnim = SelectMoveAnimation(moveDir, aimDir);
-            nextAnimName = GetAnimationName(weapon, moveAnim);
+            animator.CrossFade(nextMoveAnimName, crossFadeTime, 0);
+            currentAnimName = nextMoveAnimName;
         }
 
-        if (currentAnimName == nextAnimName)
-            return;
+        if (animationState.IsAttacking && !wasAttacking)
+        {
+            isWeaponAimActive = true;
+            isAimFadingOut = false;
+            weaponAimTimer = 0f;
+            aimFadeTimer = 0f;
 
-        float fadeTime = animationState.IsAttacking ? attackFadeTime : crossFadeTime;
+            switch (weapon)
+            {
+                case WeaponType.Pipe:
+                    animator.SetTrigger("PipeAttack");
+                    break;
 
-        if (animationState.IsAttacking)
-            animator.CrossFade(nextAnimName, fadeTime, 0, 0f);
-        else
-            animator.CrossFade(nextAnimName, fadeTime);
+                case WeaponType.Pistol:
+                    animator.SetTrigger("PistolAttack");
+                    break;
 
-        currentAnimName = nextAnimName;
+                case WeaponType.ShotGun:
+                    animator.SetTrigger("ShotGunAttack");
+                    break;
+            }
+        }
+
+        if (isWeaponAimActive && !animationState.IsAttacking)
+        {
+            weaponAimTimer += Time.deltaTime;
+
+            if (weaponAimTimer >= aimHoldTime)
+            {
+                isWeaponAimActive = false;
+                isAimFadingOut = true;
+                aimFadeTimer = 0f;
+            }
+        }
+
+        float upperBodyWeight = 0f;
+
+        if (animationState.IsAttacking || isWeaponAimActive)
+        {
+            upperBodyWeight = 1f;
+        }
+        else if (isAimFadingOut)
+        {
+            aimFadeTimer += Time.deltaTime;
+
+            float t = Mathf.Clamp01(aimFadeTimer / aimExitFadeTime);
+            upperBodyWeight = Mathf.Lerp(1f, 0f, t);
+
+            if (t >= 1f)
+                isAimFadingOut = false;
+        }
+
+        animator.SetLayerWeight(upperBodyLayerIndex, upperBodyWeight);
+
+        wasAttacking = animationState.IsAttacking;
     }
 
     private string SelectMoveAnimation(Vector3 moveDir, Vector3 aimDir)
@@ -77,29 +132,5 @@ public class PlayerAnimationSelector : MonoBehaviour
             return forwardValue >= 0f ? "Forward" : "Back";
 
         return rightValue >= 0f ? "Right" : "Left";
-    }
-
-    private string GetAnimationName(WeaponType weapon, string moveAnim)
-    {
-        return weapon.ToString() + "_" + moveAnim;
-    }
-
-    private string GetAttackAnimationName(WeaponType weapon, Vector3 moveDir, Vector3 aimDir)
-    {
-        switch (weapon)
-        {
-            case WeaponType.Pipe:
-                return "Pipe_Attack";
-
-            case WeaponType.ShotGun:
-                return "ShotGun_Attack";
-
-            case WeaponType.Pistol:
-                string moveAnim = SelectMoveAnimation(moveDir, aimDir);
-                return GetAnimationName(weapon, moveAnim);
-
-            default:
-                return "Pipe_Idle";
-        }
     }
 }

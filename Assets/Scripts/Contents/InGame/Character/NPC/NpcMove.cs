@@ -1,24 +1,27 @@
-using System.Collections;
-using System.Collections.Generic;
+using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
-public class NpcMove : MonoBehaviour 
+public class NpcMove : MonoBehaviour
 {
     [SerializeField] private float wanderRadius = 10f;
-    private void Start()
+
+    private void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
+        voicePlayer = GetComponent<VoicePlayer>();
+        Debug.Assert(navMeshAgent);
+        Debug.Assert(voicePlayer);
         CenterPos = transform.position;
-        Debug.Log($"CenterPos: {CenterPos}");
     }
+
+    public bool IsMoving => navMeshAgent.velocity.sqrMagnitude > 0.01f;
+    public Vector3 CenterPos { get; set; }
 
     public bool IsReach()
     {
-        if (!navMeshAgent.pathPending && navMeshAgent.remainingDistance < 0.5f)
-            return true;
-        return false;
+        return !navMeshAgent.pathPending && navMeshAgent.remainingDistance < 0.5f;
     }
 
     public void SetRandomDestination()
@@ -42,6 +45,5 @@ public class NpcMove : MonoBehaviour
     }
 
     private NavMeshAgent navMeshAgent;
-    public Vector3 CenterPos { get; set; }
-    
+    private VoicePlayer voicePlayer;
 }

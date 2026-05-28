@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerRespawnController : NetworkBehaviour
 {
     [Header("References")]
-    [SerializeField] private PlayerHealth playerHealth;
+    [SerializeField] private CharacterHealth playerHealth;
     [SerializeField] private RespawnManager respawnManager;
 
     [Header("Respawn Time")]
@@ -31,7 +31,7 @@ public class PlayerRespawnController : NetworkBehaviour
     {
         if (playerHealth == null)
         {
-            playerHealth = GetComponent<PlayerHealth>();
+            playerHealth = GetComponent<CharacterHealth>();
         }
 
         if (respawnManager == null)
@@ -95,7 +95,7 @@ public class PlayerRespawnController : NetworkBehaviour
 
         transform.position = respawnPosition;
 
-        playerHealth.ResetStat();
+        playerHealth.RPC_ResetStat();
 
         deathCount++;
         isRespawning = false;

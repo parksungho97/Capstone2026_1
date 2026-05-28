@@ -1,44 +1,53 @@
+using Fusion;
 using UnityEngine;
+using static Unity.Collections.Unicode;
 
-public class Movement
+public class Movement : MonoBehaviour
 {
-    public Movement(GameObject owner, float moveSpeed = 3.0f, float turnSpeed = 15.0f)
+    [SerializeField] private float moveSpeed = 3.0f;
+    [SerializeField] private float turnSpeed = 15.0f;
+
+    public bool bMovePossible { get; set; } = true;
+
+    public Vector3 MoveDirection => mPendingMove;
+    public Vector3 ViewDirection => mPendingLookDir;
+
+    private Vector3 mPendingMove;
+    private Vector3 mPendingLookDir;
+    private float mPendingTurnCoeff;
+
+    public void Move(Vector3 degree)
     {
-        this.owner = owner;
-        this.moveSpeed = moveSpeed;
-        this.turnSpeed = turnSpeed;
-        bMovePossible = true;
-    }
-    public bool Move(Vector3 moveDegree)
-    {
-        if (bMovePossible == false)
-            return false;
-
-        if(moveDegree == Vector3.zero) 
-            return false;
-
-        owner.transform.position += moveDegree * moveSpeed;
-
-        return true;
+        mPendingMove += degree;
     }
 
-    public bool RotateTo(Vector3 lookDir, float turnCoeiff)
+    public void RotateTo(Vector3 lookDir, float coeff = 1.0f)
     {
-        if (lookDir.sqrMagnitude <= 0.0001f) 
-            return false;
-
-        Quaternion targetRot = Quaternion.LookRotation(lookDir, Vector3.up);
-        owner.transform.rotation = Quaternion.Slerp(
-            owner.transform.rotation,
-            targetRot,
-            turnSpeed * turnCoeiff
-        );
-
-        return true;
+        mPendingLookDir = lookDir;
+        mPendingTurnCoeff = coeff;
     }
 
-    private GameObject owner;
-    private float moveSpeed = 3.0f;
-    private float turnSpeed = 15.0f;
-    public bool bMovePossible { get; set; }
+    public void SetMovePossible(bool possible)
+    {
+        bMovePossible = possible;
+    }
+
+    public void MoveUpdate()
+    {
+        if (bMovePossible && mPendingMove != Vector3.zero)
+            transform.position += mPendingMove * moveSpeed * Time.deltaTime;
+        mPendingMove = Vector3.zero;
+
+        if (bMovePossible && mPendingLookDir.sqrMagnitude > 0.0001f)
+        {
+            Quaternion targetRot = Quaternion.LookRotation(mPendingLookDir, Vector3.up);
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                targetRot,
+                turnSpeed * mPendingTurnCoeff * Time.deltaTime
+            );
+        }
+        mPendingLookDir = Vector3.zero;
+        mPendingTurnCoeff = 0f;
+    }
 }

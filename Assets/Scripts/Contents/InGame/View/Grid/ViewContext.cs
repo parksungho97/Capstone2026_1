@@ -17,8 +17,6 @@ public class ViewContext : MonoBehaviour
     [SerializeField] private float worldX;
     [SerializeField] private float worldY;
 
-    [SerializeField] private string playerTag;
-
     [SerializeField] private LayerMask obstacleLayer;
 
     [SerializeField] private List<FOV> fovs = new List<FOV>();
@@ -41,15 +39,21 @@ public class ViewContext : MonoBehaviour
                 ViewInfo.RegistObstacle(objects[i]);
         }
 
-        GameObject[] players = GameObject.FindGameObjectsWithTag(playerTag);
+        ViewCulled[] culledTargets = FindObjectsByType<ViewCulled>(FindObjectsSortMode.None);
+
         viewCulling = new ViewCulling();
-        foreach (var cullableObject in players)
+
+        foreach (var target in culledTargets)
         {
-            if (cullableObject != gameObject)
-                viewCulling.RegistCulledObject(cullableObject);
+            if (target.gameObject == gameObject)
+                continue;
+
+            viewCulling.RegistCulledObject(target);
         }
 
         viewCulling.AddObstacleLayer(obstacleLayer);
+
+        Player.OnNetworkSpawned += OnPlayerSpawned;
     }
 
     private void LateUpdate()
@@ -79,6 +83,18 @@ public class ViewContext : MonoBehaviour
     {
         viewBuilder.Cleanup();
         viewRenderer.Cleanup();
+    }
+
+    private void OnDestroy()
+    {
+        Player.OnNetworkSpawned -= OnPlayerSpawned;
+    }
+
+    private void OnPlayerSpawned(Player player)
+    {
+        ViewCulled viewCulled = player.GetComponent<ViewCulled>();
+        if (viewCulled != null)
+            viewCulling.RegistCulledObject(viewCulled);
     }
 
     public void Initalize(GameObject refGameObject)

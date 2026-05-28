@@ -1,70 +1,48 @@
 using Fusion;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class NpcPlayVoice : State<NpcContext>
 {
-    public NpcPlayVoice(VoiceClipManager voiceClipManager, AudioSource npcAudioSource)
+    public NpcPlayVoice(VoicePlayer voicePlayer, NpcMove npcMove)
     {
-        this.voiceClipManager = voiceClipManager;
-        this.npcAudioSource = npcAudioSource;
+        this.voicePlayer = voicePlayer;
+        this.npcMove = npcMove;
     }
 
     public override void Enter(NpcContext context)
     {
-        AudioClip clip = voiceClipManager.GetRandomClipOrNull();
-        if (clip != null)
-        {
-            bOriginLooped = npcAudioSource.loop;
-            npcAudioSource.loop = false;
-
-            Debug.Log("PlaySound");
-            npcAudioSource.PlayOneShot(clip);
-        }
+        npcMove.StopMove();
+        voicePlayer.PlayRandom();
     }
 
-    public override void Exit(NpcContext context)
-    {
-        npcAudioSource.loop = bOriginLooped;
-        bSoundEnd = false;
-    }
+    public override void Exit(NpcContext context) { }
 
-    public override void Update(NpcContext context)
-    {
-        bSoundEnd = !npcAudioSource.isPlaying;
-    }
+    public override void Update(NpcContext context) { }
 
-    private VoiceClipManager voiceClipManager;
-    private AudioSource npcAudioSource;
-
-    private bool bOriginLooped = false;
-
-    public bool bSoundEnd { get; private set; }
+    private VoicePlayer voicePlayer;
+    private NpcMove npcMove;
 }
 public class NpcChaseTarget : State<NpcContext>
 {
-    public NpcChaseTarget(NpcMove npcMove, Transform targetTransform)
+    public NpcChaseTarget(NpcMove npcMove, Chaser chaser)
     {
         this.npcMove = npcMove;
-        this.targetTransform = targetTransform;
-    }
-    public override void Enter(NpcContext npcContext)
-    {
-
+        this.chaser = chaser;
     }
 
-    public override void Exit(NpcContext npcContext)
-    {
-    }
+    public override void Enter(NpcContext npcContext) { }
+
+    public override void Exit(NpcContext npcContext) { }
 
     public override void Update(NpcContext npcContext)
     {
-        npcMove.SetDestination(targetTransform.position);
+        Transform target = chaser.NearestTarget;
+        if (target != null)
+            npcMove.SetDestination(target.position);
     }
 
     private NpcMove npcMove;
-    private Transform targetTransform;
+    private Chaser chaser;
 }
 
 public class NpcBack : State<NpcContext>
@@ -93,24 +71,14 @@ public class NpcBack : State<NpcContext>
 
 public class MeetTarget : StateTransition
 {
-    public MeetTarget(GameObject owner, GameObject target, float detectDistance = 10.0f)
+    public MeetTarget(Chaser chaser)
     {
-        this.owner = owner;
-        this.target = target;
-        this.detectDistance = detectDistance;
+        this.chaser = chaser;
     }
 
-    public override bool ShouldTransition()
-    {
-        float dist = (target.transform.position - owner.transform.position).magnitude;
-        if (dist < detectDistance)
-            return true;
-        return false;
-    }
+    public override bool ShouldTransition() => chaser.HasTarget;
 
-    private GameObject owner;
-    private GameObject target;
-    private float detectDistance;
+    private Chaser chaser;
 }
 
 public class TimeOut : StateTransition
@@ -122,8 +90,8 @@ public class TimeOut : StateTransition
 
     public override bool ShouldTransition()
     {
-        elapsed += UnityEngine.Time.deltaTime;
-        Debug.Log($"{elapsed}");
+        elapsed += Time.deltaTime;
+        
         if (elapsed >= duration)
         {
             elapsed = 0f;
@@ -157,17 +125,17 @@ public class ReachPosition : StateTransition
 
 public class VoiceEnd : StateTransition
 {
-    public VoiceEnd(NpcPlayVoice npcPlayVoice, float duration = 4.0f)
+    public VoiceEnd(VoicePlayer voicePlayer, float duration = 4.0f)
     {
-        this.npcPlayVoice = npcPlayVoice;
+        this.voicePlayer = voicePlayer;
         this.duration = duration;
     }
 
     public override bool ShouldTransition()
     {
-        if (bWaitState == false)
+        if (!bWaitState)
         {
-            if (npcPlayVoice.bSoundEnd)
+            if (!voicePlayer.IsPlaying)
                 bWaitState = true;
         }
 
@@ -178,7 +146,6 @@ public class VoiceEnd : StateTransition
             {
                 time = 0f;
                 bWaitState = false;
-
                 return true;
             }
         }
@@ -186,7 +153,7 @@ public class VoiceEnd : StateTransition
         return false;
     }
 
-    private NpcPlayVoice npcPlayVoice;
+    private VoicePlayer voicePlayer;
 
     private bool bWaitState = false;
 
@@ -197,64 +164,69 @@ public class VoiceEnd : StateTransition
 [RequireComponent(typeof(NpcMove))]
 public class VoiceNPCStateManager : NetworkBehaviour
 {
-    [SerializeField] private VoiceClipManager voiceClipManager;
-    [SerializeField] private float detectDistance;
-    private void Start()
+    [SerializeField] private Chaser chaser;
+
+    public override void Spawned()
     {
+        base.Spawned();
+
+        if (Object.HasStateAuthority == false)
+            return;
+
         npcContext = new NpcContext();
         stateMachine = new StateMachine<NpcContext>(npcContext);
 
         NpcMove npcMove = GetComponent<NpcMove>();
-        AudioSource audioSource = GetComponent<AudioSource>();
+        VoicePlayer voicePlayer = GetComponent<VoicePlayer>();
+        characterHealth = GetComponent<CharacterHealth>();
+        Npc npc = GetComponent<Npc>();
+        Animator animator = GetComponent<Animator>();
+
         Debug.Assert(npcMove);
-        Debug.Assert(audioSource);
-        Debug.Assert(voiceClipManager);
+        Debug.Assert(voicePlayer);
+        Debug.Assert(chaser);
 
         idle = new NpcIdle(npcMove);
+        die = new NpcDie(npc, animator);
+        npcPlayVoiceFirst = new NpcPlayVoice(voicePlayer, npcMove);
+        npcPlayVoiceSecond = new NpcPlayVoice(voicePlayer, npcMove);
+        chaseTarget = new NpcChaseTarget(npcMove, chaser);
+        back = new NpcBack(npcMove, npcMove.CenterPos);
+
+        stateMachine.AddTransition(idle, npcPlayVoiceFirst, new MeetTarget(chaser));
+        stateMachine.AddTransition(npcPlayVoiceFirst, npcPlayVoiceSecond, new VoiceEnd(voicePlayer, 4.0f));
+        stateMachine.AddTransition(npcPlayVoiceSecond, chaseTarget, new VoiceEnd(voicePlayer, 0.0f));
+        stateMachine.AddTransition(chaseTarget, back, new TimeOut(1.0f));
+        stateMachine.AddTransition(back, idle, new ReachPosition(gameObject.transform, npcMove.CenterPos));
+        stateMachine.AddTransition(die, null, new AnimationEnd(animator));
 
         stateMachine.SetState(idle);
-
-        npcPlayVoiceFirst = new NpcPlayVoice(voiceClipManager, audioSource);
-        npcPlayVoiceSecond = new NpcPlayVoice(voiceClipManager, audioSource);
     }
 
     public override void FixedUpdateNetwork()
     {
         base.FixedUpdateNetwork();
 
+        if (Object.HasStateAuthority == false)
+            return;
+
+        if (!isDead && characterHealth.CurrentHP <= 0)
+        {
+            isDead = true;
+            stateMachine.SetState(die);
+            return;
+        }
+
         stateMachine.Update();
     }
 
-    public void AddTargetChaseState(GameObject target)
-    {
-        NpcMove npcMove = GetComponent<NpcMove>();
-
-        Debug.Assert(npcMove);
-
-        chaseTarget = new NpcChaseTarget(npcMove, target.transform);
-        back = new NpcBack(npcMove, npcMove.CenterPos);
-
-        MeetTarget meetTarget = new MeetTarget(gameObject, target, detectDistance);
-        stateMachine.AddTransition(idle, npcPlayVoiceFirst, meetTarget);
-
-        VoiceEnd voiceEnd4 = new VoiceEnd(npcPlayVoiceFirst, 4.0f);
-        stateMachine.AddTransition(npcPlayVoiceFirst, npcPlayVoiceSecond, voiceEnd4);
-
-        VoiceEnd voiceEnd0 = new VoiceEnd(npcPlayVoiceSecond, 0.0f);
-        stateMachine.AddTransition(npcPlayVoiceSecond, chaseTarget, voiceEnd0);
-
-        TimeOut timeOut = new TimeOut(1.0f);
-        stateMachine.AddTransition(chaseTarget, back, timeOut);
-
-        ReachPosition reachPosition = new ReachPosition(gameObject.transform, npcMove.CenterPos);
-        stateMachine.AddTransition(back, idle, reachPosition);
-    }
-
-
     private NpcContext npcContext;
     private StateMachine<NpcContext> stateMachine;
+    private CharacterHealth characterHealth;
+    private bool isDead;
 
     private NpcIdle idle;
+    private NpcDie die;
     private NpcChaseTarget chaseTarget;
     private NpcBack back;
     private NpcPlayVoice npcPlayVoiceFirst;
