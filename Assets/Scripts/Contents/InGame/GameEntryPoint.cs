@@ -18,6 +18,9 @@ public class GameEntryPoint : NetworkBehaviour
     [SerializeField] private NetworkObject voices;
     [SerializeField] private PlayerStatUIController playerStatUIController;
 
+    //추가
+    [SerializeField] private RespawnUIController respawnUIController;
+
     [Header("Spawn")]
     [SerializeField] private PlayerSpawnPointManager spawnPointManager;
     [SerializeField] private NetworkTimerClock timer;
@@ -71,6 +74,21 @@ public class GameEntryPoint : NetworkBehaviour
 
         CharacterHealth playerHealth = newPlayer.GetComponent<CharacterHealth>();
         playerStatUIController.Initialize(playerHealth);
+
+        //추가: 리스폰 UI 초기화
+        PlayerRespawnController respawnController = newPlayer.GetComponent<PlayerRespawnController>();
+
+        if (respawnController != null && respawnUIController != null)
+        {
+            respawnUIController.Initialize(respawnController);
+        }//추가 끝
+
+
+        voiceNPCStateManager.AddTargetChaseState(newPlayer.gameObject);
+
+        ItemCollector itemCollector = newPlayer.GetComponentInChildren<ItemCollector>();
+        Debug.Assert(itemCollector != null, "ItemCollector가 없습니다.");
+        itemCollector.Initialize(itemManager, inventory);
 
         if (Object.HasStateAuthority)
             StartCoroutine(WaitAndStartTimer());
