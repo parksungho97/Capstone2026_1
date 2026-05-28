@@ -19,5 +19,4 @@ MonoBehaviour:
   desc: Bullet
   type: 1
   typeValue: 1
-  mesh: {fileID: 7612784544473548660, guid: 01237cf3a3022d54a829e75d81f0d5e5, type: 3}
-  material: {fileID: 2100000, guid: cd439f2bb53ac76429c6c99e3adfbe74, type: 2}
+  itemPrefab: {fileID: 5919220286410709334, guid: 487dbb68ef818f247a229a25fa68bcac, type: 3}

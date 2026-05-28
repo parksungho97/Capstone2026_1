@@ -10,12 +10,11 @@ public class ItemSO : ScriptableObject
     [SerializeField] private string desc;
     [SerializeField] private EItemMapType type;
     [SerializeField] private int typeValue;
-    [SerializeField] private Mesh mesh;
-    [SerializeField] private Material material;
+    [SerializeField] private GameObject itemPrefab;
 
     public void Load(ItemManager itemManager, ItemMappings itemMappings)
     {
-        itemManager.Register(itemId, new ItemData(itemName, icon, desc, mesh, material));
+        itemManager.Register(itemId, new ItemData(itemName, icon, desc, itemPrefab));
         itemMappings.Register(itemId, type, typeValue);
     }
 }

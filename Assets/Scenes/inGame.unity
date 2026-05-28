@@ -1185,6 +1185,71 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb1e29d931afa514f86f6aab689dcda1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1296633870
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1296633873}
+  - component: {fileID: 1296633872}
+  - component: {fileID: 1296633871}
+  m_Layer: 0
+  m_Name: ItemInstanceManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1296633871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1296633870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 1648613289
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 1296633872}
+  ForceRemoteRenderTimeframe: 0
+--- !u!114 &1296633872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1296633870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9692c39b2c17fa46b2d92a3a6f034dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemInstancePrefab: {fileID: 8317841873800076762, guid: 163559ae958fe554faaeca337d2adc39, type: 3}
+--- !u!4 &1296633873
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1296633870}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.568484, y: 2.801674, z: -132.75058}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1333348357
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1399,7 +1464,6 @@ MonoBehaviour:
   gridY: 4096
   worldX: 400
   worldY: 400
-  playerTag: Character
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -2625,3 +2689,4 @@ SceneRoots:
   - {fileID: 399658410}
   - {fileID: 1503247014}
   - {fileID: 979770157}
+  - {fileID: 1296633873}

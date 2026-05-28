@@ -19,5 +19,4 @@ MonoBehaviour:
   desc: Potion
   type: 1
   typeValue: 0
-  mesh: {fileID: -1948423400586059757, guid: 687f9559644557d4ba5b955087ff2032, type: 3}
-  material: {fileID: 2100000, guid: da717d4b21a492b47b6be6122f915f3f, type: 2}
+  itemPrefab: {fileID: 3343229072912101299, guid: bf58252b67b807e4eb830e9401bb344d, type: 3}

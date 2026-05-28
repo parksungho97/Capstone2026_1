@@ -128,6 +128,7 @@ public class ViewRenderer
             commandBuffer.DrawRenderer(r, stencilMat);
 
         commandBuffer.SetGlobalTexture("_ObstacleMask", obstacleMaskTexture);
+        //commandBuffer.Blit(obstacleMaskTexture, BuiltinRenderTextureType.CameraTarget);
         commandBuffer.Blit(fogTempRT, BuiltinRenderTextureType.CameraTarget, viewRenderMaterial);
         commandBuffer.ReleaseTemporaryRT(fogTempRT);
     }
