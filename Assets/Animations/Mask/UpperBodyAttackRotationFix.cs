@@ -3,11 +3,11 @@ using UnityEngine;
 public class UpperBodyAttackRotationFix : MonoBehaviour
 {
     [SerializeField] private Animator animator;
-    [SerializeField] private PlayerAnimationState animationState;
+    [SerializeField] private PlayerAnimationNetworkState animationState;
 
     [Header("Rotation Fix")]
     [SerializeField] private HumanBodyBones upperBodyBone = HumanBodyBones.Chest;
-    [SerializeField] private Vector3 localEulerOffset = new Vector3(0f, 90f, 0f);
+    [SerializeField] private Vector3 localEulerOffset = new Vector3(0f, -70f, 0f);
     [SerializeField] private int upperBodyLayerIndex = 1;
 
     private Transform upperBodyTransform;
@@ -23,7 +23,7 @@ public class UpperBodyAttackRotationFix : MonoBehaviour
             animator = GetComponent<Animator>();
 
         if (animationState == null)
-            animationState = GetComponent<PlayerAnimationState>();
+            animationState = GetComponent<PlayerAnimationNetworkState>();
 
         upperBodyTransform = animator.GetBoneTransform(upperBodyBone);
         neckTransform = animator.GetBoneTransform(HumanBodyBones.Neck);
@@ -35,7 +35,10 @@ public class UpperBodyAttackRotationFix : MonoBehaviour
         if (animator == null || animationState == null || upperBodyTransform == null)
             return;
 
-        if (animationState.CurrentWeapon == 0)
+        WeaponType weapon = GetWeaponType(animationState.CurrentWeaponId);
+
+        // Pipe는 회전 보정 제외
+        if (weapon == WeaponType.Pipe)
             return;
 
         float layerWeight = animator.GetLayerWeight(upperBodyLayerIndex);
@@ -49,21 +52,44 @@ public class UpperBodyAttackRotationFix : MonoBehaviour
         if (headTransform != null)
             headOriginalRotation = headTransform.rotation;
 
-        Quaternion offsetRotation = Quaternion.Euler(localEulerOffset);
+        Quaternion targetRotation =
+    transform.rotation * Quaternion.Euler(localEulerOffset);
 
-        Quaternion blendedOffset = Quaternion.Slerp(
-            Quaternion.identity,
-            offsetRotation,
+        upperBodyTransform.rotation = Quaternion.Slerp(
+            upperBodyTransform.rotation,
+            targetRotation,
             layerWeight
         );
-
-        upperBodyTransform.localRotation =
-            upperBodyTransform.localRotation * blendedOffset;
 
         if (neckTransform != null)
             neckTransform.rotation = neckOriginalRotation;
 
         if (headTransform != null)
             headTransform.rotation = headOriginalRotation;
+    }
+
+    private enum WeaponType
+    {
+        Pipe = 0,
+        Pistol = 1,
+        ShotGun = 2
+    }
+
+    private WeaponType GetWeaponType(int weaponId)
+    {
+        switch (weaponId)
+        {
+            case 0:
+                return WeaponType.Pipe;
+
+            case 1:
+                return WeaponType.Pistol;
+
+            case 2:
+                return WeaponType.ShotGun;
+
+            default:
+                return WeaponType.Pipe;
+        }
     }
 }

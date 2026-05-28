@@ -9,8 +9,8 @@ public class Movement : MonoBehaviour
 
     public bool bMovePossible { get; set; } = true;
 
-    public Vector3 MoveDirection => mPendingMove;
-    public Vector3 ViewDirection => mPendingLookDir;
+    public Vector3 MoveDirection { get; private set; }
+    public Vector3 ViewDirection { get; private set; }
 
     private Vector3 mPendingMove;
     private Vector3 mPendingLookDir;
@@ -35,11 +35,21 @@ public class Movement : MonoBehaviour
     public void MoveUpdate()
     {
         if (bMovePossible && mPendingMove != Vector3.zero)
+        {
+            MoveDirection = mPendingMove.normalized;
             transform.position += mPendingMove * moveSpeed * Time.deltaTime;
+        }
+        else
+        {
+            MoveDirection = Vector3.zero;
+        }
+
         mPendingMove = Vector3.zero;
 
         if (bMovePossible && mPendingLookDir.sqrMagnitude > 0.0001f)
         {
+            ViewDirection = mPendingLookDir.normalized;
+
             Quaternion targetRot = Quaternion.LookRotation(mPendingLookDir, Vector3.up);
             transform.rotation = Quaternion.Slerp(
                 transform.rotation,
@@ -47,7 +57,9 @@ public class Movement : MonoBehaviour
                 turnSpeed * mPendingTurnCoeff * Time.deltaTime
             );
         }
+
         mPendingLookDir = Vector3.zero;
         mPendingTurnCoeff = 0f;
     }
 }
+    

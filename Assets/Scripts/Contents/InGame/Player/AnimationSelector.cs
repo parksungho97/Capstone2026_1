@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerAnimationSelector : MonoBehaviour
 {
     [SerializeField] private Animator animator;
-    [SerializeField] private PlayerAnimationState animationState;
+    [SerializeField] private PlayerAnimationNetworkState animationState;
 
     public enum WeaponType
     {
@@ -35,7 +35,7 @@ public class PlayerAnimationSelector : MonoBehaviour
             animator = GetComponent<Animator>();
 
         if (animationState == null)
-            animationState = GetComponent<PlayerAnimationState>();
+            animationState = GetComponent<PlayerAnimationNetworkState>();
 
         animator.SetLayerWeight(upperBodyLayerIndex, 0f);
     }
@@ -47,7 +47,7 @@ public class PlayerAnimationSelector : MonoBehaviour
 
         Vector3 moveDir = animationState.MoveDirection;
         Vector3 aimDir = animationState.AimDirection;
-        WeaponType weapon = (WeaponType)animationState.CurrentWeapon;
+        WeaponType weapon = GetWeaponType(animationState.CurrentWeaponId);
 
         string moveAnim = SelectMoveAnimation(moveDir, aimDir);
         string nextMoveAnimName = "Pipe_" + moveAnim;
@@ -58,29 +58,69 @@ public class PlayerAnimationSelector : MonoBehaviour
             currentAnimName = nextMoveAnimName;
         }
 
+        // 공격 시작: 공격 애니메이션만 재생
         if (animationState.IsAttacking && !wasAttacking)
         {
-            isWeaponAimActive = true;
+            isWeaponAimActive = false;
             isAimFadingOut = false;
             weaponAimTimer = 0f;
             aimFadeTimer = 0f;
 
+            animator.ResetTrigger("PipeAttack");
+            animator.ResetTrigger("PistolAttack");
+            animator.ResetTrigger("ShotGunAttack");
+
             switch (weapon)
             {
                 case WeaponType.Pipe:
-                    animator.SetTrigger("PipeAttack");
+                    animator.CrossFadeInFixedTime(
+                        "UpperBodyAttack.Pipe_Attack",
+                        0.05f,
+                        upperBodyLayerIndex,
+                        0f
+                    );
                     break;
 
                 case WeaponType.Pistol:
-                    animator.SetTrigger("PistolAttack");
+                    animator.CrossFadeInFixedTime(
+                        "UpperBodyAttack.Pistol_Attack",
+                        0.05f,
+                        upperBodyLayerIndex,
+                        0f
+                    );
                     break;
 
                 case WeaponType.ShotGun:
-                    animator.SetTrigger("ShotGunAttack");
+                    animator.CrossFadeInFixedTime(
+                        "UpperBodyAttack.ShotGun_Attack",
+                        0.05f,
+                        upperBodyLayerIndex,
+                        0f
+                    );
                     break;
             }
         }
 
+        // 공격 종료 순간: Pistol / ShotGun만 Weapon_Aim 시작
+        if (wasAttacking && !animationState.IsAttacking)
+        {
+            if (weapon == WeaponType.Pistol || weapon == WeaponType.ShotGun)
+            {
+                isWeaponAimActive = true;
+                isAimFadingOut = false;
+                weaponAimTimer = 0f;
+                aimFadeTimer = 0f;
+
+                animator.CrossFadeInFixedTime(
+                    "UpperBodyAttack.Weapon_Aim",
+                    0.08f,
+                    upperBodyLayerIndex,
+                    0f
+                );
+            }
+        }
+
+        // Weapon_Aim 유지 시간 계산
         if (isWeaponAimActive && !animationState.IsAttacking)
         {
             weaponAimTimer += Time.deltaTime;
@@ -132,5 +172,23 @@ public class PlayerAnimationSelector : MonoBehaviour
             return forwardValue >= 0f ? "Forward" : "Back";
 
         return rightValue >= 0f ? "Right" : "Left";
+    }
+
+    private WeaponType GetWeaponType(int weaponId)
+    {
+        switch (weaponId)
+        {
+            case 0:
+                return WeaponType.Pipe;
+
+            case 1:
+                return WeaponType.Pistol;
+
+            case 2:
+                return WeaponType.ShotGun;
+
+            default:
+                return WeaponType.Pipe;
+        }
     }
 }

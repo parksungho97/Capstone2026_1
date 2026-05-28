@@ -50,7 +50,7 @@ public class Player : NetworkBehaviour
         if (bMove)
         {
             voicePlayer.PlayFootStep();
-            animtor.SetTrigger("Walk");
+           // animtor.SetTrigger("Walk");
         }
     }
 
