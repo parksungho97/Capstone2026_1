@@ -2,36 +2,50 @@ using UnityEngine;
 
 public class Magazine : MonoBehaviour
 {
-    private int currentProjectileId = -1;
-    private EquipmentSlot equipmentComponent;
-    private ConsumptionStore consumptionStore;
+    public int CurrentProjectileId { get; private set; } = -1;
 
-    public int CurrentProjectileId => currentProjectileId;
+    private ConsumptionStore consumptionStore;
+    private EquipmentSlot equipmentSlot;
 
     private void Start()
     {
-        equipmentComponent = GetComponent<EquipmentSlot>();
         consumptionStore = GetComponent<ConsumptionStore>();
-        Debug.Assert(equipmentComponent != null);
+        equipmentSlot = GetComponent<EquipmentSlot>();
         Debug.Assert(consumptionStore != null);
-    }
-
-    public void SetAttackInstance(int attackInstance)
-    {
-        currentProjectileId = attackInstance;
+        Debug.Assert(equipmentSlot != null);
     }
 
     public bool TryConsume()
     {
-        if (equipmentComponent.Weapon == null)
+        if (!TryFindLoaded(out int attackId, out int consumptionId))
             return false;
 
-        if (currentProjectileId == -1)
+        CurrentProjectileId = attackId;
+        return consumptionStore.Consume(consumptionId, gameObject);
+    }
+
+    private bool TryFindLoaded(out int attackId, out int consumptionId)
+    {
+        Weapon weapon = equipmentSlot?.Weapon;
+        if (weapon == null)
+        {
+            attackId = -1;
+            consumptionId = -1;
             return false;
+        }
 
-        if (AttackConsumptionMapping.Instance.TryGetConsumption(currentProjectileId, out int consumptionId))
-            return consumptionStore.Consume(consumptionId, gameObject);
+        foreach (int id in weapon.AttackIds)
+        {
+            if (AttackConsumptionMapping.Instance.TryGetConsumption(id, out consumptionId)
+                && consumptionStore.HasItem(consumptionId))
+            {
+                attackId = id;
+                return true;
+            }
+        }
 
-        return true;
+        attackId = -1;
+        consumptionId = -1;
+        return false;
     }
 }

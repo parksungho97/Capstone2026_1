@@ -3,20 +3,21 @@ using UnityEngine;
 
 public class PlayerContext
 {
-    public PlayerContext(Animator animator, Movement movement, VoicePlayer voicePlayer, PlayerController playerController)
+    public PlayerContext(Animator animator, Movement movement, VoicePlayer voicePlayer
+        , PlayerController playerController, Respawn respawn)
     {
         Animator = animator;
         Movement = movement;
         VoicePlayer = voicePlayer;
         PlayerController = playerController;
+        Respawn = respawn;
     }
 
     public Animator Animator { get; private set; }
     public Movement Movement { get; private set; }
-
     public VoicePlayer VoicePlayer { get; private set; }
-
-    public PlayerController PlayerController { get; private set;  }
+    public PlayerController PlayerController { get; private set; }
+    public Respawn Respawn { get; private set; }
 }
 
 [RequireComponent(typeof(Animator))]
@@ -28,41 +29,36 @@ public class PlayerStateManager : MonoBehaviour
         Animator animator = GetComponent<Animator>();
         Movement movement = GetComponent<Movement>();
         CapturePointInteracter captureInteractor = GetComponent<CapturePointInteracter>();
-        CharacterAttack characterAttack = GetComponent<CharacterAttack>();
         VoicePlayer voicePlayer = GetComponent<VoicePlayer>();
         PlayerController playerController = GetComponent<PlayerController>();
+        Respawn respawn = GetComponent<Respawn>();
+
         Debug.Assert(animator);
         Debug.Assert(movement);
         Debug.Assert(captureInteractor);
-        Debug.Assert(characterAttack);
         Debug.Assert(voicePlayer);
         Debug.Assert(playerController);
+        Debug.Assert(respawn);
 
-        playerContext = new PlayerContext(animator, movement, voicePlayer, playerController);
-
+        playerContext = new PlayerContext(animator, movement, voicePlayer, playerController, respawn);
         stateMachine = new StateMachine<PlayerContext>(playerContext);
 
-        playerIdle = new PlayerIdle();
-        playerWalk = new PlayerWalk();
-        playerInteract = new PlayerInteract();
-        playerAttackState = new PlayerAttackState();
+        playerBase = new PlayerBase();
+        playerDontMove = new PlayerDontMove();
+        playerDead = new PlayerDeadState();
 
-        isWalk = new IsWalk(playerController, true);
-        isNotWalk = new IsWalk(playerController, false);
         isInteract = new IsInteract(captureInteractor, true);
         isNotInteract = new IsInteract(captureInteractor, false);
-        onAttack = new OnAttackStateTransition(characterAttack);
-        onAttackEnd = new OnAttackEndTransition(characterAttack);
+        isDead = new IsDead(respawn, true);
+        isNotDead = new IsDead(respawn, false);
 
-        stateMachine.AddTransition(playerIdle, playerWalk, isWalk);
-        stateMachine.AddTransition(playerWalk, playerIdle, isNotWalk);
-        stateMachine.AddTransition(playerIdle, playerInteract, isInteract);
-        stateMachine.AddTransition(playerInteract, playerIdle, isNotInteract);
-        stateMachine.AddTransition(playerIdle, playerAttackState, onAttack);
-        stateMachine.AddTransition(playerWalk, playerAttackState, onAttack);
-        stateMachine.AddTransition(playerAttackState, playerIdle, onAttackEnd);
+        stateMachine.AddTransition(playerBase, playerDontMove, isInteract);
+        stateMachine.AddTransition(playerDontMove, playerBase, isNotInteract);
+        stateMachine.AddTransition(playerBase, playerDead, isDead);
+        stateMachine.AddTransition(playerDontMove, playerDead, isDead);
+        stateMachine.AddTransition(playerDead, playerBase, isNotDead);
 
-        stateMachine.SetState(playerIdle);
+        stateMachine.SetState(playerBase);
     }
 
     private void Update()
@@ -71,18 +67,14 @@ public class PlayerStateManager : MonoBehaviour
     }
 
     private PlayerContext playerContext;
-
     private StateMachine<PlayerContext> stateMachine;
 
-    private PlayerIdle playerIdle;
-    private PlayerWalk playerWalk;
-    private PlayerInteract playerInteract;
-    private PlayerAttackState playerAttackState;
+    private PlayerBase playerBase;
+    private PlayerDontMove playerDontMove;
+    private PlayerDeadState playerDead;
 
-    private IsWalk isWalk;
-    private IsWalk isNotWalk;
     private IsInteract isInteract;
     private IsInteract isNotInteract;
-    private OnAttackStateTransition onAttack;
-    private OnAttackEndTransition onAttackEnd;
+    private IsDead isDead;
+    private IsDead isNotDead;
 }

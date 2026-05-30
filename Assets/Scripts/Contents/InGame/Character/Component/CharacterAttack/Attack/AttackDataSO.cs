@@ -7,6 +7,10 @@ public abstract class AttackDataBase
     public int Damage;
     public float KnockbackForce;
     public Vector3 SpawnOffset;
+    public int AttackVfxId;
+    public int HitVfxId;
+    public int CastSoundId;
+    public int HitSoundId;
 }
 
 public abstract class AttackDataSO : ScriptableObject

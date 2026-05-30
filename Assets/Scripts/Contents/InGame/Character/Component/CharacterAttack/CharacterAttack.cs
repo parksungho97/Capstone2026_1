@@ -72,6 +72,12 @@ public class CharacterAttack : MonoBehaviour
 
                 attacker.RangedAttack(magazine.CurrentProjectileId, AttackContext.AttackDelay);
                 break;
+            case EAttackType.Shotgun:
+                if (magazine == null || !magazine.TryConsume())
+                    return;
+
+                attacker.ShotgunAttack(magazine.CurrentProjectileId, AttackContext.AttackDelay);
+                break;
         }
 
         animator?.SetTrigger(attackTrigger);

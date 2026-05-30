@@ -9,9 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4868299d524726642a30a67fe2fa9fd5, type: 3}
-  m_Name: 1.Bullet
+  m_Script: {fileID: 11500000, guid: c88e1ae8087703f40ac5eced26ba5796, type: 3}
+  m_Name: 3.Shotgun
   m_EditorClassIdentifier: 
-  consumptionId: 1
-  maxCount: 9
+  equipId: 3
+  attackType: 2
+  attackIds: 02000000
   attackPower: 10

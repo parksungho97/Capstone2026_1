@@ -25,9 +25,12 @@ public class ExtraWeaponSlot : MonoBehaviour
 
     public void Swap()
     {
-        Weapon temp = equipmentSlot.Weapon;
-        equipmentSlot.SetWeapon(Weapon);
-        Weapon = temp;
+        if (Weapon != null)
+        {
+            Weapon temp = equipmentSlot.Weapon;
+            equipmentSlot.SetWeapon(Weapon);
+            Weapon = temp;
+        }
     }
 
     public void Equip(Weapon weapon)

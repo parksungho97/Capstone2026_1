@@ -117,6 +117,7 @@ MonoBehaviour:
   - {fileID: 4093250457193427681}
   - {fileID: 4103996838576592822}
   - {fileID: 9095254718630095927}
+  - {fileID: 8086947336892419551}
   - {fileID: 1559543253139044431}
   ForceRemoteRenderTimeframe: 0
 --- !u!195 &4372642342994691858
@@ -489,6 +490,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 1333240100388563542}
   health: {fileID: 9095254718630095927}
+  playerController: {fileID: 0}
+  hitStunDuration: 0.5
 --- !u!1001 &6161229944743731338
 PrefabInstance:
   m_ObjectHideFlags: 0

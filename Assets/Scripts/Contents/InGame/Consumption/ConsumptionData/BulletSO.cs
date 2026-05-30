@@ -6,9 +6,10 @@ public class Bullet : ConsumptionData
 {
     public int AttackPower { get; }
 
-    public Bullet(int attackPower)
+    public Bullet(int attackPower, int maxCount)
     {
         AttackPower = attackPower;
+        MaxCount = maxCount;
     }
 
     public override void Use(GameObject user) { }
@@ -21,5 +22,5 @@ public class BulletSO : ConsumptionSO
     [SerializeField] private int attackPower;
 
     public override void Load(ConsumptionManager manager)
-        => manager.Register(consumptionId, new Bullet(attackPower));
+        => manager.Register(consumptionId, new Bullet(attackPower, maxCount));
 }

@@ -3,8 +3,21 @@ using UnityEngine;
 
 public class RespawnManager : NetworkBehaviour
 {
+    public static RespawnManager Instance { get; private set; }
+
     [Header("Respawn Points")]
     [SerializeField] private RespawnPoint[] respawnPoints;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
 
     [Header("Safety Check")]
     [SerializeField] private LayerMask obstacleLayer;

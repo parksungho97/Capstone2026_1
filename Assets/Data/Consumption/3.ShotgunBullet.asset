@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4868299d524726642a30a67fe2fa9fd5, type: 3}
-  m_Name: 1.Bullet
+  m_Name: 3.ShotgunBullet
   m_EditorClassIdentifier: 
-  consumptionId: 1
+  consumptionId: 3
   maxCount: 9
   attackPower: 10

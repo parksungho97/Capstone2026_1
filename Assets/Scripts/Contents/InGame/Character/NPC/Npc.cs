@@ -44,8 +44,8 @@ public class Npc : NetworkBehaviour
     {
         base.Render();
 
-        if (voicePlayer != null && bMoving)
-            voicePlayer.PlayFootStep();
+        //if (voicePlayer != null && bMoving)
+        //    voicePlayer.PlayFootStep();
     }
     private void Update()
     {

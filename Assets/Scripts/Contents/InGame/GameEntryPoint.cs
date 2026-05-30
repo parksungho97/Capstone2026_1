@@ -44,13 +44,14 @@ public class GameEntryPoint : NetworkBehaviour
         Debug.Assert(playerStatUIController);
         Debug.Assert(spawnPointManager);
         Debug.Assert(inventoryUIMapper);
+        Debug.Assert(respawnUIController);
 
         gameMode.Initialize(timer);
         gameMode.ActionGameEnded += (EResultType resultType) =>
         {
             Debug.Log($"Game Ended! Result: {resultType}");
         };
-        
+
         Transform spawnPoint = spawnPointManager.GetRandomSpawnPoint();
 
         var newPlayer = await Runner.SpawnAsync(player, position: spawnPoint.position,
@@ -75,13 +76,9 @@ public class GameEntryPoint : NetworkBehaviour
         CharacterHealth playerHealth = newPlayer.GetComponent<CharacterHealth>();
         playerStatUIController.Initialize(playerHealth);
 
-        //추가: 리스폰 UI 초기화
-        PlayerRespawnController respawnController = newPlayer.GetComponent<PlayerRespawnController>();
-
-        if (respawnController != null && respawnUIController != null)
-        {
-            respawnUIController.Initialize(respawnController);
-        }
+        Respawn respawn = newPlayer.GetComponent<Respawn>();
+        Debug.Assert(respawn);
+        respawnUIController.Initialize(respawn);
 
         if (Object.HasStateAuthority)
             StartCoroutine(WaitAndStartTimer());
@@ -105,4 +102,5 @@ public class GameEntryPoint : NetworkBehaviour
 
         timer.SetMinutes(minute);
     }
+
 }

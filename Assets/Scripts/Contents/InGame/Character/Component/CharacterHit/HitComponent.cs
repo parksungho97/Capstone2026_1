@@ -1,25 +1,47 @@
+using Fusion;
 using System;
 using UnityEngine;
 
-public class HitComponent : MonoBehaviour
+public class HitComponent : NetworkBehaviour
 {
     [SerializeField] private Rigidbody rb;
-
     [SerializeField] private CharacterHealth health;
+    [SerializeField] private PlayerController playerController;
+    [SerializeField] private float hitStunDuration = 0.5f;
 
     public Action ActionHitted;
 
+    [SerializeField] private VoicePlayer voicePlayer;
+
     private void Start()
     {
+        voicePlayer = GetComponent<VoicePlayer>();
         Debug.Assert(rb);
         Debug.Assert(health);
     }
 
-    public void Hit(int damage, Vector3 knockbackDir, float knockbackForce)
+    public void Hit(int damage, Vector3 knockbackDir, float knockbackForce, int vfxId = -1, int soundId = -1)
     {
-        rb.AddForce(knockbackDir.normalized * knockbackForce, ForceMode.Impulse);
+        RPC_HitAuthority(damage, knockbackDir, knockbackForce);
+        RPC_HitAll(vfxId, soundId);
+    }
 
-        health.RPC_ServeHP(damage);
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    private void RPC_HitAuthority(int damage, Vector3 knockbackDir, float knockbackForce)
+    {
+        rb?.AddForce(knockbackDir.normalized * knockbackForce, ForceMode.Impulse);
+        health?.RPC_ServeHP(damage);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    private void RPC_HitAll(int vfxId, int soundId)
+    {
+        playerController?.DisableInputForSeconds(hitStunDuration);
+
+        if (vfxId >= 0)
+            VFXManager.Instance.Spawn(vfxId, transform.position);
+        if (soundId >= 0)
+            voicePlayer?.PlayAttackClip(soundId);
 
         ActionHitted?.Invoke();
     }

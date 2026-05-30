@@ -9,18 +9,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 308d80dc3bccd7e41b4d7e09e3f1c3c4, type: 3}
-  m_Name: 0.PipeAttack
+  m_Script: {fileID: 11500000, guid: db36fb20cd85d7045bb1cf9f44fba522, type: 3}
+  m_Name: 2.ShotgunAttack
   m_EditorClassIdentifier: 
-  id: 0
+  id: 2
   data:
     Prefab: {fileID: -1205818650260235087, guid: bcfc6301c3662b148b8475e96ab1031c, type: 3}
-    Damage: 34
+    Damage: 20
     KnockbackForce: 10
-    SpawnOffset: {x: 0, y: 2, z: 3}
-    AttackVfxId: -1
+    SpawnOffset: {x: 0, y: 2, z: 2}
+    AttackVfxId: 0
     HitVfxId: 0
-    CastSoundId: -1
-    HitSoundId: 0
-    ActivationTime: 0.6
-    Duration: 1.3
+    CastSoundId: 0
+    HitSoundId: 1
+    ActivationTime: 0
+    Duration: 1
+    InitialScale: {x: 1, y: 1, z: 1}
+    FinalScale: {x: 8, y: 5, z: 5}
+    DashSpeed: 20

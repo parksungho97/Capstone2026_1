@@ -24,6 +24,7 @@ public enum EAttackType
 {
     Melee,
     Ranged,
+    Shotgun,
 }
 public class Weapon : Equipment
 {
@@ -31,7 +32,8 @@ public class Weapon : Equipment
     public IReadOnlyList<int> AttackIds { get; }
     public int AttackPower { get; }
 
-    public Weapon(int id, EAttackType attackType, IReadOnlyList<int> attackIds, int attackPower) : base(id)
+    public Weapon(int id, EAttackType attackType, IReadOnlyList<int> attackIds, int attackPower) 
+        : base(id)
     {
         AttackType = attackType;
         AttackIds = new List<int>(attackIds);

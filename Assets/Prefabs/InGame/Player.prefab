@@ -200,6 +200,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 4633489097491031141}
   health: {fileID: 1987929451324610142}
+  playerController: {fileID: 2854249696004987484}
+  hitStunDuration: 0.5
+  voicePlayer: {fileID: 8227755266992488921}
 --- !u!1 &7474874513299646184
 GameObject:
   m_ObjectHideFlags: 0
@@ -685,7 +688,10 @@ PrefabInstance:
       addedObject: {fileID: 7313579103356649580}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5659626534878db43b6e257276f9e34f, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2435413512849704707}
+      addedObject: {fileID: -8236649479826274671}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5659626534878db43b6e257276f9e34f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2877092397099777778}
   m_SourcePrefab: {fileID: 100100000, guid: 5659626534878db43b6e257276f9e34f, type: 3}
 --- !u!4 &112493039935944063 stripped
 Transform:
@@ -807,7 +813,9 @@ MonoBehaviour:
   - {fileID: 2848988751772690672}
   - {fileID: 3916394991154882148}
   - {fileID: 2071082523166238926}
-  - {fileID: 2435413512849704707}
+  - {fileID: -8236649479826274671}
+  - {fileID: 2877092397099777778}
+  - {fileID: 8056722664998124107}
   ForceRemoteRenderTimeframe: 0
 --- !u!82 &-5958771651917931232
 AudioSource:
@@ -1005,7 +1013,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultMaxHP: 100
-  defaultMaxArmor: 50
+  defaultMaxArmor: 10
   _MaxHP: 0
   _CurrentHP: 0
   _MaxArmor: 0
@@ -1220,7 +1228,21 @@ MonoBehaviour:
   pipeObject: {fileID: 8339265770899297952}
   pistolObject: {fileID: 9003500356965685683}
   shotgunObject: {fileID: 3161372612214266067}
---- !u!114 &2435413512849704707
+--- !u!114 &-8236649479826274671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7106837159742798860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4520f4cd03b3ca74ba9b94cfc3a60b81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  respawnDelay: 12
+  _bDead: 0
+--- !u!114 &2877092397099777778
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1232,10 +1254,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0268a6cab4d5b542a29d2d6fb24c665, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerHealth: {fileID: 0}
-  respawnManager: {fileID: 0}
-  baseRespawnDelay: 12
-  extraDelayPerDeath: 4
+  hitComponent: {fileID: 8056722664998124107}
 --- !u!4 &7632297427691873974 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5659626534878db43b6e257276f9e34f, type: 3}

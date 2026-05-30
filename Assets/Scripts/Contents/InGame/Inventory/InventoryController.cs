@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class InventoryController : MonoBehaviour
@@ -14,6 +15,7 @@ public class InventoryController : MonoBehaviour
     private EquipmentStore equipmentStore;
     private ConsumptionStore consumptionStore;
     private int totalCount;
+    private readonly Dictionary<int, (string Name, Sprite Icon)> consumptionItemData = new();
 
     private void Awake()
     {
@@ -24,6 +26,7 @@ public class InventoryController : MonoBehaviour
         equipmentStore.OnItemRemoved += OnEquipmentItemRemoved;
         consumptionStore.OnItemAdded += OnStoreItemAdded;
         consumptionStore.OnItemRemoved += OnConsumptionItemRemoved;
+        consumptionStore.OnCountChanged += OnConsumptionCountChanged;
     }
 
     public void AddItem(ItemId itemId, int count)
@@ -48,6 +51,7 @@ public class InventoryController : MonoBehaviour
                 bool isNew = !consumptionStore.HasItem(typeValue);
                 consumptionStore.Add(typeValue, count);
                 if (itemData == null) break;
+                consumptionItemData[typeValue] = (itemData.Name, itemData.Icon);
                 if (isNew && consumptionStore.HasItem(typeValue))
                     OnConsumptionAdded?.Invoke(typeValue, itemData.Name, itemData.Icon, count);
                 else if (!isNew)
@@ -76,9 +80,16 @@ public class InventoryController : MonoBehaviour
         OnEquipmentRemoved?.Invoke(storeSlotIndex);
     }
 
+    private void OnConsumptionCountChanged(int consumptionId, int newCount)
+    {
+        if (!consumptionItemData.TryGetValue(consumptionId, out var data)) return;
+        OnConsumptionUpdated?.Invoke(consumptionId, data.Name, data.Icon, newCount);
+    }
+
     private void OnConsumptionItemRemoved(int consumptionId)
     {
         OnStoreItemRemoved();
+        consumptionItemData.Remove(consumptionId);
         OnConsumptionRemoved?.Invoke(consumptionId);
     }
 

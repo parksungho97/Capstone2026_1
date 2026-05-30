@@ -6,9 +6,10 @@ public class Armor : ConsumptionData
 {
     public int ArmorAmount { get; }
 
-    public Armor(int armorAmount)
+    public Armor(int armorAmount, int maxCount)
     {
         ArmorAmount = armorAmount;
+        MaxCount = maxCount;
     }
 
     public override void Use(GameObject user) 
@@ -23,5 +24,5 @@ public class ArmorSO : ConsumptionSO
     [SerializeField] private int armorAmount;
 
     public override void Load(ConsumptionManager manager)
-        => manager.Register(consumptionId, new Armor(armorAmount));
+        => manager.Register(consumptionId, new Armor(armorAmount, maxCount));
 }

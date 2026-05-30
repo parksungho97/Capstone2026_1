@@ -7,10 +7,11 @@ public class Potion : ConsumptionData
     public int Time { get; }
     public int HpAmount { get; }
 
-    public Potion(int time, int hpAmount)
+    public Potion(int time, int hpAmount, int maxCount)
     {
         Time = time;
         HpAmount = hpAmount;
+        MaxCount = maxCount;
     }
 
     public override void Use(GameObject user)
@@ -26,5 +27,5 @@ public class PotionSO : ConsumptionSO
     [SerializeField] private int hpAmount;
 
     public override void Load(ConsumptionManager manager)
-        => manager.Register(consumptionId, new Potion(time, hpAmount));
+        => manager.Register(consumptionId, new Potion(time, hpAmount, maxCount));
 }

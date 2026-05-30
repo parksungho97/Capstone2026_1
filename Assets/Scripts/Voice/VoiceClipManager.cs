@@ -5,7 +5,9 @@ public class VoiceClipManager : MonoBehaviour
 {
     public static VoiceClipManager Instance { get; private set; }
 
-    private readonly List<AudioClip> clips = new();
+    private List<AudioClip> clips = new();
+
+    [SerializeField] private List<AudioClip> attackClips;
 
     private void Awake()
     {
@@ -42,5 +44,18 @@ public class VoiceClipManager : MonoBehaviour
     {
         int index = GetRandomIndex();
         return index >= 0 ? GetClipAt(index) : null;
+    }
+
+    public void Play(int id, Vector3 position)
+    {
+        AudioClip clip = GetClipAt(id);
+        if (clip == null) return;
+        AudioSource.PlayClipAtPoint(clip, position);
+    }
+
+    public AudioClip GetAttackClipAt(int id)
+    {
+        if (id < 0 || id >= attackClips.Count) return null;
+        return attackClips[id];
     }
 }

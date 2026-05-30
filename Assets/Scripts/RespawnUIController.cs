@@ -9,11 +9,11 @@ public class RespawnUIController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI countdownText;
     [SerializeField] private Image progressImage;
 
-    private PlayerRespawnController targetRespawnController;
+    private Respawn respawn;
 
-    public void Initialize(PlayerRespawnController controller)
+    public void Initialize(Respawn respawn)
     {
-        targetRespawnController = controller;
+        this.respawn = respawn;
 
         if (rootPanel != null)
             rootPanel.SetActive(false);
@@ -21,26 +21,23 @@ public class RespawnUIController : MonoBehaviour
 
     private void Update()
     {
-        if (targetRespawnController == null)
+        if (respawn == null)
         {
             if (rootPanel != null && rootPanel.activeSelf)
                 rootPanel.SetActive(false);
-
             return;
         }
 
-        if (targetRespawnController.IsRespawning)
+        if (respawn.IsTimerActive)
         {
             if (rootPanel != null && !rootPanel.activeSelf)
                 rootPanel.SetActive(true);
 
-            int remainSeconds = targetRespawnController.GetRemainingRespawnSeconds();
-
             if (countdownText != null)
-                countdownText.text = remainSeconds.ToString();
+                countdownText.text = Mathf.CeilToInt(respawn.GetRemainingSeconds()).ToString();
 
             if (progressImage != null)
-                progressImage.fillAmount = targetRespawnController.GetRespawnProgress01();
+                progressImage.fillAmount = respawn.GetProgress01();
         }
         else
         {

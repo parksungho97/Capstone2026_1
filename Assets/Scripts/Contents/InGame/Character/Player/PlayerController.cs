@@ -1,3 +1,4 @@
+using System.Collections;
 using Fusion;
 using UnityEngine;
 
@@ -35,7 +36,7 @@ public class PlayerController : NetworkBehaviour
         {
             bool hasMovedThisTick = false;
 
-            if (GetInput<NetworkInputData>(out NetworkInputData data))
+            if (!bInputDisabled && GetInput<NetworkInputData>(out NetworkInputData data))
             {
                 Vector3 moveDegree = Vector3.zero;
 
@@ -95,4 +96,19 @@ public class PlayerController : NetworkBehaviour
 
     [Networked] private NetworkButtons previousButtons { get; set; }
     [Networked] public bool bMove { get; set; }
+
+    public bool bInputDisabled { get; set; } = false;
+
+    public void DisableInputForSeconds(float duration)
+    {
+        if (!Object.HasInputAuthority) return;
+        StartCoroutine(DisableInputCoroutine(duration));
+    }
+
+    private IEnumerator DisableInputCoroutine(float duration)
+    {
+        bInputDisabled = true;
+        yield return new WaitForSeconds(duration);
+        bInputDisabled = false;
+    }
 }

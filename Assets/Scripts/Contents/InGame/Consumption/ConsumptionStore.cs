@@ -6,6 +6,7 @@ public class ConsumptionStore : MonoBehaviour
 {
     public event Action OnItemAdded;
     public event Action<int> OnItemRemoved;
+    public event Action<int, int> OnCountChanged;
 
     public bool IsFull { get; set; }
 
@@ -15,6 +16,13 @@ public class ConsumptionStore : MonoBehaviour
 
     public void Add(int consumptionId, int count)
     {
+        if (!ConsumptionManager.Instance.TryGet(consumptionId, out ConsumptionData data))
+            return;
+
+        int current = counts.TryGetValue(consumptionId, out int c) ? c : 0;
+        if (data.MaxCount > 0 && current + count > data.MaxCount)
+            return;
+
         if (counts.ContainsKey(consumptionId))
         {
             counts[consumptionId] += count;
@@ -40,6 +48,10 @@ public class ConsumptionStore : MonoBehaviour
         {
             counts.Remove(consumptionId);
             OnItemRemoved?.Invoke(consumptionId);
+        }
+        else
+        {
+            OnCountChanged?.Invoke(consumptionId, counts[consumptionId]);
         }
 
         data.Use(user);

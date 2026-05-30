@@ -8,6 +8,8 @@ public class ProjectileInstance : MonoBehaviour
     private float knockbackForce;
     private float speed;
     private float maxDistance;
+    private int vfxId;
+    private int hitSoundId;
 
     private NetworkObject self;
     private NetworkObject owner;
@@ -24,6 +26,8 @@ public class ProjectileInstance : MonoBehaviour
         knockbackForce = data.KnockbackForce;
         speed = data.Speed;
         maxDistance = data.MaxDistance;
+        vfxId = data.HitVfxId;
+        hitSoundId = data.HitSoundId;
         startPosition = transform.position;
         despawning = false;
     }
@@ -47,7 +51,7 @@ public class ProjectileInstance : MonoBehaviour
         if (hit)
         {
             Debug.Log(other.name);
-            hit.Hit(damage, transform.forward, knockbackForce);
+            hit.Hit(damage, transform.forward, knockbackForce, vfxId, hitSoundId);
             DoDespawn();
         }
     }

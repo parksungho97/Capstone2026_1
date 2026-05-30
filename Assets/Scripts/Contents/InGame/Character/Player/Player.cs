@@ -22,9 +22,6 @@ public class Player : NetworkBehaviour
         else
             Debug.Log("DefaultWeapon Is Null");
 
-        magazine = GetComponent<Magazine>();
-        magazine.SetAttackInstance(1);
-
         playerController = GetComponent<PlayerController>();
         Debug.Assert(playerController);
 
@@ -35,6 +32,7 @@ public class Player : NetworkBehaviour
         Debug.Assert(animtor);
 
         OnNetworkSpawned?.Invoke(this);
+
     }
 
     public override void FixedUpdateNetwork()
@@ -48,10 +46,9 @@ public class Player : NetworkBehaviour
     {
         base.Render();
         if (bMove)
-        {
-            voicePlayer.PlayFootStep();
-           // animtor.SetTrigger("Walk");
-        }
+            voicePlayer.StartFootSteps();
+        else
+            voicePlayer.StopFootSteps();
     }
 
     private EquipmentSlot equipmentComponent;

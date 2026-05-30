@@ -12,6 +12,7 @@ public class PlayerSpawnPointManager : MonoBehaviour
             return transform;
         }
 
+        //int randomIndex = 5;
         int randomIndex = Random.Range(0, spawnPoints.Length);
         return spawnPoints[randomIndex].transform;
     }
