@@ -1331,6 +1331,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2843208492066292281, guid: dc56f9b9cc03c69478a348e72815fafb, type: 3}
+      propertyPath: count
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2843208492066292281, guid: dc56f9b9cc03c69478a348e72815fafb, type: 3}
       propertyPath: _Count
       value: 1
       objectReference: {fileID: 0}
@@ -1705,6 +1709,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   viewBuildComputeShader: {fileID: 7200000, guid: 17601f641f097624e87ef42cf28c738f, type: 3}
+  viewRenderShader: {fileID: 4800000, guid: e39d16edfcec4e34d991396a5cf078d9, type: 3}
+  obstacleMaskShader: {fileID: 4800000, guid: da9944ee25c9e8343a7c744083f36304, type: 3}
   _fogColor: {r: 0, g: 0, b: 0, a: 1}
   _fogOpacity: 0.95
   gridX: 4096
@@ -2026,6 +2032,10 @@ PrefabInstance:
       propertyPath: keyCode
       value: 51
       objectReference: {fileID: 0}
+    - target: {fileID: 4305168441473134361, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5766674406611514861, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
       propertyPath: m_Type
       value: 3
@@ -2117,6 +2127,10 @@ PrefabInstance:
     - target: {fileID: 7232669442464081494, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7813829117393652883, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -792
       objectReference: {fileID: 0}
     - target: {fileID: 7872622794276500353, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size

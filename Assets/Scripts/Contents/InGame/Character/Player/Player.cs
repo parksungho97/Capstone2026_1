@@ -15,7 +15,7 @@ public class Player : NetworkBehaviour
         equipmentComponent = GetComponent<EquipmentSlot>();
         Debug.Assert(equipmentComponent);
 
-        Debug.Assert(EquipmentManager.Instance.TryGet(defaultWeaponId, out EquipmentData weaponData));
+        EquipmentManager.Instance.TryGet(defaultWeaponId, out EquipmentData weaponData);
         Weapon pipe = weaponData.Generate() as Weapon;
         if (pipe != null)
             equipmentComponent.SetWeapon(pipe);

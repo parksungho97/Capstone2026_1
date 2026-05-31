@@ -6,17 +6,17 @@ using System.Linq;
 
 public class ViewRenderer
 {
-    public ViewRenderer(Camera mainCamera, float topDownHeight = 20f)
+    public ViewRenderer(Camera mainCamera, Shader viewRenderShader, Shader obstacleMaskShader, float topDownHeight = 20f)
     {
         this.mainCamera = mainCamera;
         mainCamera.depthTextureMode |= DepthTextureMode.Depth;
 
-        viewRenderMaterial = new Material(Shader.Find("jjh/ViewRender"));
+        viewRenderMaterial = new Material(viewRenderShader);
 
         commandBuffer = new CommandBuffer { name = "ViewGrid Fog Overlay" };
         mainCamera.AddCommandBuffer(CameraEvent.AfterForwardAlpha, commandBuffer);
 
-        stencilShader = Shader.Find("jjh/ObstacleMask");
+        stencilShader = obstacleMaskShader;
         stencilMat = new Material(stencilShader);
 
         int um = 512;

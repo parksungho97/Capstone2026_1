@@ -61,31 +61,21 @@ public class PlayerController : NetworkBehaviour
                 }
                 if (data.buttons.WasPressed(previousButtons, EInputButton.Z)) itemCollector.AcquireOne();
 
+                if (cameraController != null && cameraController.GetMouseWorldPosition(data.mousePosition, out Vector3 mouseWorldPosition))
+                {
+                    Vector3 lookDir = mouseWorldPosition - transform.position;
+                    lookDir.y = 0f;
+                    if (lookDir.sqrMagnitude > 0.0001f)
+                        move.RotateTo(lookDir.normalized);
+                }
+
                 previousButtons = data.buttons;
             }
 
             bMove = hasMovedThisTick;
         }
 
-        move.MoveUpdate();
-    }
-
-    private void Update()
-    {
-        if (!Object.HasInputAuthority) 
-            return;
-
-        if (cameraController.GetMouseWorldPosition(Input.mousePosition, out Vector3 mouseWorldPosition))
-        {
-            Vector3 lookDir = mouseWorldPosition - transform.position;
-            lookDir.y = 0f;
-
-            if (lookDir.sqrMagnitude > 0.0001f)
-            {
-                Vector3 aimDir = lookDir.normalized;
-                move.RotateTo(aimDir);
-            }
-        }
+        move.MoveUpdate(Runner.DeltaTime);
     }
 
     private Movement move;

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Fusion;
 using UnityEngine;
 
@@ -22,6 +23,31 @@ public class ItemInstanceManager : NetworkBehaviour
         Instance = this;
 
         Debug.Assert(itemInstancePrefab);
+
+        // 씬에 직접 배치된 ItemInstance를 계층 구조 순서 기준으로 정렬해 등록
+        // (모든 클라이언트가 동일한 씬을 로드하므로 동일한 순서 보장)
+        var sceneItems = FindObjectsByType<ItemInstance>(FindObjectsSortMode.None)
+            .OrderBy(item => GetHierarchyPath(item.transform))
+            .ToList();
+
+        foreach (var item in sceneItems)
+        {
+            int managingId = nextManagingId++;
+            Register(managingId, item);
+            if (Object.HasStateAuthority)
+                managingIdToItemId[managingId] = item.ItemIdValue;
+        }
+    }
+
+    private static string GetHierarchyPath(Transform t)
+    {
+        var path = new System.Text.StringBuilder();
+        while (t != null)
+        {
+            path.Insert(0, "/" + t.GetSiblingIndex().ToString("D6"));
+            t = t.parent;
+        }
+        return path.ToString();
     }
 
     // Any peer requests a new item spawn; only the host processes it

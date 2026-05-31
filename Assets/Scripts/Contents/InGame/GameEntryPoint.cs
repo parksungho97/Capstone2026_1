@@ -58,6 +58,7 @@ public class GameEntryPoint : NetworkBehaviour
             rotation: spawnPoint.rotation,
             inputAuthority: Runner.LocalPlayer);
         cameraController.SetTarget(newPlayer.transform);
+        viewContext.Initalize(newPlayer.gameObject);
         newPlayer.GetComponent<PlayerController>().Initalize(cameraController);
 
         InventoryController inventoryController = newPlayer.GetComponent<InventoryController>();
@@ -67,11 +68,8 @@ public class GameEntryPoint : NetworkBehaviour
         if (weaponSlotUIBinder != null)
             weaponSlotUIBinder.Link(newPlayer.GetComponent<EquipmentSlot>());
 
-
         AudioListener audioListener = newPlayer.AddComponent<AudioListener>();
         audioListener.enabled = true;
-
-        viewContext.Initalize(newPlayer.gameObject);
 
         CharacterHealth playerHealth = newPlayer.GetComponent<CharacterHealth>();
         playerStatUIController.Initialize(playerHealth);

@@ -3,8 +3,11 @@ using UnityEngine;
 
 public class ItemInstance : MonoBehaviour
 {
-    public int ItemIdValue { get; set; }
-    public int Count { get; set; }
+    [SerializeField] private int itemIdValue;
+    [SerializeField] private int count;
+
+    public int ItemIdValue { get => itemIdValue; set => itemIdValue = value; }
+    public int Count { get => count; set => count = value; }
 
     public ItemId ItemId => new ItemId(ItemIdValue);
 
