@@ -56,20 +56,25 @@ public class PlayerRespawnController : NetworkBehaviour
 
         Show(true);
         characterHealth.RPC_ResetStat();
-        RPC_SetPosition();
-    }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_SetPosition()
-    {
-        if (RespawnManager.Instance == null)
+        if (Object.HasInputAuthority)
         {
-            Debug.LogWarning("[PlayerRespawnController] RespawnManager instance not found.");
-            return;
+            pendingRespawnPosition = RespawnManager.Instance.GetRandomSafeRespawnPosition();
+            hasPendingRespawn = true;
         }
-
-        transform.position = RespawnManager.Instance.GetRandomSafeRespawnPosition();
     }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (hasPendingRespawn)
+        {
+            transform.position = pendingRespawnPosition;
+            hasPendingRespawn = false;
+        }
+    }
+
+    private bool hasPendingRespawn;
+    private Vector3 pendingRespawnPosition;
 
     private void Show(bool bShow)
     {

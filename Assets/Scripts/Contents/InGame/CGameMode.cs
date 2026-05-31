@@ -11,44 +11,55 @@ public enum EResultType : byte
 
 public class CGameMode : NetworkBehaviour
 {
+    [SerializeField] private CapturePointController[] capturePointControllers;
+
     public Action<EResultType> ActionGameEnded;
+
     public void Initialize(NetworkTimerClock networkTimerClock)
     {
         this.networkTimerClock = networkTimerClock;
-
-        ActionGameEnded += (resultType) =>
-        {
-            Debug.Log($"Game Ended with result: {resultType}");
-        };
     }
 
     public override void FixedUpdateNetwork()
     {
         base.FixedUpdateNetwork();
 
-        if (bGameEnded == true)
+        if (!Object.HasStateAuthority || bGameEnded)
             return;
 
-        // TODO: query jjhCapturePointController array to determine per-team capture counts
-        // and end the game when all points are captured.
         if (networkTimerClock.IsExpired())
-            EndGame(0, 0);
+        {
+            int redCount = 0, blueCount = 0;
+            foreach (var cp in capturePointControllers)
+            {
+                if (cp == null) continue;
+                ECaptureState state = cp.CapturePoint.GetCaptureState();
+                if (state == ECaptureState.Red) redCount++;
+                else if (state == ECaptureState.Blue) blueCount++;
+            }
+            EndGame(redCount, blueCount);
+        }
     }
 
     private void EndGame(int redCount, int blueCount)
     {
         bGameEnded = true;
 
-        if (redCount > blueCount)
-            ActionGameEnded?.Invoke(EResultType.Red);
-        else if (blueCount > redCount)
-            ActionGameEnded?.Invoke(EResultType.Blue);
-        else
-            ActionGameEnded?.Invoke(EResultType.Draw);
+        EResultType result;
+        if (redCount > blueCount)       result = EResultType.Red;
+        else if (blueCount > redCount)  result = EResultType.Blue;
+        else                            result = EResultType.Draw;
+
+        Debug.Log($"[CGameMode] Timer expired — Red: {redCount}, Blue: {blueCount}, Result: {result}");
+        RPC_NotifyGameEnded(result);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_NotifyGameEnded(EResultType result)
+    {
+        ActionGameEnded?.Invoke(result);
     }
 
     private NetworkTimerClock networkTimerClock;
     private bool bGameEnded = false;
-
 }
-

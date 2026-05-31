@@ -9,6 +9,7 @@ public class ViewContext : MonoBehaviour
     [SerializeField] private ComputeShader viewBuildComputeShader;
     [SerializeField] private Shader viewRenderShader;
     [SerializeField] private Shader obstacleMaskShader;
+    [SerializeField] private Material xRayMaterial;
 
     [Header("Post Process")]
     [SerializeField] private Color _fogColor = Color.black;
@@ -31,7 +32,7 @@ public class ViewContext : MonoBehaviour
         ViewInfo = new ViewInfo(gridX, gridY, worldX, worldY);
         viewBuilder = new ViewBuilder(viewBuildComputeShader);
         viewBuilder.BindViewGridBuffer((int)gridX, (int)gridY);
-        viewRenderer = new ViewRenderer(Camera.main, viewRenderShader, obstacleMaskShader);
+        viewRenderer = new ViewRenderer(Camera.main, viewRenderShader, obstacleMaskShader, xRayMaterial);
 
         GameObject[] objects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
 

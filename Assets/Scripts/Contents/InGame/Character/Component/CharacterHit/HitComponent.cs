@@ -15,7 +15,6 @@ public class HitComponent : NetworkBehaviour
 
     private void Start()
     {
-        voicePlayer = GetComponent<VoicePlayer>();
         Debug.Assert(rb);
         Debug.Assert(health);
     }
@@ -29,7 +28,8 @@ public class HitComponent : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     private void RPC_HitAuthority(int damage, Vector3 knockbackDir, float knockbackForce)
     {
-        rb?.AddForce(knockbackDir.normalized * knockbackForce, ForceMode.Impulse);
+        if (rb)
+            rb.velocity = knockbackDir.normalized * knockbackForce;
         health?.RPC_ServeHP(damage);
     }
 
@@ -42,7 +42,6 @@ public class HitComponent : NetworkBehaviour
             VFXManager.Instance.Spawn(vfxId, transform.position);
         if (soundId >= 0)
             voicePlayer?.PlayAttackClip(soundId);
-
         ActionHitted?.Invoke();
     }
 }

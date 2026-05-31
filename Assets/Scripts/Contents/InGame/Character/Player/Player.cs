@@ -12,6 +12,13 @@ public class Player : NetworkBehaviour
     {
         base.Spawned();
 
+        if(Object.HasInputAuthority)
+        {
+            AudioListener audioListener = GetComponent<AudioListener>();
+            Debug.Assert(audioListener);
+            audioListener.enabled = true;
+        }
+
         equipmentComponent = GetComponent<EquipmentSlot>();
         Debug.Assert(equipmentComponent);
 
@@ -49,6 +56,12 @@ public class Player : NetworkBehaviour
             voicePlayer.StartFootSteps();
         else
             voicePlayer.StopFootSteps();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.V))
+            GetComponent<CharacterHealth>().RPC_ServeHP(50);
     }
 
     private EquipmentSlot equipmentComponent;

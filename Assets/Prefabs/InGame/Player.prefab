@@ -619,6 +619,9 @@ PrefabInstance:
       addedObject: {fileID: -7186377803845191763}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5659626534878db43b6e257276f9e34f, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 7437404809592978759}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5659626534878db43b6e257276f9e34f, type: 3}
+      insertIndex: -1
       addedObject: {fileID: -5958771651917931232}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5659626534878db43b6e257276f9e34f, type: 3}
       insertIndex: -1
@@ -626,9 +629,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5659626534878db43b6e257276f9e34f, type: 3}
       insertIndex: -1
       addedObject: {fileID: -6734612472222626669}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5659626534878db43b6e257276f9e34f, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1260893498180229426}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5659626534878db43b6e257276f9e34f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7971465140340014708}
@@ -692,6 +692,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5659626534878db43b6e257276f9e34f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2877092397099777778}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5659626534878db43b6e257276f9e34f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1612610525157925437}
   m_SourcePrefab: {fileID: 100100000, guid: 5659626534878db43b6e257276f9e34f, type: 3}
 --- !u!4 &112493039935944063 stripped
 Transform:
@@ -754,7 +757,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!65 &9219423970636984766
 BoxCollider:
@@ -817,6 +820,14 @@ MonoBehaviour:
   - {fileID: 2877092397099777778}
   - {fileID: 8056722664998124107}
   ForceRemoteRenderTimeframe: 0
+--- !u!81 &7437404809592978759
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7106837159742798860}
+  m_Enabled: 0
 --- !u!82 &-5958771651917931232
 AudioSource:
   m_ObjectHideFlags: 0
@@ -948,18 +959,6 @@ MonoBehaviour:
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 0
---- !u!114 &1260893498180229426
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7106837159742798860}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abde281c3a15cb54e964c0d61412834b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &7971465140340014708
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1240,7 +1239,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4520f4cd03b3ca74ba9b94cfc3a60b81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  respawnDelay: 12
+  respawnDelay: 2
   _bDead: 0
 --- !u!114 &2877092397099777778
 MonoBehaviour:
@@ -1255,6 +1254,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hitComponent: {fileID: 8056722664998124107}
+--- !u!114 &1612610525157925437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7106837159742798860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d450f2245f36224aa8fbf730f910360, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healVfxId: 1
 --- !u!4 &7632297427691873974 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5659626534878db43b6e257276f9e34f, type: 3}

@@ -51,8 +51,18 @@ public class PlayerController : NetworkBehaviour
                     hasMovedThisTick = true;
                 }
 
-                if (data.buttons.WasPressed(previousButtons, EInputButton.Space)) captureInteractor.TryStartCapture();
-                if (data.buttons.WasReleased(previousButtons, EInputButton.Space)) captureInteractor.TryStopCapture();
+                if (data.buttons.WasPressed(previousButtons, EInputButton.Space))
+                {
+                    captureInteractor.TryStartCapture();
+                    move.SetMovePossible(false);
+                    bActivate = true;
+                }
+                if (data.buttons.WasReleased(previousButtons, EInputButton.Space))
+                {
+                    captureInteractor.TryStopCapture();
+                    move.SetMovePossible(true);
+                    bActivate = false;
+                }
                 if (data.buttons.WasPressed(previousButtons, EInputButton.Q)) extraWeaponSlot.Swap();
                 if (data.buttons.WasPressed(previousButtons, EInputButton.Attack))
                 {
@@ -72,7 +82,8 @@ public class PlayerController : NetworkBehaviour
                 previousButtons = data.buttons;
             }
 
-            bMove = hasMovedThisTick;
+            if (bActivate == false)
+                bMove = hasMovedThisTick;
         }
 
         move.MoveUpdate(Runner.DeltaTime);
@@ -101,4 +112,6 @@ public class PlayerController : NetworkBehaviour
         yield return new WaitForSeconds(duration);
         bInputDisabled = false;
     }
+
+    private bool bActivate = false;
 }

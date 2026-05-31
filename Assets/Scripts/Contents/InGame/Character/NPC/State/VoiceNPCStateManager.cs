@@ -45,6 +45,84 @@ public class NpcChaseTarget : State<NpcContext>
     private Chaser chaser;
 }
 
+public class NpcAttack : State<NpcContext>
+{
+    public NpcAttack(Transform self, NpcMove npcMove, CharacterAttack characterAttack, Chaser chaser)
+    {
+        this.self = self;
+        this.npcMove = npcMove;
+        this.characterAttack = characterAttack;
+        this.chaser = chaser;
+    }
+
+    public override void Enter(NpcContext context)
+    {
+        npcMove.StopMove();
+    }
+
+    public override void Update(NpcContext context)
+    {
+        Transform target = chaser.NearestTarget;
+        if (target == null) return;
+
+        Vector3 dir = target.position - self.position;
+        dir.y = 0f;
+        if (dir.sqrMagnitude > 0.001f)
+            self.rotation = Quaternion.LookRotation(dir);
+
+        //characterAttack.Attack();
+    }
+
+    public override void Exit(NpcContext context) { }
+
+    private readonly Transform self;
+    private readonly NpcMove npcMove;
+    private readonly CharacterAttack characterAttack;
+    private readonly Chaser chaser;
+}
+
+public class WithinAttackRange : StateTransition
+{
+    public WithinAttackRange(Chaser chaser, Transform self, float range)
+    {
+        this.chaser = chaser;
+        this.self = self;
+        sqrRange = range * range;
+    }
+
+    public override bool ShouldTransition()
+    {
+        Transform target = chaser.NearestTarget;
+        if (target == null) return false;
+        return (target.position - self.position).sqrMagnitude <= sqrRange;
+    }
+
+    private readonly Chaser chaser;
+    private readonly Transform self;
+    private readonly float sqrRange;
+}
+
+public class OutOfAttackRange : StateTransition
+{
+    public OutOfAttackRange(Chaser chaser, Transform self, float range)
+    {
+        this.chaser = chaser;
+        this.self = self;
+        sqrRange = range * range;
+    }
+
+    public override bool ShouldTransition()
+    {
+        Transform target = chaser.NearestTarget;
+        if (target == null) return true;
+        return (target.position - self.position).sqrMagnitude > sqrRange;
+    }
+
+    private readonly Chaser chaser;
+    private readonly Transform self;
+    private readonly float sqrRange;
+}
+
 public class NpcBack : State<NpcContext>
 {
     public NpcBack(NpcMove npcMove, Vector3 originPosition)
@@ -123,48 +201,52 @@ public class ReachPosition : StateTransition
     private Vector3 originPosition;
 }
 
-public class VoiceEnd : StateTransition
+// Fires when the voice clip finishes (plus an optional delay) AND the target condition is met.
+// requiresTarget=true  → transitions only if a target is nearby
+// requiresTarget=false → transitions only if no target is nearby
+public class VoiceEndConditional : StateTransition
 {
-    public VoiceEnd(VoicePlayer voicePlayer, float duration = 4.0f)
+    public VoiceEndConditional(VoicePlayer voicePlayer, Chaser chaser, float duration, bool requiresTarget)
     {
         this.voicePlayer = voicePlayer;
+        this.chaser = chaser;
         this.duration = duration;
+        this.requiresTarget = requiresTarget;
+    }
+
+    public override void Reset()
+    {
+        bWaitState = false;
+        time = 0f;
     }
 
     public override bool ShouldTransition()
     {
-        if (!bWaitState)
-        {
-            if (!voicePlayer.IsPlaying)
-                bWaitState = true;
-        }
+        if (!bWaitState && !voicePlayer.IsPlaying)
+            bWaitState = true;
 
-        if (bWaitState)
-        {
-            time += Time.deltaTime;
-            if (time >= duration)
-            {
-                time = 0f;
-                bWaitState = false;
-                return true;
-            }
-        }
+        if (!bWaitState) return false;
 
-        return false;
+        time += Time.deltaTime;
+        if (time < duration) return false;
+
+        return requiresTarget ? chaser.HasTarget : !chaser.HasTarget;
     }
 
-    private VoicePlayer voicePlayer;
+    private readonly VoicePlayer voicePlayer;
+    private readonly Chaser chaser;
+    private readonly float duration;
+    private readonly bool requiresTarget;
 
-    private bool bWaitState = false;
-
-    private float duration = 0.0f;
-    private float time = 0.0f;
+    private bool bWaitState;
+    private float time;
 }
 
 [RequireComponent(typeof(NpcMove))]
 public class VoiceNPCStateManager : NetworkBehaviour
 {
     [SerializeField] private Chaser chaser;
+    [SerializeField] private float attackRange = 2f;
 
     public override void Spawned()
     {
@@ -179,24 +261,35 @@ public class VoiceNPCStateManager : NetworkBehaviour
         NpcMove npcMove = GetComponent<NpcMove>();
         VoicePlayer voicePlayer = GetComponent<VoicePlayer>();
         characterHealth = GetComponent<CharacterHealth>();
+        CharacterAttack characterAttack = GetComponent<CharacterAttack>();
         Npc npc = GetComponent<Npc>();
         Animator animator = GetComponent<Animator>();
 
         Debug.Assert(npcMove);
         Debug.Assert(voicePlayer);
         Debug.Assert(chaser);
+        Debug.Assert(characterAttack);
 
         idle = new NpcIdle(npcMove);
         die = new NpcDie(npc, animator);
         npcPlayVoiceFirst = new NpcPlayVoice(voicePlayer, npcMove);
         npcPlayVoiceSecond = new NpcPlayVoice(voicePlayer, npcMove);
         chaseTarget = new NpcChaseTarget(npcMove, chaser);
+        npcAttack = new NpcAttack(transform, npcMove, characterAttack, chaser);
         back = new NpcBack(npcMove, npcMove.CenterPos);
 
         stateMachine.AddTransition(idle, npcPlayVoiceFirst, new MeetTarget(chaser));
-        stateMachine.AddTransition(npcPlayVoiceFirst, npcPlayVoiceSecond, new VoiceEnd(voicePlayer, 4.0f));
-        stateMachine.AddTransition(npcPlayVoiceSecond, chaseTarget, new VoiceEnd(voicePlayer, 0.0f));
+
+        stateMachine.AddTransition(npcPlayVoiceFirst, npcPlayVoiceSecond, new VoiceEndConditional(voicePlayer, chaser, 4.0f, requiresTarget: true));
+        stateMachine.AddTransition(npcPlayVoiceFirst, idle,              new VoiceEndConditional(voicePlayer, chaser, 4.0f, requiresTarget: false));
+
+        stateMachine.AddTransition(npcPlayVoiceSecond, chaseTarget, new VoiceEndConditional(voicePlayer, chaser, 0.0f, requiresTarget: true));
+        stateMachine.AddTransition(npcPlayVoiceSecond, idle,         new VoiceEndConditional(voicePlayer, chaser, 0.0f, requiresTarget: false));
+
+        stateMachine.AddTransition(chaseTarget, npcAttack, new WithinAttackRange(chaser, transform, attackRange));
         stateMachine.AddTransition(chaseTarget, back, new TimeOut(1.0f));
+
+        stateMachine.AddTransition(npcAttack, chaseTarget, new OutOfAttackRange(chaser, transform, attackRange));
         stateMachine.AddTransition(back, idle, new ReachPosition(gameObject.transform, npcMove.CenterPos));
         stateMachine.AddTransition(die, null, new AnimationEnd(animator));
 
@@ -228,6 +321,7 @@ public class VoiceNPCStateManager : NetworkBehaviour
     private NpcIdle idle;
     private NpcDie die;
     private NpcChaseTarget chaseTarget;
+    private NpcAttack npcAttack;
     private NpcBack back;
     private NpcPlayVoice npcPlayVoiceFirst;
     private NpcPlayVoice npcPlayVoiceSecond;

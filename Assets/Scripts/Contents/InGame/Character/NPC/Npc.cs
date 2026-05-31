@@ -10,8 +10,6 @@ public class Npc : NetworkBehaviour
 
     [Networked] public bool bMoving { get; private set; }
 
-    // ⚡ [수정] 네트워크 오브젝트는 Start 대신 Spawned에서 컴포넌트를 들고 와야 
-    // 생성 타이밍 꼬임으로 인한 널 에러(Null Error)를 완벽하게 예방합니다.
     public override void Spawned()
     {
         base.Spawned();
@@ -44,12 +42,12 @@ public class Npc : NetworkBehaviour
     {
         base.Render();
 
-        //if (voicePlayer != null && bMoving)
-        //    voicePlayer.PlayFootStep();
-    }
-    private void Update()
-    {
-        //if (voicePlayer != null && bMoving)
-        //    voicePlayer.PlayFootStep();
+        if (voicePlayer == null)
+            return;
+
+        if (bMoving)
+            voicePlayer.StartFootSteps();
+        else
+            voicePlayer.StopFootSteps();
     }
 }

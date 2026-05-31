@@ -53,5 +53,18 @@ namespace Network
 
             SceneManager.LoadScene(sceneIndex);
         }
+
+        public async Task LeaveToLobby()
+        {
+            if (Runner != null && Runner.IsRunning)
+            {
+                if (Runner.IsSharedModeMasterClient && Runner.SessionInfo != null)
+                    Runner.SessionInfo.IsOpen = false;
+
+                await Runner.Shutdown(destroyGameObject: true);
+            }
+
+            SceneManager.LoadScene(SceneNames.Lobby);
+        }
     }
 }

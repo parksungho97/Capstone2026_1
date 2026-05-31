@@ -6,9 +6,10 @@ using System.Linq;
 
 public class ViewRenderer
 {
-    public ViewRenderer(Camera mainCamera, Shader viewRenderShader, Shader obstacleMaskShader, float topDownHeight = 20f)
+    public ViewRenderer(Camera mainCamera, Shader viewRenderShader, Shader obstacleMaskShader, Material xRayMaterial = null, float topDownHeight = 20f)
     {
         this.mainCamera = mainCamera;
+        this.xRayMaterial = xRayMaterial;
         mainCamera.depthTextureMode |= DepthTextureMode.Depth;
 
         viewRenderMaterial = new Material(viewRenderShader);
@@ -195,31 +196,47 @@ public class ViewRenderer
         return new List<Renderer>(result);
     }
 
-    private static Material MakeTransparentCopy(Material original, float alpha = 0.1f)
+    private Material MakeTransparentCopy(Material original, float alpha = 0.1f)
     {
-        var mat = new Material(original);
-        if (mat.HasProperty("_SrcBlend"))
+        if (xRayMaterial != null)
         {
-            mat.SetFloat("_Mode", 3);
-            mat.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
-            mat.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
-            mat.SetInt("_ZWrite", 0);
-            mat.DisableKeyword("_ALPHATEST_ON");
-            mat.EnableKeyword("_ALPHABLEND_ON");
-            mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-            mat.renderQueue = 3000;
+            var mat = new Material(xRayMaterial);
+            if (mat.HasProperty("_Color") && original.HasProperty("_Color"))
+            {
+                Color c = original.GetColor("_Color");
+                c.a = alpha;
+                mat.SetColor("_Color", c);
+            }
+            if (mat.HasProperty("_MainTex") && original.HasProperty("_MainTex"))
+                mat.SetTexture("_MainTex", original.GetTexture("_MainTex"));
+            return mat;
         }
-        if (mat.HasProperty("_Color"))
+
+        // Fallback: editor-only path (shader variants may be stripped in builds)
+        var fallback = new Material(original);
+        if (fallback.HasProperty("_SrcBlend"))
         {
-            Color c = mat.GetColor("_Color");
+            fallback.SetFloat("_Mode", 3);
+            fallback.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+            fallback.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+            fallback.SetInt("_ZWrite", 0);
+            fallback.DisableKeyword("_ALPHATEST_ON");
+            fallback.EnableKeyword("_ALPHABLEND_ON");
+            fallback.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            fallback.renderQueue = 3000;
+        }
+        if (fallback.HasProperty("_Color"))
+        {
+            Color c = fallback.GetColor("_Color");
             c.a = alpha;
-            mat.SetColor("_Color", c);
+            fallback.SetColor("_Color", c);
         }
-        return mat;
+        return fallback;
     }
 
     private Camera mainCamera;
     private Material viewRenderMaterial;
+    private Material xRayMaterial;
     private CommandBuffer commandBuffer;
 
     private RenderTexture obstacleMaskTexture;
