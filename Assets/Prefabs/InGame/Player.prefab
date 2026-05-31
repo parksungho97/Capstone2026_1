@@ -202,6 +202,7 @@ MonoBehaviour:
   health: {fileID: 1987929451324610142}
   playerController: {fileID: 2854249696004987484}
   hitStunDuration: 0.5
+  animator: {fileID: 0}
   voicePlayer: {fileID: 8227755266992488921}
 --- !u!1 &7474874513299646184
 GameObject:
@@ -1173,6 +1174,9 @@ MonoBehaviour:
   _CurrentWeaponId: 0
   _IsAttacking:
     _value: 0
+  _IsHit:
+    _value: 0
+  hitComponent: {fileID: 8056722664998124107}
   movement: {fileID: 3779453830801691965}
   equipmentSlot: {fileID: 7379467843389735204}
   characterAttack: {fileID: 374315380834774277}

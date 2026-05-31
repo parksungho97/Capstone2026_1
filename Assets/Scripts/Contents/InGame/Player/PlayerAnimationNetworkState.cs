@@ -9,7 +9,9 @@ public class PlayerAnimationNetworkState : NetworkBehaviour
     [Networked] public Vector3 AimDirection { get; private set; }
     [Networked] public int CurrentWeaponId { get; private set; }
     [Networked] public NetworkBool IsAttacking { get; private set; }
+    [Networked] public NetworkBool IsHit { get; private set; }
 
+    [SerializeField] private HitComponent hitComponent;
     [SerializeField] private Movement movement;
     [SerializeField] private EquipmentSlot equipmentSlot;
     [SerializeField] private CharacterAttack characterAttack;
@@ -31,6 +33,8 @@ public class PlayerAnimationNetworkState : NetworkBehaviour
             equipmentSlot = GetComponent<EquipmentSlot>();
         if (characterAttack == null)
             characterAttack = GetComponent<CharacterAttack>();
+        if (hitComponent == null)
+            hitComponent = GetComponentInChildren<HitComponent>();
     }
     public override void Spawned()
     {
@@ -38,6 +42,10 @@ public class PlayerAnimationNetworkState : NetworkBehaviour
         {
             characterAttack.ActionAttackStart += OnAttackStart;
             characterAttack.ActionAttackEnd += OnAttackEnd;
+        }
+        if (hitComponent != null)
+        {
+            hitComponent.ActionHitted += OnHit;
         }
     }
     public void SetAimDirection(Vector3 direction)
@@ -76,12 +84,30 @@ public class PlayerAnimationNetworkState : NetworkBehaviour
         SetAttacking(false);
     }
 
+    private void OnHit()
+    {
+        SetHit(true);
+    }
+
+    public void SetHit(bool isHit)
+    {
+        if (!Object.HasStateAuthority)
+            return;
+
+        IsHit = isHit;
+    }
+
+
     public override void Despawned(NetworkRunner runner, bool hasState)
     {
         if (characterAttack != null)
         {
             characterAttack.ActionAttackStart -= OnAttackStart;
             characterAttack.ActionAttackEnd -= OnAttackEnd;
+        }
+        if (hitComponent != null)
+        {
+            hitComponent.ActionHitted -= OnHit;
         }
     }
 

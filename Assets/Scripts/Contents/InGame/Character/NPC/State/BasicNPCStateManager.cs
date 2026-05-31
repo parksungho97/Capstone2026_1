@@ -40,8 +40,8 @@ public class NpcDie : State<NpcContext>
 
     public override void Enter(NpcContext context)
     {
-        //if (animator)
-        //    animator.SetTrigger("Die");
+        if (animator)
+            animator.SetTrigger("Die");
     }
 
     public override void Update(NpcContext context) { }
@@ -57,20 +57,30 @@ public class NpcDie : State<NpcContext>
 
 public class AnimationEnd : StateTransition
 {
-    public AnimationEnd(Animator animator)
+    public AnimationEnd(Animator animator, string stateName)
     {
         this.animator = animator;
+        this.stateName = stateName;
     }
 
     public override bool ShouldTransition()
     {
         if (animator == null)
             return true;
-        if (animator.IsInTransition(0)) return false;
-        return animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f;
+
+        if (animator.IsInTransition(0))
+            return false;
+
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+
+        if (!stateInfo.IsName(stateName))
+            return false;
+
+        return stateInfo.normalizedTime >= 1f;
     }
 
     private Animator animator;
+    private string stateName;
 }
 
 public class BasicNPCStateManager : MonoBehaviour
@@ -83,13 +93,13 @@ public class BasicNPCStateManager : MonoBehaviour
         NpcMove npcMove = GetComponent<NpcMove>();
         characterHealth = GetComponent<CharacterHealth>();
         Npc npc = GetComponent<Npc>();
-        Animator animator = GetComponent<Animator>();
+        Animator animator = GetComponentInChildren<Animator>();
 
         idle = new NpcIdle(npcMove);
         die = new NpcDie(npc, animator);
 
         stateMachine.SetState(idle);
-        stateMachine.AddTransition(die, null, new AnimationEnd(animator));
+        stateMachine.AddTransition(die, null, new AnimationEnd(animator, "Npc_Dead"));
     }
 
     private void Update()

@@ -20,6 +20,7 @@ public class PlayerAnimationSelector : MonoBehaviour
     [SerializeField] private float aimExitFadeTime = 1.5f;
 
     private bool wasAttacking = false;
+    private bool wasHit = false;
 
     private bool isWeaponAimActive = false;
     private float weaponAimTimer = 0f;
@@ -51,6 +52,14 @@ public class PlayerAnimationSelector : MonoBehaviour
 
         string moveAnim = SelectMoveAnimation(moveDir, aimDir);
         string nextMoveAnimName = "Pipe_" + moveAnim;
+
+        if (animationState.IsHit && !wasHit)
+        {
+            Debug.Log("[PlayerAnimationSelector] Hit Trigger 호출");
+
+            animator.SetTrigger("Hit");
+            animationState.SetHit(false);
+        }
 
         if (currentAnimName != nextMoveAnimName)
         {
@@ -153,6 +162,7 @@ public class PlayerAnimationSelector : MonoBehaviour
         animator.SetLayerWeight(upperBodyLayerIndex, upperBodyWeight);
 
         wasAttacking = animationState.IsAttacking;
+        wasHit = animationState.IsHit;
     }
 
     private string SelectMoveAnimation(Vector3 moveDir, Vector3 aimDir)
