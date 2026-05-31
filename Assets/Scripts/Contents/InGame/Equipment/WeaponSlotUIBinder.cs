@@ -21,20 +21,24 @@ public class WeaponSlotUIBinder : MonoBehaviour
     {
         if (weapon == null)
         {
-            weaponSlotUI.SetWeapon(string.Empty, null);
+            weaponSlotUI.SetWeapon(string.Empty, null, WeaponAmmoType.Infinite, 0, 0);
             return;
         }
+
+        WeaponAmmoType ammoType = weapon.AttackType == EAttackType.Melee
+            ? WeaponAmmoType.Infinite
+            : WeaponAmmoType.Limited;
 
         if (ItemMappings.Instance.TryGetItemByTypeValue(EItemMapType.Equipment, weapon.Id, out ItemId itemId))
         {
             ItemData data = ItemManager.Instance.Get(itemId);
             if (data != null)
             {
-                weaponSlotUI.SetWeapon(data.Name, data.Icon);
+                weaponSlotUI.SetWeapon(data.Name, data.Icon, ammoType, 0, 0);
                 return;
             }
         }
 
-        weaponSlotUI.SetWeapon(weapon.Id.ToString(), null);
+        weaponSlotUI.SetWeapon(weapon.Id.ToString(), null, ammoType, 0, 0);
     }
 }
