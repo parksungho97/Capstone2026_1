@@ -180,7 +180,7 @@ public class VoiceNPCStateManager : NetworkBehaviour
         VoicePlayer voicePlayer = GetComponent<VoicePlayer>();
         characterHealth = GetComponent<CharacterHealth>();
         Npc npc = GetComponent<Npc>();
-        Animator animator = GetComponent<Animator>();
+        Animator animator = GetComponentInChildren<Animator>();
 
         Debug.Assert(npcMove);
         Debug.Assert(voicePlayer);
@@ -198,7 +198,7 @@ public class VoiceNPCStateManager : NetworkBehaviour
         stateMachine.AddTransition(npcPlayVoiceSecond, chaseTarget, new VoiceEnd(voicePlayer, 0.0f));
         stateMachine.AddTransition(chaseTarget, back, new TimeOut(1.0f));
         stateMachine.AddTransition(back, idle, new ReachPosition(gameObject.transform, npcMove.CenterPos));
-        stateMachine.AddTransition(die, null, new AnimationEnd(animator));
+        stateMachine.AddTransition(die, null, new AnimationEnd(animator, "Npc_Dead"));
 
         stateMachine.SetState(idle);
     }
