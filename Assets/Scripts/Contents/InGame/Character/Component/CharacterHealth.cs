@@ -17,6 +17,8 @@ public class CharacterHealth : NetworkBehaviour
     [Networked] private float recoveryRate { get; set; }
     [Networked] private float recoveryAccumulator { get; set; }
 
+    public bool IsRecovering => recoveryRemaining > 0f;
+
     public override void Spawned()
     {
         Debug.Log($"[PlayerHealth] Spawned / Authority: {Object.HasStateAuthority}");
@@ -151,16 +153,7 @@ public class CharacterHealth : NetworkBehaviour
 
         recoveryAccumulator -= whole;
 
-        int remaining = whole;
         if (CurrentHP < MaxHP)
-        {
-            int gain = Mathf.Min(MaxHP - CurrentHP, remaining);
-            CurrentHP += gain;
-            remaining -= gain;
-        }
-        if (remaining > 0 && CurrentArmor < MaxArmor)
-        {
-            CurrentArmor = Mathf.Min(CurrentArmor + remaining, MaxArmor);
-        }
+            CurrentHP = Mathf.Min(CurrentHP + whole, MaxHP);
     }
 }

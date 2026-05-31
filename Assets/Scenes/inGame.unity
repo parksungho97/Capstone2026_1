@@ -753,6 +753,9 @@ MonoBehaviour:
   - id: 0
     prefab: {fileID: 2466452857672358469, guid: c0f069f0e4637b149941c794d7de0559, type: 3}
     initialPoolSize: 0
+  - id: 1
+    prefab: {fileID: 8014903522719909632, guid: bfa0461dffa9c35468ecad84f2256fc7, type: 3}
+    initialPoolSize: 10
 --- !u!4 &858329928
 Transform:
   m_ObjectHideFlags: 0
@@ -1331,6 +1334,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2843208492066292281, guid: dc56f9b9cc03c69478a348e72815fafb, type: 3}
+      propertyPath: count
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2843208492066292281, guid: dc56f9b9cc03c69478a348e72815fafb, type: 3}
       propertyPath: _Count
       value: 1
       objectReference: {fileID: 0}
@@ -1705,6 +1712,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   viewBuildComputeShader: {fileID: 7200000, guid: 17601f641f097624e87ef42cf28c738f, type: 3}
+  viewRenderShader: {fileID: 4800000, guid: e39d16edfcec4e34d991396a5cf078d9, type: 3}
+  obstacleMaskShader: {fileID: 4800000, guid: da9944ee25c9e8343a7c744083f36304, type: 3}
+  xRayMaterial: {fileID: 2100000, guid: 8745392f82506da4fabfc7bc1a460bfd, type: 2}
   _fogColor: {r: 0, g: 0, b: 0, a: 1}
   _fogOpacity: 0.95
   gridX: 4096
@@ -1783,6 +1793,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06ea3670c63f4c14cbd558eb3e6293b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  capturePointControllers: []
 --- !u!4 &1392825104
 Transform:
   m_ObjectHideFlags: 0
@@ -2026,6 +2037,14 @@ PrefabInstance:
       propertyPath: keyCode
       value: 51
       objectReference: {fileID: 0}
+    - target: {fileID: 4305168441473134361, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5486320143611143201, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
+      propertyPath: ammoText
+      value: 
+      objectReference: {fileID: 1658968283}
     - target: {fileID: 5766674406611514861, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
       propertyPath: m_Type
       value: 3
@@ -2118,6 +2137,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7813829117393652883, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -792
+      objectReference: {fileID: 0}
     - target: {fileID: 7872622794276500353, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 1
@@ -2185,6 +2208,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7232669442464081494, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
   m_PrefabInstance: {fileID: 1658968279}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1658968283 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8587324695484007661, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}
+  m_PrefabInstance: {fileID: 1658968279}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1658968284 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1106888721348079789, guid: cdf6d408ff7edda4ea0f38f2b17996be, type: 3}

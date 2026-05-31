@@ -9,9 +9,10 @@ public class CameraController : MonoBehaviour
     {
         this.target = target;
     }
-    public void Start()
+    private void Awake()
     {
-        Debug.Assert(targetCamera = GetComponent<Camera>());
+        targetCamera = GetComponent<Camera>();
+        Debug.Assert(targetCamera);
     }
 
     private void LateUpdate()
@@ -25,6 +26,12 @@ public class CameraController : MonoBehaviour
 
     public bool GetMouseWorldPosition(Vector3 mousePosition, out Vector3 mouseWorldPosition)
     {
+        if (targetCamera == null)
+        {
+            mouseWorldPosition = Vector3.zero;
+            return false;
+        }
+
         Ray ray = targetCamera.ScreenPointToRay(mousePosition);
 
         Vector3 planeOrigin = (target != null) ? target.position : Vector3.zero;

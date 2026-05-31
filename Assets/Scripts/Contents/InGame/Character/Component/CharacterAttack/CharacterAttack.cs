@@ -33,9 +33,6 @@ public class AttackContext
 
 public class CharacterAttack : MonoBehaviour
 {
-    [SerializeField] private Animator animator;
-    [SerializeField] private string attackTrigger = "Attack";
-
     public Action ActionAttackStart;
     public Action ActionAttackEnd;
 
@@ -80,7 +77,6 @@ public class CharacterAttack : MonoBehaviour
                 break;
         }
 
-        animator?.SetTrigger(attackTrigger);
         ActionAttackStart?.Invoke();
         bPrevAttackReady = false;
     }

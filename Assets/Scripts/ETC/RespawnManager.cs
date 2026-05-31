@@ -45,6 +45,7 @@ public class RespawnManager : NetworkBehaviour
 
             if (IsSpawnPointSafe(position))
             {
+                Debug.Log(index);
                 return position;
             }
         }

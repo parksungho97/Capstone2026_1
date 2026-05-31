@@ -10,6 +10,7 @@ public abstract class State<T>
 public abstract class StateTransition
 {
     public abstract bool ShouldTransition();
+    public virtual void Reset() { }
 }
 
 public class StateMachine<T>
@@ -40,6 +41,9 @@ public class StateMachine<T>
         if (!transitions.ContainsKey(currentState))
             transitions[currentState] = new List<(StateTransition, State<T>)>();
         currentTransitions = transitions[currentState];
+
+        foreach (var (transition, _) in currentTransitions)
+            transition.Reset();
     }
 
     public void Update()

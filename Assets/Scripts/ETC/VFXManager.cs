@@ -19,6 +19,7 @@ public class VFXManager : MonoBehaviour
     private Dictionary<int, GameObject> prefabMap = new();
     private Dictionary<int, Queue<GameObject>> pool = new();
     private Dictionary<GameObject, ParticleSystem[]> particleCache = new();
+    private Dictionary<GameObject, int> persistentObjects = new();
 
     private void Awake()
     {
@@ -38,6 +39,35 @@ public class VFXManager : MonoBehaviour
 
     public GameObject Spawn(int id, Vector3 position, Quaternion rotation)
     {
+        GameObject obj = Activate(id, position, rotation);
+        if (obj != null)
+            StartCoroutine(ReturnWhenDone(id, obj));
+        return obj;
+    }
+
+    public GameObject Spawn(int id, Vector3 position)
+        => Spawn(id, position, Quaternion.identity);
+
+    // Spawns without auto-return. Caller must call ReturnToPool when done.
+    public GameObject SpawnPersistent(int id, Vector3 position)
+    {
+        GameObject obj = Activate(id, position, Quaternion.identity);
+        if (obj != null)
+            persistentObjects[obj] = id;
+        return obj;
+    }
+
+    public void ReturnToPool(GameObject obj)
+    {
+        if (obj == null || !persistentObjects.TryGetValue(obj, out int id)) return;
+        persistentObjects.Remove(obj);
+        foreach (var ps in particleCache[obj])
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        StartCoroutine(ReturnWhenDone(id, obj));
+    }
+
+    private GameObject Activate(int id, Vector3 position, Quaternion rotation)
+    {
         if (!prefabMap.TryGetValue(id, out GameObject prefab))
             return null;
 
@@ -51,15 +81,13 @@ public class VFXManager : MonoBehaviour
         foreach (var ps in particleCache[obj])
         {
             ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            var main = ps.main;
+            main.stopAction = ParticleSystemStopAction.None;
             ps.Play(true);
         }
 
-        StartCoroutine(ReturnWhenDone(id, obj));
         return obj;
     }
-
-    public GameObject Spawn(int id, Vector3 position)
-        => Spawn(id, position, Quaternion.identity);
 
     private GameObject CreateInstance(int id, GameObject prefab)
     {

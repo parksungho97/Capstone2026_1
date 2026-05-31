@@ -32,12 +32,12 @@ public class Movement : MonoBehaviour
         bMovePossible = possible;
     }
 
-    public void MoveUpdate()
+    public void MoveUpdate(float dt)
     {
         if (bMovePossible && mPendingMove != Vector3.zero)
         {
             MoveDirection = mPendingMove.normalized;
-            transform.position += mPendingMove * moveSpeed * Time.deltaTime;
+            transform.position += mPendingMove * moveSpeed * dt;
         }
         else
         {

@@ -31,6 +31,7 @@ public class InventoryController : MonoBehaviour
 
     public void AddItem(ItemId itemId, int count)
     {
+        if (count <= 0) return;
         if (!ItemMappings.Instance.TryGet(itemId, out EItemMapType type, out int typeValue))
             return;
 
