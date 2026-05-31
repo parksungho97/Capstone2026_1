@@ -268,7 +268,7 @@ public class VoiceNPCStateManager : NetworkBehaviour
         Debug.Assert(npcMove);
         Debug.Assert(voicePlayer);
         Debug.Assert(chaser);
-        Debug.Assert(characterAttack);
+        //Debug.Assert(characterAttack);
 
         idle = new NpcIdle(npcMove);
         die = new NpcDie(npc, animator);

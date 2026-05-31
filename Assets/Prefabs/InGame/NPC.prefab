@@ -18,7 +18,6 @@ GameObject:
   - component: {fileID: 4093250457193427681}
   - component: {fileID: 4103996838576592822}
   - component: {fileID: 9095254718630095927}
-  - component: {fileID: 2432920282914316060}
   - component: {fileID: -6880639991214439475}
   - component: {fileID: 5669932406093206510}
   - component: {fileID: 850010370272652508}
@@ -95,7 +94,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 1
   m_Interpolate: 0
-  m_Constraints: 84
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!114 &9043345543447589474
 MonoBehaviour:
@@ -303,21 +302,6 @@ MonoBehaviour:
   _CurrentHP: 100
   _MaxArmor: 0
   _CurrentArmor: 0
---- !u!114 &2432920282914316060
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 77286735445477815}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 88f54f54bd9a57747b7d79ac1edaf25d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animator: {fileID: 354518095021448475}
-  animationState: {fileID: 5839470035317793980}
-  crossFadeTime: 0.2
 --- !u!114 &-6880639991214439475
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -590,11 +574,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 7299329132027761133}
   m_SourcePrefab: {fileID: 100100000, guid: fec21e3b58e285149b47cf155b424e8f, type: 3}
---- !u!95 &354518095021448475 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: fec21e3b58e285149b47cf155b424e8f, type: 3}
-  m_PrefabInstance: {fileID: 6161229944743731338}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5912008604919940961 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: fec21e3b58e285149b47cf155b424e8f, type: 3}
