@@ -58,11 +58,6 @@ public class Player : NetworkBehaviour
             voicePlayer.StopFootSteps();
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.V))
-            GetComponent<CharacterHealth>().RPC_ServeHP(50);
-    }
 
     private EquipmentSlot equipmentComponent;
     private Magazine magazine;

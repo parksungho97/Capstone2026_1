@@ -31,6 +31,17 @@ public class GameEntryPoint : NetworkBehaviour
     [SerializeField] private InventoryUIMapper inventoryUIMapper;
     [SerializeField] private WeaponSlotUIBinder weaponSlotUIBinder;
 
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_F()
+    {
+        Debug.Log("gd");
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.V))
+            RPC_F();
+    }
     public override async void Spawned()
     {
         base.Spawned();
@@ -52,7 +63,7 @@ public class GameEntryPoint : NetworkBehaviour
             Debug.Log($"[CGameMode] Result: {resultType}");
             StartCoroutine(LeaveAfterDelay(3f));
         };
-
+        
         Transform spawnPoint = spawnPointManager.GetRandomSpawnPoint();
 
         var newPlayer = await Runner.SpawnAsync(player, position: spawnPoint.position,
@@ -61,7 +72,7 @@ public class GameEntryPoint : NetworkBehaviour
         cameraController.SetTarget(newPlayer.transform);
         viewContext.Initalize(newPlayer.gameObject);
         newPlayer.GetComponent<PlayerController>().Initalize(cameraController);
-
+        
         InventoryController inventoryController = newPlayer.GetComponent<InventoryController>();
         Debug.Assert(inventoryController);
         inventoryUIMapper.LinkInventoryController(inventoryController);
@@ -71,6 +82,7 @@ public class GameEntryPoint : NetworkBehaviour
 
         CharacterHealth playerHealth = newPlayer.GetComponent<CharacterHealth>();
         playerStatUIController.Initialize(playerHealth);
+        
 
         Respawn respawn = newPlayer.GetComponent<Respawn>();
         Debug.Assert(respawn);

@@ -202,7 +202,6 @@ MonoBehaviour:
   health: {fileID: 1987929451324610142}
   playerController: {fileID: 2854249696004987484}
   hitStunDuration: 0.5
-  animator: {fileID: 0}
   voicePlayer: {fileID: 8227755266992488921}
 --- !u!1 &7474874513299646184
 GameObject:
@@ -1054,8 +1053,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88628d386a5a6ae4dac6677150e24c67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 9161375997074535896}
-  attackTrigger: Attack
 --- !u!114 &7379467843389735204
 MonoBehaviour:
   m_ObjectHideFlags: 0

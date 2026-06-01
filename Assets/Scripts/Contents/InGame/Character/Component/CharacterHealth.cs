@@ -57,19 +57,13 @@ public class CharacterHealth : NetworkBehaviour
         CurrentArmor = Mathf.Min(CurrentArmor + amount, MaxArmor);
     }
 
-    /// <summary>
-    /// 데미지 처리 (RPC 개조)
-    /// </summary>
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_ServeHP(int damage)
+    // State authority가 직접 데미지를 적용할 때 사용. RPC 없이 호출 가능.
+    public void ApplyDamage(int damage)
     {
-        Debug.Log($"[ServeHP RPC] 서버에서 실행됨 / damage: {damage}");
-
         if (damage <= 0) return;
 
         int remainingDamage = damage;
 
-        // 1. 방어구 먼저 감소
         if (CurrentArmor > 0)
         {
             int armorDamage = Mathf.Min(CurrentArmor, remainingDamage);
@@ -77,14 +71,12 @@ public class CharacterHealth : NetworkBehaviour
             remainingDamage -= armorDamage;
         }
 
-        // 2. 남은 데미지를 HP에 적용
         if (remainingDamage > 0)
-        {
             CurrentHP = Mathf.Max(CurrentHP - remainingDamage, 0);
-        }
-
-        Debug.Log($"[ServeHP RPC] 결과 → HP:{CurrentHP}, Armor:{CurrentArmor}");
     }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_ServeHP(int damage) => ApplyDamage(damage);
 
     /// <summary>
     /// 회복 처리 (RPC 개조)

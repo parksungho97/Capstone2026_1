@@ -8,10 +8,9 @@ public class HitComponent : NetworkBehaviour
     [SerializeField] private CharacterHealth health;
     [SerializeField] private PlayerController playerController;
     [SerializeField] private float hitStunDuration = 0.5f;
+    [SerializeField] private VoicePlayer voicePlayer;
 
     public Action ActionHitted;
-
-    [SerializeField] private VoicePlayer voicePlayer;
 
     private void Start()
     {
@@ -21,27 +20,28 @@ public class HitComponent : NetworkBehaviour
 
     public void Hit(int damage, Vector3 knockbackDir, float knockbackForce, int vfxId = -1, int soundId = -1)
     {
-        RPC_HitAuthority(damage, knockbackDir, knockbackForce);
-        RPC_HitAll(vfxId, soundId);
-    }
-
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    private void RPC_HitAuthority(int damage, Vector3 knockbackDir, float knockbackForce)
-    {
-        if (rb)
-            rb.velocity = knockbackDir.normalized * knockbackForce;
-        health?.RPC_ServeHP(damage);
+        RPC_Hit(damage, knockbackDir, knockbackForce, vfxId, soundId);
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
-    private void RPC_HitAll(int vfxId, int soundId)
+    private void RPC_Hit(int damage, Vector3 knockbackDir, float knockbackForce, int vfxId, int soundId)
     {
-        playerController?.DisableInputForSeconds(hitStunDuration);
+        Debug.Log($"[HitComponent] Hit received — damage: {damage}");
+
+        if (Object.HasStateAuthority)
+        {
+            if (rb) rb.velocity = knockbackDir.normalized * knockbackForce;
+            health?.ApplyDamage(damage);
+        }
+
+        if (Object.HasInputAuthority)
+            playerController?.DisableInputForSeconds(hitStunDuration);
 
         if (vfxId >= 0)
             VFXManager.Instance.Spawn(vfxId, transform.position);
         if (soundId >= 0)
             voicePlayer?.PlayAttackClip(soundId);
+
         ActionHitted?.Invoke();
     }
 }
