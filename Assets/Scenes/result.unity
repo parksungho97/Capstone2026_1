@@ -219,9 +219,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db4fa35ecd4a60340a9df0c3c6e19162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mVictoryImage: {fileID: 1997253441}
-  mDefeatImage: {fileID: 767142271}
-  mReturnDelay: 5
+  victoryScreen: {fileID: 0}
+  defeatScreen: {fileID: 0}
 --- !u!4 &208983845
 Transform:
   m_ObjectHideFlags: 0
@@ -237,11 +236,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &767142271 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5526666363195435104, guid: b8ebc2c62b16c4b47b4e80bd3b199a3f, type: 3}
-  m_PrefabInstance: {fileID: 7853420398325289187}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1132016379
 GameObject:
   m_ObjectHideFlags: 0
@@ -472,11 +466,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1997253441 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5950929584160407038, guid: b8ebc2c62b16c4b47b4e80bd3b199a3f, type: 3}
-  m_PrefabInstance: {fileID: 7853420398325289187}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7853420398325289187
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -568,6 +557,10 @@ PrefabInstance:
     - target: {fileID: 3401629659292122753, guid: b8ebc2c62b16c4b47b4e80bd3b199a3f, type: 3}
       propertyPath: m_Name
       value: Canvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 5950929584160407038, guid: b8ebc2c62b16c4b47b4e80bd3b199a3f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

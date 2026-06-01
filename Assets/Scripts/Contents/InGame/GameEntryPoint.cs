@@ -31,7 +31,11 @@ public class GameEntryPoint : NetworkBehaviour
     [SerializeField] private InventoryUIMapper inventoryUIMapper;
     [SerializeField] private WeaponSlotUIBinder weaponSlotUIBinder;
 
+    [SerializeField] private ResultUIController resultUIController;
+
     [Networked] private int readyPlayerCount { get; set; }
+
+    private PlayerController localPlayerController;
 
     [Networked, Capacity(8)]
     private NetworkDictionary<int, int> spawnAssignments => default;
@@ -55,6 +59,15 @@ public class GameEntryPoint : NetworkBehaviour
         gameMode.ActionGameEnded += (EResultType resultType) =>
         {
             Debug.Log($"[CGameMode] Result: {resultType}");
+
+            if (localPlayerController != null)
+                localPlayerController.bInputDisabled = true;
+
+            EPlayerTeam localTeam = TeamInfo.Instance.GetTeam(Runner.LocalPlayer.PlayerId);
+            bool isVictory = (resultType == EResultType.Red  && localTeam == EPlayerTeam.Red)
+                          || (resultType == EResultType.Blue && localTeam == EPlayerTeam.Blue);
+            resultUIController.ShowResult(isVictory);
+
             Network.NetworkRoot.Instance.StartCoroutine(LeaveAfterDelay(5f));
         };
 
@@ -105,7 +118,8 @@ public class GameEntryPoint : NetworkBehaviour
 
         cameraController.SetTarget(newPlayer.transform);
         viewContext.Initalize(newPlayer.gameObject);
-        newPlayer.GetComponent<PlayerController>().Initalize(cameraController);
+        localPlayerController = newPlayer.GetComponent<PlayerController>();
+        localPlayerController.Initalize(cameraController);
 
         InventoryController inventoryController = newPlayer.GetComponent<InventoryController>();
         Debug.Assert(inventoryController);

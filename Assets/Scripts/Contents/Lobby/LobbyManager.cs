@@ -24,6 +24,7 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     [SerializeField] private int sceneIndex;
     [SerializeField] private int maxPlayerCount = 8;
+    [SerializeField] private GameObject loadingScreen;
 
     public Action<List<CRoomInfo>> ActionRoomChange;
 
@@ -137,17 +138,19 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private async void JoinLobby()
     {
+        if (loadingScreen != null)
+            loadingScreen.SetActive(true);
+
         var runner = Network.NetworkRoot.Instance.Runner;
         StartGameResult result = await runner.JoinSessionLobby(SessionLobby.Shared);
 
         if (result.Ok)
-        {
             Debug.Log("[로비] 접속 성공!");
-        }
         else
-        {
             Debug.LogError($"[로비] JoinSessionLobby 실패: {result.ShutdownReason}");
-        }
+
+        if (loadingScreen != null)
+            loadingScreen.SetActive(false);
     }
     void INetworkRunnerCallbacks.OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     void INetworkRunnerCallbacks.OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }

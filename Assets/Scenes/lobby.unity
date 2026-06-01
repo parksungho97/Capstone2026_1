@@ -633,6 +633,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneIndex: 3
   maxPlayerCount: 8
+  loadingScreen: {fileID: 0}
 --- !u!4 &1560932347
 Transform:
   m_ObjectHideFlags: 0
