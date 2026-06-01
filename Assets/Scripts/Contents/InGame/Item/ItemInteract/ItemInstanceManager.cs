@@ -50,6 +50,22 @@ public class ItemInstanceManager : NetworkBehaviour
         return path.ToString();
     }
 
+    // Call from StateAuthority to skip the RPC_RequestSpawn round-trip.
+    // Falls back to RPC_RequestSpawn when called from a non-authority client.
+    public void SpawnImmediate(int itemId, Vector3 position, int count)
+    {
+        if (Object.HasStateAuthority)
+        {
+            int managingId = nextManagingId++;
+            managingIdToItemId[managingId] = itemId;
+            RPC_OnItemSpawned(managingId, itemId, position, count);
+        }
+        else
+        {
+            RPC_RequestSpawn(itemId, position, count);
+        }
+    }
+
     // Any peer requests a new item spawn; only the host processes it
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_RequestSpawn(int itemId, Vector3 position, int count)

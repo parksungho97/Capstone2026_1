@@ -42,7 +42,13 @@ public class InventoryHotKeyBinder : MonoBehaviour
 
     private void OnInventorySlotClicked(int uiSlotIndex)
     {
-        if (!inventoryUIMapper.TryGetConsumptionByUiSlot(uiSlotIndex, out _, out _, out _, out _))
+        if (!inventoryUIMapper.TryGetConsumptionByUiSlot(uiSlotIndex, out int consumptionId, out _, out _, out _))
+        {
+            pendingUiSlotIndex = -1;
+            return;
+        }
+
+        if (ConsumptionManager.Instance.TryGet(consumptionId, out ConsumptionData data) && data is Bullet)
         {
             pendingUiSlotIndex = -1;
             return;

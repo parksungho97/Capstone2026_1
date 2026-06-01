@@ -11,14 +11,19 @@ public class AttackDelay
         timer = delay;
         IsReady = false;
     }
-
+    public float Timer {  get { return timer; } }
     public bool IsAttackReady() => IsReady == true;
 
     public void Tick()
     {
+        Tick(Time.deltaTime);
+    }
+
+    public void Tick(float dt)
+    {
         if (timer > 0f)
         {
-            timer -= Time.deltaTime;
+            timer -= dt;
 
             if (timer <= 0f)
                 IsReady = true;
@@ -53,8 +58,12 @@ public class CharacterAttack : MonoBehaviour
 
     public void Attack()
     {
+        if (bPossibleAttack == false)
+            return;
+
         if (equipmentComponent.Weapon == null)
             return;
+
         if (!AttackContext.AttackDelay.IsAttackReady())
             return;
 
@@ -64,16 +73,26 @@ public class CharacterAttack : MonoBehaviour
                 attacker.MeleeAttack(equipmentComponent.Weapon.AttackIds[0], AttackContext.AttackDelay);
                 break;
             case EAttackType.Ranged:
-                if (magazine == null || !magazine.TryConsume())
-                    return;
-
-                attacker.RangedAttack(magazine.CurrentProjectileId, AttackContext.AttackDelay);
+                if (RequiresConsumption())
+                {
+                    if (magazine == null || !magazine.TryConsume()) return;
+                    attacker.RangedAttack(magazine.CurrentProjectileId, AttackContext.AttackDelay);
+                }
+                else
+                {
+                    attacker.RangedAttack(equipmentComponent.Weapon.AttackIds[0], AttackContext.AttackDelay);
+                }
                 break;
             case EAttackType.Shotgun:
-                if (magazine == null || !magazine.TryConsume())
-                    return;
-
-                attacker.ShotgunAttack(magazine.CurrentProjectileId, AttackContext.AttackDelay);
+                if (RequiresConsumption())
+                {
+                    if (magazine == null || !magazine.TryConsume()) return;
+                    attacker.ShotgunAttack(magazine.CurrentProjectileId, AttackContext.AttackDelay);
+                }
+                else
+                {
+                    attacker.ShotgunAttack(equipmentComponent.Weapon.AttackIds[0], AttackContext.AttackDelay);
+                }
                 break;
         }
 
@@ -92,9 +111,20 @@ public class CharacterAttack : MonoBehaviour
         }
     }
 
+    private bool RequiresConsumption()
+    {
+        if (AttackConsumptionMapping.Instance == null) return false;
+        foreach (int id in equipmentComponent.Weapon.AttackIds)
+            if (AttackConsumptionMapping.Instance.TryGetConsumption(id, out _)) return true;
+        return false;
+    }
+
     private EquipmentSlot equipmentComponent;
     private Attacker attacker;
     private Magazine magazine;
     public AttackContext AttackContext { get; private set; }
     private bool bPrevAttackReady = true;
+
+    public bool bPossibleAttack { get; set; } = true;
+
 }

@@ -120,6 +120,12 @@ public class CharacterHealth : NetworkBehaviour
         CurrentArmor = MaxArmor;
     }
 
+    public void ResetStat()
+    {
+        CurrentHP = MaxHP;
+        CurrentArmor = MaxArmor;
+    }
+
     /// <summary>
     /// duration초에 걸쳐 amount만큼 HP/Armor를 회복
     /// </summary>

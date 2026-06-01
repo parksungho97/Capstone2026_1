@@ -45,9 +45,9 @@ public class Respawn : NetworkBehaviour
     {
         IsTimerActive = true;
         timerDuration = respawnDelay;
-        timerEndTime = Time.time + respawnDelay;
+        timerEndTime = Time.realtimeSinceStartup + respawnDelay;
 
-        yield return new WaitForSeconds(respawnDelay);
+        yield return new WaitForSecondsRealtime(respawnDelay);
 
         IsTimerActive = false;
         bDead = false;
@@ -57,7 +57,7 @@ public class Respawn : NetworkBehaviour
     public float GetRemainingSeconds()
     {
         if (!IsTimerActive) return 0f;
-        return Mathf.Max(timerEndTime - Time.time, 0f);
+        return Mathf.Max(timerEndTime - Time.realtimeSinceStartup, 0f);
     }
 
     public float GetProgress01()

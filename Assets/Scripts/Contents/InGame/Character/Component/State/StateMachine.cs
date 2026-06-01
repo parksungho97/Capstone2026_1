@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Diagnostics;
+using UnityEngine;
 
 public abstract class State<T>
 {
@@ -49,7 +51,7 @@ public class StateMachine<T>
     public void Update()
     {
         if (currentState == null) return;
-
+        
         currentState.Update(context);
 
         foreach (var (transition, targetState) in currentTransitions)
@@ -61,6 +63,8 @@ public class StateMachine<T>
             }
         }
     }
+
+    public State<T> CurrentState => currentState;
 
     private T context;
     private State<T> currentState;

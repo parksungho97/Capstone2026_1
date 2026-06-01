@@ -47,20 +47,25 @@ public class PlayerController : NetworkBehaviour
 
                 if (moveDegree != Vector3.zero)
                 {
-                    move.Move(moveDegree); // 대각선 이동 속도 균일을 위해 normalized 권장
+                    move.Move(moveDegree);
                     hasMovedThisTick = true;
                 }
 
                 if (data.buttons.WasPressed(previousButtons, EInputButton.Space))
                 {
-                    captureInteractor.TryStartCapture();
-                    move.SetMovePossible(false);
-                    bActivate = true;
+                    if (captureInteractor.IsInsideCaptureZone)
+                    {
+                        captureInteractor.TryStartCapture();
+                        move.SetMovePossible(false);
+                        playerAttack.bPossibleAttack = false;
+                        bActivate = true;
+                    }
                 }
                 if (data.buttons.WasReleased(previousButtons, EInputButton.Space))
                 {
                     captureInteractor.TryStopCapture();
                     move.SetMovePossible(true);
+                    playerAttack.bPossibleAttack = true;
                     bActivate = false;
                 }
                 if (data.buttons.WasPressed(previousButtons, EInputButton.Q)) extraWeaponSlot.Swap();
@@ -82,8 +87,9 @@ public class PlayerController : NetworkBehaviour
                 previousButtons = data.buttons;
             }
 
-            if (bActivate == false)
-                bMove = hasMovedThisTick;
+            bMove = hasMovedThisTick;
+            if (captureInteractor.IsCapturing)
+                bMove = false;
         }
 
         move.MoveUpdate(Runner.DeltaTime);

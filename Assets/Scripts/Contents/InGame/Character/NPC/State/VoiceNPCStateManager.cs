@@ -12,7 +12,7 @@ public class NpcPlayVoice : State<NpcContext>
     public override void Enter(NpcContext context)
     {
         npcMove.StopMove();
-        voicePlayer.PlayRandom();
+        voicePlayer.PlayRandomOnAll();
     }
 
     public override void Exit(NpcContext context) { }
@@ -47,11 +47,11 @@ public class NpcChaseTarget : State<NpcContext>
 
 public class NpcAttack : State<NpcContext>
 {
-    public NpcAttack(Transform self, NpcMove npcMove, CharacterAttack characterAttack, Chaser chaser)
+    public NpcAttack(Transform self, NpcMove npcMove, NpcAttackNetworkState npcAttackNetworkState, Chaser chaser)
     {
         this.self = self;
         this.npcMove = npcMove;
-        this.characterAttack = characterAttack;
+        this.npcAttackNetworkState = npcAttackNetworkState;
         this.chaser = chaser;
     }
 
@@ -70,14 +70,14 @@ public class NpcAttack : State<NpcContext>
         if (dir.sqrMagnitude > 0.001f)
             self.rotation = Quaternion.LookRotation(dir);
 
-        //characterAttack.Attack();
+        npcAttackNetworkState.Attack();
     }
 
     public override void Exit(NpcContext context) { }
 
     private readonly Transform self;
     private readonly NpcMove npcMove;
-    private readonly CharacterAttack characterAttack;
+    private readonly NpcAttackNetworkState npcAttackNetworkState;
     private readonly Chaser chaser;
 }
 
@@ -169,7 +169,7 @@ public class TimeOut : StateTransition
     public override bool ShouldTransition()
     {
         elapsed += Time.deltaTime;
-        
+
         if (elapsed >= duration)
         {
             elapsed = 0f;
@@ -261,21 +261,21 @@ public class VoiceNPCStateManager : NetworkBehaviour
         NpcMove npcMove = GetComponent<NpcMove>();
         VoicePlayer voicePlayer = GetComponent<VoicePlayer>();
         characterHealth = GetComponent<CharacterHealth>();
-        CharacterAttack characterAttack = GetComponent<CharacterAttack>();
+        NpcAttackNetworkState npcAttackNetworkState = GetComponent<NpcAttackNetworkState>();
         Npc npc = GetComponent<Npc>();
         Animator animator = GetComponentInChildren<Animator>();
 
         Debug.Assert(npcMove);
         Debug.Assert(voicePlayer);
         Debug.Assert(chaser);
-        //Debug.Assert(characterAttack);
+        Debug.Assert(npcAttackNetworkState);
 
         idle = new NpcIdle(npcMove);
         die = new NpcDie(npc, animator);
         npcPlayVoiceFirst = new NpcPlayVoice(voicePlayer, npcMove);
         npcPlayVoiceSecond = new NpcPlayVoice(voicePlayer, npcMove);
         chaseTarget = new NpcChaseTarget(npcMove, chaser);
-        npcAttack = new NpcAttack(transform, npcMove, characterAttack, chaser);
+        npcAttack = new NpcAttack(transform, npcMove, npcAttackNetworkState, chaser);
         back = new NpcBack(npcMove, npcMove.CenterPos);
 
         stateMachine.AddTransition(idle, npcPlayVoiceFirst, new MeetTarget(chaser));
@@ -302,9 +302,10 @@ public class VoiceNPCStateManager : NetworkBehaviour
 
         if (Object.HasStateAuthority == false)
             return;
-
+        //Debug.Log(stateMachine.CurrentState.GetType());
         if (!isDead && characterHealth.CurrentHP <= 0)
         {
+            Debug.Log("Dead");
             isDead = true;
             stateMachine.SetState(die);
             return;

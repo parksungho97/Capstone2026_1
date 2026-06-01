@@ -5,17 +5,14 @@ using UnityEngine.AI;
 public class NpcAnimationNetworkState : NetworkBehaviour
 {
     [Networked] public NetworkBool IsMoving { get; private set; }
-    [Networked] public NetworkBool IsHit { get; private set; }
 
-    [SerializeField] private NavMeshAgent navMeshAgent;
+    [SerializeField] private Npc npc;
     [SerializeField] private HitComponent hitComponent;
     [SerializeField] private float moveThreshold = 0.05f;
+    public bool IsHit { get; private set; }
 
     private void Awake()
     {
-        if (navMeshAgent == null)
-            navMeshAgent = GetComponent<NavMeshAgent>();
-
         if (hitComponent == null)
             hitComponent = GetComponentInChildren<HitComponent>();
     }
@@ -24,6 +21,8 @@ public class NpcAnimationNetworkState : NetworkBehaviour
     {
         if (hitComponent != null)
             hitComponent.ActionHitted += OnHit;
+        npc = GetComponent<Npc>();
+        Debug.Assert(npc);
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState)
@@ -34,14 +33,12 @@ public class NpcAnimationNetworkState : NetworkBehaviour
 
     private void OnHit()
     {
+        Debug.Log("NpcHitted");
         SetHit(true);
     }
 
     public void SetHit(bool isHit)
     {
-        if (!Object.HasStateAuthority)
-            return;
-
         IsHit = isHit;
     }
 
@@ -50,9 +47,9 @@ public class NpcAnimationNetworkState : NetworkBehaviour
         if (!Object.HasStateAuthority)
             return;
 
-        if (navMeshAgent == null)
-            return;
-
-        IsMoving = navMeshAgent.velocity.sqrMagnitude > moveThreshold * moveThreshold;
+        if(npc.bMoving)
+        {
+            // Tood: 
+        }
     }
 }

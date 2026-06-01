@@ -33,7 +33,7 @@ public class NpcAnimationSelector : MonoBehaviour
         {
             CharacterHealth health = GetComponent<CharacterHealth>();
 
-            if (health == null || health.CurrentHP > 0)
+            if (health == null || health.CurrentHP >= 0)
             {
                 animator.SetTrigger("Hit");
             }

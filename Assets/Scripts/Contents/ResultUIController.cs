@@ -1,91 +1,78 @@
-using System.Collections;
-using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-namespace Network
+public class ResultUIController : MonoBehaviour
 {
-    public class ResultUIController : MonoBehaviour
+    [Header("Result UI")]
+    [SerializeField] private GameObject victoryScreen;
+    [SerializeField] private GameObject defeatScreen;
+
+    private void Awake()
     {
-        //[SerializeField] private GameObject mVictoryImage = null;
-        //[SerializeField] private GameObject mDefeatImage = null;
-        //[SerializeField] private float mReturnDelay = 5.0f;
+        HideAll();
+    }
 
-        //private void Start()
-        //{
-        //    if (mVictoryImage != null)
-        //        mVictoryImage.SetActive(false);
+    /// <summary>
+    /// 승리 결과를 표시합니다.
+    /// 다른 스크립트에서 승리로 판단했을 때 호출합니다.
+    /// </summary>
+    public void ShowVictory()
+    {
+        if (victoryScreen == null)
+        {
+            Debug.LogError("[ResultUIController] Victory Screen이 연결되지 않았습니다.");
+            return;
+        }
 
-        //    if (mDefeatImage != null)
-        //        mDefeatImage.SetActive(false);
+        if (defeatScreen != null)
+            defeatScreen.SetActive(false);
 
-        //    StartCoroutine(CoShowResultAndReturn());
-        //}
+        victoryScreen.SetActive(true);
 
-        //private IEnumerator CoShowResultAndReturn()
-        //{
-        //    yield return null;
-        //    yield return null;
-        //    yield return null;
+        Debug.Log("[ResultUIController] 승리 화면 표시");
+    }
 
-        //    if (RoomManager.Instance == null)
-        //        yield break;
+    /// <summary>
+    /// 패배 결과를 표시합니다.
+    /// 다른 스크립트에서 패배로 판단했을 때 호출합니다.
+    /// </summary>
+    public void ShowDefeat()
+    {
+        if (defeatScreen == null)
+        {
+            Debug.LogError("[ResultUIController] Defeat Screen이 연결되지 않았습니다.");
+            return;
+        }
 
-        //    if (NetworkManager.Singleton == null)
-        //        yield break;
+        if (victoryScreen != null)
+            victoryScreen.SetActive(false);
 
-        //    if (RoomManager.Instance.TryGetMyRoomId(out int roomId) == false)
-        //    {
-        //        Debug.LogError("[ResultUI] failed to get my roomId");
-        //        yield break;
-        //    }
+        defeatScreen.SetActive(true);
 
-        //    ulong localPlayerId = NetworkManager.Singleton.LocalClientId;
+        Debug.Log("[ResultUIController] 패배 화면 표시");
+    }
 
-        //    if (RoomManager.Instance.TryGetPlayerTeam(localPlayerId, roomId, out Team myTeam) == false)
-        //    {
-        //        Debug.LogError($"[ResultUI] failed to get my team. clientId={localPlayerId}, roomId={roomId}");
-        //        yield break;
-        //    }
+    /// <summary>
+    /// 모든 결과 화면을 숨깁니다.
+    /// 초기화 또는 결과 화면 종료 시 사용할 수 있습니다.
+    /// </summary>
+    public void HideAll()
+    {
+        if (victoryScreen != null)
+            victoryScreen.SetActive(false);
 
-        //    GameWinner winnerTeam = RoomManager.Instance.WinnerTeam;
+        if (defeatScreen != null)
+            defeatScreen.SetActive(false);
+    }
 
-        //    bool isVictory =
-        //        (winnerTeam == GameWinner.Red && myTeam == Team.Red) ||
-        //        (winnerTeam == GameWinner.Blue && myTeam == Team.Blue);
-
-        //    if (isVictory)
-        //    {
-        //        if (mVictoryImage != null)
-        //        {
-        //            mVictoryImage.SetActive(true);
-        //            mVictoryImage.transform.SetAsLastSibling();
-        //        }
-
-        //        if (mDefeatImage != null)
-        //            mDefeatImage.SetActive(false);
-        //    }
-        //    else
-        //    {
-        //        if (mVictoryImage != null)
-        //            mVictoryImage.SetActive(false);
-
-        //        if (mDefeatImage != null)
-        //        {
-        //            mDefeatImage.SetActive(true);
-        //            mDefeatImage.transform.SetAsLastSibling();
-        //        }
-        //    }
-
-        //    yield return new WaitForSeconds(mReturnDelay);
-
-        //    if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
-        //    {
-        //        NetworkManager.Singleton.SceneManager.LoadScene(
-        //            SceneNames.Room,
-        //            LoadSceneMode.Single
-        //        );
-        //    }
-        //}
+    /// <summary>
+    /// bool 값으로 결과를 전달할 수 있는 편의 함수입니다.
+    /// true면 승리, false면 패배 화면을 표시합니다.
+    /// </summary>
+    public void ShowResult(bool isVictory)
+    {
+        if (isVictory)
+            ShowVictory();
+        else
+            ShowDefeat();
     }
 }

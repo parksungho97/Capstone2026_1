@@ -8,8 +8,8 @@ public class PlayerRespawnController : NetworkBehaviour
     private CharacterHealth characterHealth;
     private Rigidbody rb;
     private Collider[] colliders;
-    private Renderer[] renderers;
     private PlayerAnimationSelector playerAnimationSelector;
+    [SerializeField] private GameObject[] childs;
     [SerializeField] private HitComponent hitComponent;
 
     private void Start()
@@ -18,7 +18,6 @@ public class PlayerRespawnController : NetworkBehaviour
         characterHealth = GetComponent<CharacterHealth>();
         rb = GetComponent<Rigidbody>();
         colliders = GetComponents<Collider>();
-        renderers = GetComponentsInChildren<Renderer>();
         playerAnimationSelector = GetComponent<PlayerAnimationSelector>();
         respawn = GetComponent<Respawn>();
 
@@ -31,37 +30,57 @@ public class PlayerRespawnController : NetworkBehaviour
 
         respawn.ActionDead += Dead;
         respawn.ActionRespawnComplete += Respawn;
+
+        playerAnimationSelector.ActionDeadAnimEnd += () =>
+        {
+            Show(false);
+        };
     }
 
     public void Dead()
     {
-        playerController.bInputDisabled = true;
+        RPC_Dead();
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    private void RPC_Dead()
+    {
+        Debug.Log("Rpc_Dead");
+        if (Object.HasInputAuthority)
+            playerController.bInputDisabled = true;
+
         hitComponent.enabled = false;
         rb.isKinematic = true;
 
         foreach (Collider c in colliders)
             c.enabled = false;
-
-        Show(false);
     }
 
     public void Respawn()
     {
-        playerController.bInputDisabled = false;
+        RPC_Respawn();
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    private void RPC_Respawn()
+    {
+        Debug.Log("Rpc_Respawn");
         hitComponent.enabled = true;
         rb.isKinematic = false;
 
         foreach (Collider c in colliders)
             c.enabled = true;
 
-        Show(true);
-        characterHealth.RPC_ResetStat();
+        characterHealth.ResetStat();
 
         if (Object.HasInputAuthority)
         {
+            playerController.bInputDisabled = false;
             pendingRespawnPosition = RespawnManager.Instance.GetRandomSafeRespawnPosition();
             hasPendingRespawn = true;
         }
+
+        Show(true);
     }
 
     public override void FixedUpdateNetwork()
@@ -78,7 +97,14 @@ public class PlayerRespawnController : NetworkBehaviour
 
     private void Show(bool bShow)
     {
-        foreach (Renderer r in renderers)
-            r.enabled = bShow;
+        if (childs.Length > 0)
+            foreach (var c in childs)
+                c.SetActive(bShow);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.V))
+            GetComponent<CharacterHealth>().RPC_ServeHP(50);
     }
 }

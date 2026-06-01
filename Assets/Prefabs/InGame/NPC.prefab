@@ -22,6 +22,8 @@ GameObject:
   - component: {fileID: 5669932406093206510}
   - component: {fileID: 850010370272652508}
   - component: {fileID: 5839470035317793980}
+  - component: {fileID: -9130786511615166184}
+  - component: {fileID: -1717774360649042757}
   m_Layer: 0
   m_Name: NPC
   m_TagString: Untagged
@@ -117,7 +119,10 @@ MonoBehaviour:
   - {fileID: 4093250457193427681}
   - {fileID: 4103996838576592822}
   - {fileID: 9095254718630095927}
+  - {fileID: -6880639991214439475}
   - {fileID: 5839470035317793980}
+  - {fileID: -9130786511615166184}
+  - {fileID: -1717774360649042757}
   - {fileID: 8086947336892419551}
   - {fileID: 1559543253139044431}
   ForceRemoteRenderTimeframe: 0
@@ -356,11 +361,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _IsMoving:
     _value: 0
-  _IsHit:
-    _value: 0
-  navMeshAgent: {fileID: 4372642342994691858}
+  npc: {fileID: 0}
   hitComponent: {fileID: 8086947336892419551}
   moveThreshold: 0.05
+--- !u!114 &-9130786511615166184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 77286735445477815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37286d88e439e1248bde2222ab0e241b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-1717774360649042757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 77286735445477815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1acaca7f0f9bc614592f95f4ff30d062, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meleeAttackId: 0
+  attackInterval: 3
 --- !u!1 &5282960857625873925
 GameObject:
   m_ObjectHideFlags: 0

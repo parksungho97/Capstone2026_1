@@ -49,32 +49,50 @@ public class RoomController : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void AddPlayerRPC(int playerId, NetworkString<_16> playerName)
     {
+        // 이미 입장한 플레이어라면 중복 추가 방지
         if (PlayerContexts.ContainsKey(playerId))
             return;
 
+        // 방 최대 정원을 초과하면 추가하지 않음
         if (PlayerContexts.Count >= maxRedPlayerCount + maxBluePlayerCount)
             return;
-        
-        EPlayerTeam team = EPlayerTeam.Red;
-        if (RedPlayerCount >= maxRedPlayerCount)
+
+        EPlayerTeam assignedTeam;
+
+        // Blue 팀을 우선 배정
+        // 인원수가 같거나 Blue가 더 적으면 Blue 입장
+        if (BluePlayerCount < maxBluePlayerCount &&
+            (BluePlayerCount <= RedPlayerCount || RedPlayerCount >= maxRedPlayerCount))
         {
-            team = EPlayerTeam.Blue;
+            assignedTeam = EPlayerTeam.Blue;
             BluePlayerCount += 1;
+        }
+        // Blue가 더 많으면 Red 입장
+        else if (RedPlayerCount < maxRedPlayerCount)
+        {
+            assignedTeam = EPlayerTeam.Red;
+            RedPlayerCount += 1;
         }
         else
         {
-            team = EPlayerTeam.Red;
-            RedPlayerCount += 1;
+            Debug.LogWarning("[RoomController] 입장 가능한 팀이 없습니다.");
+            return;
         }
 
         PlayerRoomContext newContext = new PlayerRoomContext
         {
-            team = team,
+            team = assignedTeam,
             name = playerName,
             bReady = false
         };
 
         PlayerContexts.Add(playerId, newContext);
+
+        Debug.Log(
+            $"[RoomController] 자동 팀 배정 완료 / " +
+            $"PlayerId: {playerId}, Team: {assignedTeam}, " +
+            $"Blue: {BluePlayerCount}, Red: {RedPlayerCount}"
+        );
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]

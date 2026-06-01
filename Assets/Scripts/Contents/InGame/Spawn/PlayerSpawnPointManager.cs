@@ -12,8 +12,19 @@ public class PlayerSpawnPointManager : MonoBehaviour
             return transform;
         }
 
-        //int randomIndex = 5;
         int randomIndex = Random.Range(0, spawnPoints.Length);
         return spawnPoints[randomIndex].transform;
+    }
+
+    public Transform GetSpawnPointByIndex(int index)
+    {
+        if (spawnPoints == null || spawnPoints.Length == 0)
+        {
+            Debug.LogWarning("[PlayerSpawnPointManager] SpawnPoint가 없습니다.");
+            return transform;
+        }
+
+        int clampedIndex = Mathf.Clamp(index, 0, spawnPoints.Length - 1);
+        return spawnPoints[clampedIndex].transform;
     }
 }

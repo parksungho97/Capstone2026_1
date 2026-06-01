@@ -1,10 +1,12 @@
 using Fusion;
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
 public class Attacker : NetworkBehaviour
 {
     private VoicePlayer voicePlayer;
+    public Action ActionAttack;
 
     private void Start()
     {
@@ -51,6 +53,7 @@ public class Attacker : NetworkBehaviour
             VFXManager.Instance.Spawn(vfxId, position);
         if (soundId >= 0)
             voicePlayer?.PlayAttackClip(soundId);
+        ActionAttack?.Invoke();
     }
 
     private async Task SpawnShotgunAsync(ShotgunAttackData data)

@@ -24,7 +24,7 @@ public class VoiceClipManager : MonoBehaviour
     public void AddClip(AudioClip clip)
     {
         if (clip == null) return;
-
+        Debug.Log("AddClip");
         clips.Add(clip);
     }
 

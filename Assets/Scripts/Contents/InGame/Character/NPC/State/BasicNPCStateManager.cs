@@ -40,15 +40,14 @@ public class NpcDie : State<NpcContext>
 
     public override void Enter(NpcContext context)
     {
-        if (animator)
-            animator.SetTrigger("Die");
+        npc.DestroyNpc();
     }
 
     public override void Update(NpcContext context) { }
 
     public override void Exit(NpcContext context)
     {
-        npc.DestroyNpc();
+        
     }
 
     private Npc npc;
@@ -110,7 +109,7 @@ public class BasicNPCStateManager : MonoBehaviour
             stateMachine.SetState(die);
             return;
         }
-
+        
         stateMachine.Update();
     }
 

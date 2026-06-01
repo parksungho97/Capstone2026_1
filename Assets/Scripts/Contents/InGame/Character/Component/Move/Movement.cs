@@ -2,15 +2,17 @@ using Fusion;
 using UnityEngine;
 using static Unity.Collections.Unicode;
 
-public class Movement : MonoBehaviour
+public class Movement : NetworkBehaviour
 {
     [SerializeField] private float moveSpeed = 3.0f;
     [SerializeField] private float turnSpeed = 15.0f;
 
     public bool bMovePossible { get; set; } = true;
+    public bool bRotatePossible {  get; set; } = true;
+    public bool bAnyPossible {  get; set; } = true;
 
-    public Vector3 MoveDirection { get; private set; }
-    public Vector3 ViewDirection { get; private set; }
+    [Networked] public Vector3 MoveDirection { get; private set; }
+    [Networked] public Vector3 ViewDirection { get; private set; }
 
     private Vector3 mPendingMove;
     private Vector3 mPendingLookDir;
@@ -34,6 +36,9 @@ public class Movement : MonoBehaviour
 
     public void MoveUpdate(float dt)
     {
+        if (bAnyPossible == false)
+            return;
+
         if (bMovePossible && mPendingMove != Vector3.zero)
         {
             MoveDirection = mPendingMove.normalized;
@@ -46,7 +51,7 @@ public class Movement : MonoBehaviour
 
         mPendingMove = Vector3.zero;
 
-        if (bMovePossible && mPendingLookDir.sqrMagnitude > 0.0001f)
+        if (bRotatePossible && mPendingLookDir.sqrMagnitude > 0.0001f)
         {
             ViewDirection = mPendingLookDir.normalized;
 
@@ -62,4 +67,3 @@ public class Movement : MonoBehaviour
         mPendingTurnCoeff = 0f;
     }
 }
-    

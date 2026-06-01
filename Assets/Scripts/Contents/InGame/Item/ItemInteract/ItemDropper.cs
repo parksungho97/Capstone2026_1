@@ -21,6 +21,6 @@ public class ItemDropper : MonoBehaviour
         if (ItemInstanceManager.Instance == null) return;
 
         DropData data = dropDataList[Random.Range(0, dropDataList.Count)];
-        ItemInstanceManager.Instance.RPC_RequestSpawn(data.ItemId.Value, transform.position, data.Count);
+        ItemInstanceManager.Instance.SpawnImmediate(data.ItemId.Value, transform.position, data.Count);
     }
 }

@@ -58,7 +58,6 @@ public class Player : NetworkBehaviour
             voicePlayer.StopFootSteps();
     }
 
-
     private EquipmentSlot equipmentComponent;
     private Magazine magazine;
     private PlayerController playerController;

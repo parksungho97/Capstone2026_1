@@ -1,6 +1,7 @@
+using Fusion;
 using UnityEngine;
 
-public class VoicePlayer : MonoBehaviour
+public class VoicePlayer : NetworkBehaviour
 {
     [SerializeField] private AudioClip[] footStepClips;
 
@@ -48,6 +49,24 @@ public class VoicePlayer : MonoBehaviour
         AudioClip clip = VoiceClipManager.Instance.GetClipAt(i);
         if (clip == null) return;
 
+        audioSource.PlayOneShot(clip);
+    }
+
+    public void PlayRandomOnAll()
+    {
+        if (!Object.HasStateAuthority) return;
+
+        int i = VoiceClipManager.Instance.GetRandomIndex();
+        if (i < 0) return;
+
+        RPC_PlayRandom(i);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_PlayRandom(int clipIndex)
+    {
+        AudioClip clip = VoiceClipManager.Instance.GetClipAt(clipIndex);
+        if (clip == null) return;
         audioSource.PlayOneShot(clip);
     }
 

@@ -1,9 +1,12 @@
+using System;
 using UnityEngine;
 
 public class PlayerAnimationSelector : MonoBehaviour
 {
     [SerializeField] private Animator animator;
     [SerializeField] private PlayerAnimationNetworkState animationState;
+
+    public Action ActionDeadAnimEnd;
 
     public enum WeaponType
     {
@@ -30,6 +33,8 @@ public class PlayerAnimationSelector : MonoBehaviour
 
     private string currentAnimName = "";
 
+    private Movement movement;
+
     private void Awake()
     {
         if (animator == null)
@@ -37,6 +42,9 @@ public class PlayerAnimationSelector : MonoBehaviour
 
         if (animationState == null)
             animationState = GetComponent<PlayerAnimationNetworkState>();
+
+        movement = GetComponent<Movement>();
+        Debug.Assert(movement);
 
         animator.SetLayerWeight(upperBodyLayerIndex, 0f);
     }
@@ -46,8 +54,8 @@ public class PlayerAnimationSelector : MonoBehaviour
         if (animator == null || animationState == null)
             return;
 
-        Vector3 moveDir = animationState.MoveDirection;
-        Vector3 aimDir = animationState.AimDirection;
+        Vector3 moveDir = movement.MoveDirection;
+        Vector3 aimDir = movement.ViewDirection;
         WeaponType weapon = GetWeaponType(animationState.CurrentWeaponId);
 
         string moveAnim = SelectMoveAnimation(moveDir, aimDir);

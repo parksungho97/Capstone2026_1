@@ -25,7 +25,8 @@ public class Npc : NetworkBehaviour
 
     public void DestroyNpc()
     {
-        if (!Object.HasStateAuthority) return;
+        if (!Object.HasStateAuthority) 
+            return;
 
         itemDropper.Drop();
         Runner.Despawn(Object);

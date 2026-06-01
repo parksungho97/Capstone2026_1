@@ -14,6 +14,7 @@ public class MeleeAttackInstance : MonoBehaviour
     private Collider hitCollider;
     private NetworkObject self;
     private NetworkObject owner;
+    private Vector3 spawnOffset;
     private float activationTimer;
     private float durationTimer;
 
@@ -23,6 +24,7 @@ public class MeleeAttackInstance : MonoBehaviour
     {
         this.self = self;
         this.owner = owner;
+        spawnOffset = data.SpawnOffset;
         damage = data.Damage;
         knockbackForce = data.KnockbackForce;
         activationTime = data.ActivationTime;
@@ -45,6 +47,12 @@ public class MeleeAttackInstance : MonoBehaviour
 
         if (activationTimer > 0f)
         {
+            if (owner != null)
+            {
+                transform.position = owner.transform.position + owner.transform.rotation * spawnOffset;
+                transform.rotation = owner.transform.rotation;
+            }
+
             activationTimer -= Time.fixedDeltaTime;
             if (activationTimer <= 0f && hitCollider != null)
                 hitCollider.enabled = true;
@@ -63,6 +71,7 @@ public class MeleeAttackInstance : MonoBehaviour
     {
         if (!self.HasStateAuthority || activationTimer > 0f) 
             return;
+
         if (owner == null || other.transform.IsChildOf(owner.transform)) 
             return;
 

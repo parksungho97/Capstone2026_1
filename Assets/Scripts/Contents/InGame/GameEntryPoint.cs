@@ -3,9 +3,9 @@ using Network;
 using Photon.Voice.Fusion;
 using Photon.Voice.Unity;
 using System.Collections;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
-using static Unity.Collections.AllocatorManager;
 
 public class GameEntryPoint : NetworkBehaviour
 {
@@ -31,18 +31,12 @@ public class GameEntryPoint : NetworkBehaviour
     [SerializeField] private InventoryUIMapper inventoryUIMapper;
     [SerializeField] private WeaponSlotUIBinder weaponSlotUIBinder;
 
-    [Rpc(RpcSources.All, RpcTargets.All)]
-    public void RPC_F()
-    {
-        Debug.Log("gd");
-    }
+    [Networked] private int readyPlayerCount { get; set; }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.V))
-            RPC_F();
-    }
-    public override async void Spawned()
+    [Networked, Capacity(8)]
+    private NetworkDictionary<int, int> spawnAssignments => default;
+
+    public override void Spawned()
     {
         base.Spawned();
 
@@ -61,18 +55,58 @@ public class GameEntryPoint : NetworkBehaviour
         gameMode.ActionGameEnded += (EResultType resultType) =>
         {
             Debug.Log($"[CGameMode] Result: {resultType}");
-            StartCoroutine(LeaveAfterDelay(3f));
+            Network.NetworkRoot.Instance.StartCoroutine(LeaveAfterDelay(5f));
         };
-        
-        Transform spawnPoint = spawnPointManager.GetRandomSpawnPoint();
 
+        RPC_ReportReady(Runner.LocalPlayer.PlayerId);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    private void RPC_ReportReady(int clientId)
+    {
+        readyPlayerCount++;
+        if (readyPlayerCount < TeamInfo.Instance.All.Count) return;
+
+        var clientIds = TeamInfo.Instance.All.Keys.OrderBy(id => id).ToList();
+        int[] indices = Enumerable.Range(0, clientIds.Count).ToArray();
+
+        for (int i = indices.Length - 1; i > 0; i--)
+        {
+            int j = UnityEngine.Random.Range(0, i + 1);
+            (indices[i], indices[j]) = (indices[j], indices[i]);
+        }
+
+        for (int i = 0; i < clientIds.Count; i++)
+            spawnAssignments.Set(clientIds[i], indices[i]);
+
+        RPC_StartGame();
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_StartGame()
+    {
+        if (!spawnAssignments.TryGet(Runner.LocalPlayer.PlayerId, out int spawnIndex))
+        {
+            Debug.LogError($"[GameEntryPoint] No spawn assignment for player {Runner.LocalPlayer.PlayerId}");
+            return;
+        }
+
+        SpawnPlayerAsync(spawnPointManager.GetSpawnPointByIndex(spawnIndex));
+
+        if (Object.HasStateAuthority)
+            StartCoroutine(WaitAndStartTimer());
+    }
+
+    private async void SpawnPlayerAsync(Transform spawnPoint)
+    {
         var newPlayer = await Runner.SpawnAsync(player, position: spawnPoint.position,
             rotation: spawnPoint.rotation,
             inputAuthority: Runner.LocalPlayer);
+
         cameraController.SetTarget(newPlayer.transform);
         viewContext.Initalize(newPlayer.gameObject);
         newPlayer.GetComponent<PlayerController>().Initalize(cameraController);
-        
+
         InventoryController inventoryController = newPlayer.GetComponent<InventoryController>();
         Debug.Assert(inventoryController);
         inventoryUIMapper.LinkInventoryController(inventoryController);
@@ -82,19 +116,19 @@ public class GameEntryPoint : NetworkBehaviour
 
         CharacterHealth playerHealth = newPlayer.GetComponent<CharacterHealth>();
         playerStatUIController.Initialize(playerHealth);
-        
 
         Respawn respawn = newPlayer.GetComponent<Respawn>();
         Debug.Assert(respawn);
         respawnUIController.Initialize(respawn);
 
-        if (Object.HasStateAuthority)
-            StartCoroutine(WaitAndStartTimer());
+        AudioListener audioListener = newPlayer.GetComponent<AudioListener>();
+        Debug.Assert(audioListener);
+        audioListener.enabled = true;
     }
 
     private IEnumerator LeaveAfterDelay(float seconds)
     {
-        yield return new WaitForSeconds(seconds);
+        yield return new WaitForSecondsRealtime(seconds);
         _ = NetworkRoot.Instance.LeaveToLobby();
     }
 
@@ -111,10 +145,8 @@ public class GameEntryPoint : NetworkBehaviour
             yield return null;
         }
 
-        // 3. 아주 짧은 프레임 대기 (Fusion의 내부 상태 전파를 위해)
         yield return new WaitForSeconds(0.1f);
 
         timer.SetMinutes(minute);
     }
-
 }
