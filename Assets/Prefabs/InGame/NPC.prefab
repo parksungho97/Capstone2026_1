@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 5839470035317793980}
   - component: {fileID: -9130786511615166184}
   - component: {fileID: -1717774360649042757}
+  - component: {fileID: 8689517198903032157}
   m_Layer: 0
   m_Name: NPC
   m_TagString: Untagged
@@ -361,7 +362,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _IsMoving:
     _value: 0
-  npc: {fileID: 0}
+  _IsAttack:
+    _value: 0
+  npc: {fileID: 4103996838576592822}
   hitComponent: {fileID: 8086947336892419551}
   moveThreshold: 0.05
 --- !u!114 &-9130786511615166184
@@ -390,6 +393,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   meleeAttackId: 0
   attackInterval: 3
+  animator: {fileID: 354518095021448475}
+--- !u!114 &8689517198903032157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 77286735445477815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d8e3c75ace80c440afaec425de78ad2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 354518095021448475}
+  animationState: {fileID: 5839470035317793980}
+  crossFadeTime: 0.2
 --- !u!1 &5282960857625873925
 GameObject:
   m_ObjectHideFlags: 0
@@ -638,6 +657,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 7299329132027761133}
   m_SourcePrefab: {fileID: 100100000, guid: fec21e3b58e285149b47cf155b424e8f, type: 3}
+--- !u!95 &354518095021448475 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: fec21e3b58e285149b47cf155b424e8f, type: 3}
+  m_PrefabInstance: {fileID: 6161229944743731338}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2494448116570489728 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -639763325267172598, guid: fec21e3b58e285149b47cf155b424e8f, type: 3}

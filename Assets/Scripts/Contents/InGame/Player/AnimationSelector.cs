@@ -24,6 +24,7 @@ public class PlayerAnimationSelector : MonoBehaviour
 
     private bool wasAttacking = false;
     private bool wasHit = false;
+    private bool wasDead = false;
 
     private bool isWeaponAimActive = false;
     private float weaponAimTimer = 0f;
@@ -54,6 +55,24 @@ public class PlayerAnimationSelector : MonoBehaviour
         if (animator == null || animationState == null)
             return;
 
+        if (animationState.IsDead)
+        {
+            animator.SetLayerWeight(upperBodyLayerIndex, 0f);
+
+            isWeaponAimActive = false;
+            isAimFadingOut = false;
+            weaponAimTimer = 0f;
+            aimFadeTimer = 0f;
+
+            wasDead = true;
+            return;
+        }
+        else if (wasDead)
+        {
+            wasDead = false;
+            currentAnimName = "";
+        }
+
         Vector3 moveDir = movement.MoveDirection;
         Vector3 aimDir = movement.ViewDirection;
         WeaponType weapon = GetWeaponType(animationState.CurrentWeaponId);
@@ -75,7 +94,6 @@ public class PlayerAnimationSelector : MonoBehaviour
             currentAnimName = nextMoveAnimName;
         }
 
-        // 공격 시작: 공격 애니메이션만 재생
         if (animationState.IsAttacking && !wasAttacking)
         {
             isWeaponAimActive = false;
@@ -118,7 +136,6 @@ public class PlayerAnimationSelector : MonoBehaviour
             }
         }
 
-        // 공격 종료 순간: Pistol / ShotGun만 Weapon_Aim 시작
         if (wasAttacking && !animationState.IsAttacking)
         {
             if (weapon == WeaponType.Pistol || weapon == WeaponType.ShotGun)
@@ -137,7 +154,6 @@ public class PlayerAnimationSelector : MonoBehaviour
             }
         }
 
-        // Weapon_Aim 유지 시간 계산
         if (isWeaponAimActive && !animationState.IsAttacking)
         {
             weaponAimTimer += Time.deltaTime;

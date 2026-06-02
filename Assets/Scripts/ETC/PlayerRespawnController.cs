@@ -1,16 +1,28 @@
 using Fusion;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerRespawnController : NetworkBehaviour
 {
+    [Header("Dead Animation")]
+    [SerializeField] private Animator animator;
+    [SerializeField] private string deadAnimStateName = "Dead";
+    [SerializeField] private float deadAnimDuration = 2.0f;
+
     private Respawn respawn;
     private PlayerController playerController;
     private CharacterHealth characterHealth;
     private Rigidbody rb;
     private Collider[] colliders;
     private PlayerAnimationSelector playerAnimationSelector;
+
     [SerializeField] private GameObject[] childs;
     [SerializeField] private HitComponent hitComponent;
+
+    private Coroutine deadAnimRoutine;
+
+    private bool hasPendingRespawn;
+    private Vector3 pendingRespawnPosition;
 
     private void Start()
     {
@@ -21,20 +33,19 @@ public class PlayerRespawnController : NetworkBehaviour
         playerAnimationSelector = GetComponent<PlayerAnimationSelector>();
         respawn = GetComponent<Respawn>();
 
+        if (animator == null)
+            animator = GetComponent<Animator>();
+
         Debug.Assert(playerController);
         Debug.Assert(characterHealth);
         Debug.Assert(hitComponent);
         Debug.Assert(rb);
         Debug.Assert(playerAnimationSelector);
         Debug.Assert(respawn);
+        Debug.Assert(animator);
 
         respawn.ActionDead += Dead;
         respawn.ActionRespawnComplete += Respawn;
-
-        playerAnimationSelector.ActionDeadAnimEnd += () =>
-        {
-            Show(false);
-        };
     }
 
     public void Dead()
@@ -46,6 +57,7 @@ public class PlayerRespawnController : NetworkBehaviour
     private void RPC_Dead()
     {
         Debug.Log("Rpc_Dead");
+
         if (Object.HasInputAuthority)
             playerController.bInputDisabled = true;
 
@@ -54,6 +66,32 @@ public class PlayerRespawnController : NetworkBehaviour
 
         foreach (Collider c in colliders)
             c.enabled = false;
+
+        if (deadAnimRoutine != null)
+            StopCoroutine(deadAnimRoutine);
+
+        deadAnimRoutine = StartCoroutine(DeadAnimRoutine());
+    }
+
+    private IEnumerator DeadAnimRoutine()
+    {
+        if (animator != null)
+        {
+            animator.SetLayerWeight(1, 0f);
+
+            animator.ResetTrigger("Hit");
+            animator.ResetTrigger("PipeAttack");
+            animator.ResetTrigger("PistolAttack");
+            animator.ResetTrigger("ShotGunAttack");
+
+            animator.Play(deadAnimStateName, 0, 0f);
+        }
+
+        yield return new WaitForSeconds(deadAnimDuration);
+
+        Show(false);
+
+        deadAnimRoutine = null;
     }
 
     public void Respawn()
@@ -65,6 +103,13 @@ public class PlayerRespawnController : NetworkBehaviour
     private void RPC_Respawn()
     {
         Debug.Log("Rpc_Respawn");
+
+        if (deadAnimRoutine != null)
+        {
+            StopCoroutine(deadAnimRoutine);
+            deadAnimRoutine = null;
+        }
+
         hitComponent.enabled = true;
         rb.isKinematic = false;
 
@@ -92,14 +137,13 @@ public class PlayerRespawnController : NetworkBehaviour
         }
     }
 
-    private bool hasPendingRespawn;
-    private Vector3 pendingRespawnPosition;
-
     private void Show(bool bShow)
     {
         if (childs.Length > 0)
+        {
             foreach (var c in childs)
                 c.SetActive(bShow);
+        }
     }
 
     private void Update()
