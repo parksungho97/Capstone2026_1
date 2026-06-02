@@ -15,12 +15,12 @@ MonoBehaviour:
   id: 2
   data:
     Prefab: {fileID: -1205818650260235087, guid: bcfc6301c3662b148b8475e96ab1031c, type: 3}
-    Damage: 20
-    KnockbackForce: 10
+    Damage: 50
+    KnockbackForce: 40
     SpawnOffset: {x: 0, y: 2, z: 2}
-    AttackVfxId: 0
-    HitVfxId: 0
-    CastSoundId: 0
+    AttackVfxId: 4
+    HitVfxId: 5
+    CastSoundId: 3
     HitSoundId: 1
     ActivationTime: 0
     Duration: 1

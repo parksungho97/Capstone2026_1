@@ -763,10 +763,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vfxEntries:
   - id: 0
-    prefab: {fileID: 2466452857672358469, guid: c0f069f0e4637b149941c794d7de0559, type: 3}
+    prefab: {fileID: 447409866740539227, guid: da34d66431c8cd04aa98411a543a83bf, type: 3}
     initialPoolSize: 0
   - id: 1
     prefab: {fileID: 8014903522719909632, guid: bfa0461dffa9c35468ecad84f2256fc7, type: 3}
+    initialPoolSize: 10
+  - id: 2
+    prefab: {fileID: 500345726442012828, guid: 50a810bfd70577b41a2d43ae0241ea2d, type: 3}
+    initialPoolSize: 10
+  - id: 3
+    prefab: {fileID: 100006, guid: 0661276422528d74d8c9894abad93242, type: 3}
+    initialPoolSize: 10
+  - id: 4
+    prefab: {fileID: 100006, guid: 7e9c50938e32351438a7df9ccad2f2a5, type: 3}
+    initialPoolSize: 10
+  - id: 5
+    prefab: {fileID: 5586783540032275536, guid: 6e57a3cf9435eb14fb9928fa4ee60c63, type: 3}
+    initialPoolSize: 10
+  - id: 6
+    prefab: {fileID: 100002, guid: e3b931080c9262e408c0378d77443cb7, type: 3}
     initialPoolSize: 10
 --- !u!4 &858329928
 Transform:
@@ -1094,9 +1109,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7abc5e9861a60e40932f34750a17366, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entries:
-  - attackId: 1
-    consumptionId: 1
+  entries: []
 --- !u!1001 &1057454198
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3083,8 +3096,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackClips:
-  - {fileID: 8300000, guid: 387f86e66f8380e429965f9a18bb1744, type: 3}
-  - {fileID: 8300000, guid: 19d0da907a1847e4d8a6ae07750c227e, type: 3}
+  - {fileID: 8300000, guid: c362e7e63b2cb19418ef972baa6757ab, type: 3}
+  - {fileID: 8300000, guid: ae2760bef30bd46478aad687a537651e, type: 3}
+  - {fileID: 8300000, guid: 2203773368e4340d98c114f55c2dd7fd, type: 3}
+  - {fileID: 8300000, guid: 9553d54346fa4d04fac184fa31249831, type: 3}
+  - {fileID: 8300000, guid: 9158afb6966d445db9caf1dccf7acbcc, type: 3}
+  - {fileID: 8300000, guid: 333a57c3aa694f84e9e5380ba40f7a2d, type: 3}
 --- !u!114 &1976954542
 MonoBehaviour:
   m_ObjectHideFlags: 0

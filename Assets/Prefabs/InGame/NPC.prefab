@@ -526,7 +526,7 @@ MonoBehaviour:
   health: {fileID: 9095254718630095927}
   playerController: {fileID: 0}
   hitStunDuration: 0.5
-  voicePlayer: {fileID: 0}
+  voicePlayer: {fileID: -6880639991214439475}
 --- !u!1 &8313875182970218243
 GameObject:
   m_ObjectHideFlags: 0
