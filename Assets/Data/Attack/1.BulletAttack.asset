@@ -18,6 +18,10 @@ MonoBehaviour:
     Damage: 17
     KnockbackForce: 5
     SpawnOffset: {x: 0, y: 2, z: 3}
+    AttackVfxId: 3
+    HitVfxId: 2
+    CastSoundId: 2
+    HitSoundId: 1
     Speed: 3
     MaxDistance: 30
     Cooldown: 0.5
