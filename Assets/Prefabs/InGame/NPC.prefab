@@ -290,7 +290,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemDropper: {fileID: 2716407552420797901}
-  deathDespawnDelay: 10
+  deathDespawnDelay: 3.5
   _bMoving: 0
   _IsDead:
     _value: 0
