@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d8cdd10e11b0acb42b0997b029dc6418, type: 3}
-  m_Name: 2.Helmet
+  m_Name: 6.Shotgun
   m_EditorClassIdentifier: 
   itemId:
-    Value: 2
-  itemName: Helmet
-  icon: {fileID: 21300000, guid: b8636efeb8fa41a4481cc7d1cf540040, type: 3}
-  desc: Helmet
-  type: 1
-  typeValue: 2
-  itemPrefab: {fileID: 2555459518183211385, guid: 7055651dfc5e8e44db461a2eef2a1b3b, type: 3}
+    Value: 6
+  itemName: Shotgun
+  icon: {fileID: 21300000, guid: dd1177f8a1dcf2d4096f8e25c06ff068, type: 3}
+  desc: Pistol
+  type: 0
+  typeValue: 3
+  itemPrefab: {fileID: 1236257789494122, guid: 8b0b86b42def11849a8eba21f4a6a684, type: 3}

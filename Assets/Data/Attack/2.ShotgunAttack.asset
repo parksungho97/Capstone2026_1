@@ -18,7 +18,7 @@ MonoBehaviour:
     Damage: 50
     KnockbackForce: 40
     SpawnOffset: {x: 0, y: 2, z: 2}
-    AttackVfxId: 4
+    AttackVfxId: 6
     HitVfxId: 5
     CastSoundId: 3
     HitSoundId: 1
