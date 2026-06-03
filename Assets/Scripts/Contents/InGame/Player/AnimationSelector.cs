@@ -12,7 +12,7 @@ public class PlayerAnimationSelector : MonoBehaviour
     {
         Pipe = 0,
         Pistol = 1,
-        ShotGun = 2
+        ShotGun = 3
     }
 
     [SerializeField] private float crossFadeTime = 0.2f;
@@ -31,6 +31,8 @@ public class PlayerAnimationSelector : MonoBehaviour
 
     private bool isAimFadingOut = false;
     private float aimFadeTimer = 0f;
+
+    private WeaponType attackStartWeapon = WeaponType.Pipe;
 
     private string currentAnimName = "";
 
@@ -63,6 +65,7 @@ public class PlayerAnimationSelector : MonoBehaviour
             isAimFadingOut = false;
             weaponAimTimer = 0f;
             aimFadeTimer = 0f;
+            attackStartWeapon = WeaponType.Pipe;
 
             wasDead = true;
             return;
@@ -96,6 +99,8 @@ public class PlayerAnimationSelector : MonoBehaviour
 
         if (animationState.IsAttacking && !wasAttacking)
         {
+            attackStartWeapon = weapon;
+
             isWeaponAimActive = false;
             isAimFadingOut = false;
             weaponAimTimer = 0f;
@@ -105,7 +110,7 @@ public class PlayerAnimationSelector : MonoBehaviour
             animator.ResetTrigger("PistolAttack");
             animator.ResetTrigger("ShotGunAttack");
 
-            switch (weapon)
+            switch (attackStartWeapon)
             {
                 case WeaponType.Pipe:
                     animator.CrossFadeInFixedTime(
@@ -138,7 +143,7 @@ public class PlayerAnimationSelector : MonoBehaviour
 
         if (wasAttacking && !animationState.IsAttacking)
         {
-            if (weapon == WeaponType.Pistol || weapon == WeaponType.ShotGun)
+            if (attackStartWeapon == WeaponType.Pistol || attackStartWeapon == WeaponType.ShotGun)
             {
                 isWeaponAimActive = true;
                 isAimFadingOut = false;
@@ -218,7 +223,7 @@ public class PlayerAnimationSelector : MonoBehaviour
             case 1:
                 return WeaponType.Pistol;
 
-            case 2:
+            case 3:
                 return WeaponType.ShotGun;
 
             default:

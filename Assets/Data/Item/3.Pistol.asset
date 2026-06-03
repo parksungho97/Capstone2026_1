@@ -20,3 +20,4 @@ MonoBehaviour:
   type: 0
   typeValue: 1
   itemPrefab: {fileID: 1694449805434718, guid: 6f1a7354265853f44b0ed5e2e43676ad, type: 3}
+  spawnCount: 9
