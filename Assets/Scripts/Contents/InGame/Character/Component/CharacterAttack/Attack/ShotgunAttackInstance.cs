@@ -11,6 +11,7 @@ public class ShotgunAttackInstance : MonoBehaviour
     private float duration;
     private int vfxId;
     private int hitSoundId;
+    private float hitStunDuration;
     private Vector3 initialScale;
     private Vector3 finalScale;
     private float dashSpeed;
@@ -38,6 +39,7 @@ public class ShotgunAttackInstance : MonoBehaviour
         duration = data.Duration;
         vfxId = data.HitVfxId;
         hitSoundId = data.HitSoundId;
+        hitStunDuration = data.HitStunDuration;
         initialScale = data.InitialScale;
         finalScale = data.FinalScale;
         dashSpeed = data.DashSpeed;
@@ -97,6 +99,6 @@ public class ShotgunAttackInstance : MonoBehaviour
 
         hitTargets.Add(hit);
         Vector3 dir = (other.transform.position - transform.position).normalized;
-        hit.Hit(damage, dir, knockbackForce, vfxId, hitSoundId);
+        hit.Hit(damage, dir, knockbackForce, vfxId, hitSoundId, hitStunDuration);
     }
 }

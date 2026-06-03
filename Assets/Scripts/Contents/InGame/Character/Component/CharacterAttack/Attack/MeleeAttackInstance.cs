@@ -10,6 +10,7 @@ public class MeleeAttackInstance : MonoBehaviour
     private float duration;
     private int vfxId;
     private int hitSoundId;
+    private float hitStunDuration;
 
     private Collider hitCollider;
     private NetworkObject self;
@@ -31,6 +32,7 @@ public class MeleeAttackInstance : MonoBehaviour
         duration = data.Duration;
         vfxId = data.HitVfxId;
         hitSoundId = data.HitSoundId;
+        hitStunDuration = data.HitStunDuration;
 
         hitCollider = GetComponent<Collider>();
         if (hitCollider != null) hitCollider.enabled = false;
@@ -79,7 +81,7 @@ public class MeleeAttackInstance : MonoBehaviour
         if (hit)
         {
             Vector3 dir = (other.transform.position - transform.position).normalized;
-            hit.Hit(damage, dir, knockbackForce, vfxId, hitSoundId);
+            hit.Hit(damage, dir, knockbackForce, vfxId, hitSoundId, hitStunDuration);
         }
     }
 }

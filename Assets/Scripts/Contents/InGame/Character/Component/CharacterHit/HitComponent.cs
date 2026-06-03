@@ -7,7 +7,6 @@ public class HitComponent : NetworkBehaviour
     [SerializeField] private Rigidbody rb;
     [SerializeField] private CharacterHealth health;
     [SerializeField] private PlayerController playerController;
-    [SerializeField] private float hitStunDuration = 0.5f;
     [SerializeField] private float invincibleDuration = 1.5f;
     [SerializeField] private VoicePlayer voicePlayer;
     [SerializeField] private InvincibilityBlinker blinker;
@@ -33,15 +32,15 @@ public class HitComponent : NetworkBehaviour
         characterAttack = GetComponent<CharacterAttack>();
     }
 
-    public void Hit(int damage, Vector3 knockbackDir, float knockbackForce, int vfxId = -1, int soundId = -1)
+    public void Hit(int damage, Vector3 knockbackDir, float knockbackForce, int vfxId = -1, int soundId = -1, float stunDuration = 0f)
     {
         if (Time.time < invincibilityEndTime)
             return;
-        RPC_Hit(damage, knockbackDir, knockbackForce, vfxId, soundId);
+        RPC_Hit(damage, knockbackDir, knockbackForce, vfxId, soundId, stunDuration);
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
-    private void RPC_Hit(int damage, Vector3 knockbackDir, float knockbackForce, int vfxId, int soundId)
+    private void RPC_Hit(int damage, Vector3 knockbackDir, float knockbackForce, int vfxId, int soundId, float stunDuration)
     {
         Debug.Log($"[HitComponent] Hit received — damage: {damage}");
 
@@ -53,10 +52,10 @@ public class HitComponent : NetworkBehaviour
 
         if (Object.HasInputAuthority)
         {
-            playerController?.DisableInputForSeconds(hitStunDuration);
+            playerController?.DisableInputForSeconds(stunDuration);
             AttackDelay attackDelay = characterAttack?.AttackContext.AttackDelay;
-            if (attackDelay != null && attackDelay.Timer < hitStunDuration)
-                attackDelay.SetDelay(hitStunDuration);
+            if (attackDelay != null && attackDelay.Timer < stunDuration)
+                attackDelay.SetDelay(stunDuration);
         }
 
         if (vfxId >= 0)

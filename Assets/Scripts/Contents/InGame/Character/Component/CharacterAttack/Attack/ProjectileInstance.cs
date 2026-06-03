@@ -10,6 +10,7 @@ public class ProjectileInstance : MonoBehaviour
     private float maxDistance;
     private int vfxId;
     private int hitSoundId;
+    private float hitStunDuration;
 
     private NetworkObject self;
     private NetworkObject owner;
@@ -28,6 +29,7 @@ public class ProjectileInstance : MonoBehaviour
         maxDistance = data.MaxDistance;
         vfxId = data.HitVfxId;
         hitSoundId = data.HitSoundId;
+        hitStunDuration = data.HitStunDuration;
         startPosition = transform.position;
         despawning = false;
     }
@@ -51,7 +53,7 @@ public class ProjectileInstance : MonoBehaviour
         if (hit)
         {
             Debug.Log(other.name);
-            hit.Hit(damage, transform.forward, knockbackForce, vfxId, hitSoundId);
+            hit.Hit(damage, transform.forward, knockbackForce, vfxId, hitSoundId, hitStunDuration);
             DoDespawn();
         }
     }

@@ -11,6 +11,7 @@ public abstract class AttackDataBase
     public int HitVfxId;
     public int CastSoundId;
     public int HitSoundId;
+    public float HitStunDuration;
 }
 
 public abstract class AttackDataSO : ScriptableObject
