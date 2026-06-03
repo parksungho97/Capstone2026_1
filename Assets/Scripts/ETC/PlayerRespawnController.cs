@@ -18,14 +18,13 @@ public class PlayerRespawnController : NetworkBehaviour
     private PlayerAnimationSelector playerAnimationSelector;
     private AudioListener audioListener;
     private AudioSource audioSource;
+    private NetworkTransform networkTransform;
+    private VoicePlayer voicePlayer;
 
     [SerializeField] private GameObject[] childs;
     [SerializeField] private HitComponent hitComponent;
 
     private Coroutine deadAnimRoutine;
-
-    private bool hasPendingRespawn;
-    private Vector3 pendingRespawnPosition;
 
     private void Start()
     {
@@ -37,6 +36,7 @@ public class PlayerRespawnController : NetworkBehaviour
         respawn = GetComponent<Respawn>();
         audioListener = GetComponent<AudioListener>();
         audioSource =  GetComponent<AudioSource>();
+        voicePlayer = GetComponent<VoicePlayer>();
 
         if (animator == null)
             animator = GetComponent<Animator>();
@@ -50,9 +50,17 @@ public class PlayerRespawnController : NetworkBehaviour
         Debug.Assert(animator);
         Debug.Assert(audioListener);
         Debug.Assert(audioSource);
+        Debug.Assert(voicePlayer);
 
         respawn.ActionDead += Dead;
         respawn.ActionRespawnComplete += Respawn;
+    }
+
+    public override void Spawned()
+    {
+        base.Spawned();
+        networkTransform = GetComponent<NetworkTransform>();
+        Debug.Assert(networkTransform);
     }
 
     public void Dead()
@@ -78,6 +86,8 @@ public class PlayerRespawnController : NetworkBehaviour
             c.enabled = false;
 
         audioSource.enabled = false;
+
+        voicePlayer.StopFootSteps();
 
         if (deadAnimRoutine != null)
             StopCoroutine(deadAnimRoutine);
@@ -133,24 +143,16 @@ public class PlayerRespawnController : NetworkBehaviour
 
         audioSource.enabled = true;
 
+        if(Object.HasStateAuthority)
+            networkTransform.Teleport(RespawnManager.Instance.GetRandomSafeRespawnPosition());
+
         if (Object.HasInputAuthority)
         {
             playerController.bInputDisabled = false;
-            pendingRespawnPosition = RespawnManager.Instance.GetRandomSafeRespawnPosition();
-            hasPendingRespawn = true;
             audioListener.enabled = true;
         }
 
         Show(true);
-    }
-
-    public override void FixedUpdateNetwork()
-    {
-        if (hasPendingRespawn)
-        {
-            transform.position = pendingRespawnPosition;
-            hasPendingRespawn = false;
-        }
     }
 
     private void Show(bool bShow)

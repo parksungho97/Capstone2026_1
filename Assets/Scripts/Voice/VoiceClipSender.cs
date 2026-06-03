@@ -8,7 +8,7 @@ public class VoiceClipSender : NetworkBehaviour
 {
     [SerializeField] private VoiceClipManager voiceClipManager;
 
-    private const string BASE_URL = "http://192.168.3.63/";
+    [SerializeField] private const string BASE_URL = "https://finisher-cavalry-narrow.ngrok-free.dev/";
     private const string UPLOAD_URL = BASE_URL + "upload.php";
     private const string CLEANUP_URL = BASE_URL + "cleanup.php";
     private const int SAMPLE_RATE = 16000;
