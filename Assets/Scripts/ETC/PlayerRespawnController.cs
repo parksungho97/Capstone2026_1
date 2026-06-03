@@ -9,6 +9,7 @@ public class PlayerRespawnController : NetworkBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private string deadAnimStateName = "Dead";
     [SerializeField] private float deadAnimDuration = 2.0f;
+    [SerializeField] private Chased chased;
 
     private Respawn respawn;
     private PlayerController playerController;
@@ -20,11 +21,13 @@ public class PlayerRespawnController : NetworkBehaviour
     private AudioSource audioSource;
     private NetworkTransform networkTransform;
     private VoicePlayer voicePlayer;
+    
 
     [SerializeField] private GameObject[] childs;
     [SerializeField] private HitComponent hitComponent;
 
     private Coroutine deadAnimRoutine;
+    private Coroutine disableAudioRoutine;
 
     private void Start()
     {
@@ -51,6 +54,7 @@ public class PlayerRespawnController : NetworkBehaviour
         Debug.Assert(audioListener);
         Debug.Assert(audioSource);
         Debug.Assert(voicePlayer);
+        Debug.Assert(chased);
 
         respawn.ActionDead += Dead;
         respawn.ActionRespawnComplete += Respawn;
@@ -85,9 +89,13 @@ public class PlayerRespawnController : NetworkBehaviour
         foreach (Collider c in colliders)
             c.enabled = false;
 
-        audioSource.enabled = false;
-
         voicePlayer.StopFootSteps();
+
+        chased.IsActive = false;
+
+        if (disableAudioRoutine != null)
+            StopCoroutine(disableAudioRoutine);
+        disableAudioRoutine = StartCoroutine(DisableAudioAfterPlaying());
 
         if (deadAnimRoutine != null)
             StopCoroutine(deadAnimRoutine);
@@ -124,7 +132,11 @@ public class PlayerRespawnController : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.All)]
     private void RPC_Respawn()
     {
-        Debug.Log("Rpc_Respawn");
+        if (disableAudioRoutine != null)
+        {
+            StopCoroutine(disableAudioRoutine);
+            disableAudioRoutine = null;
+        }
 
         if (deadAnimRoutine != null)
         {
@@ -143,7 +155,9 @@ public class PlayerRespawnController : NetworkBehaviour
 
         audioSource.enabled = true;
 
-        if(Object.HasStateAuthority)
+        chased.IsActive = true;
+
+        if (Object.HasStateAuthority)
             networkTransform.Teleport(RespawnManager.Instance.GetRandomSafeRespawnPosition());
 
         if (Object.HasInputAuthority)
@@ -162,6 +176,13 @@ public class PlayerRespawnController : NetworkBehaviour
             foreach (var c in childs)
                 c.SetActive(bShow);
         }
+    }
+
+    private IEnumerator DisableAudioAfterPlaying()
+    {
+        yield return new WaitWhile(() => audioSource.isPlaying);
+        audioSource.enabled = false;
+        disableAudioRoutine = null;
     }
 
     private void Update()

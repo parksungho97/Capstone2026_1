@@ -1324,6 +1324,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   respawnDelay: 12
+  respawnDelayIncrement: 4
   _bDead: 0
 --- !u!114 &2877092397099777778
 MonoBehaviour:
@@ -1340,12 +1341,10 @@ MonoBehaviour:
   animator: {fileID: 0}
   deadAnimStateName: Dead
   deadAnimDuration: 2
+  chased: {fileID: 5810439487169223117}
   childs:
   - {fileID: 1136104555502582882}
   - {fileID: 3256899345698773096}
-  - {fileID: 7474874513299646184}
-  - {fileID: 4108127276923768511}
-  - {fileID: 2761266127936043645}
   hitComponent: {fileID: 8056722664998124107}
 --- !u!114 &1612610525157925437
 MonoBehaviour:

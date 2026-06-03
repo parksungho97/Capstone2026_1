@@ -76,7 +76,7 @@ public class MeleeAttackInstance : MonoBehaviour
             return;
 
         HitComponent hit = other.GetComponent<HitComponent>();
-        if (hit )
+        if (hit)
         {
             Vector3 dir = (other.transform.position - transform.position).normalized;
             hit.Hit(damage, dir, knockbackForce, vfxId, hitSoundId);

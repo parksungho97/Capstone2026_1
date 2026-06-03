@@ -57,6 +57,7 @@ public class ViewContext : MonoBehaviour
         viewCulling.AddObstacleLayer(obstacleLayer);
 
         Player.OnNetworkSpawned += OnPlayerSpawned;
+        Npc.OnNetworkSpawned += OnNpcSpawned;
     }
 
     private void LateUpdate()
@@ -91,11 +92,19 @@ public class ViewContext : MonoBehaviour
     private void OnDestroy()
     {
         Player.OnNetworkSpawned -= OnPlayerSpawned;
+        Npc.OnNetworkSpawned -= OnNpcSpawned;
     }
 
     private void OnPlayerSpawned(Player player)
     {
         ViewCulled viewCulled = player.GetComponent<ViewCulled>();
+        if (viewCulled != null)
+            viewCulling.RegistCulledObject(viewCulled);
+    }
+
+    private void OnNpcSpawned(Npc npc)
+    {
+        ViewCulled viewCulled = npc.GetComponent<ViewCulled>();
         if (viewCulled != null)
             viewCulling.RegistCulledObject(viewCulled);
     }

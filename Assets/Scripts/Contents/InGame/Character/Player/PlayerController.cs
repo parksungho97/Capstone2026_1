@@ -21,8 +21,8 @@ public class PlayerController : NetworkBehaviour
 
         Debug.Assert(itemCollector);
 
-        playerAttack = GetComponent<CharacterAttack>();
-        Debug.Assert(playerAttack);
+        PlayerAttack = GetComponent<CharacterAttack>();
+        Debug.Assert(PlayerAttack);
 
         extraWeaponSlot = GetComponent<ExtraWeaponSlot>();
         Debug.Assert(extraWeaponSlot);
@@ -57,7 +57,7 @@ public class PlayerController : NetworkBehaviour
                     {
                         captureInteractor.TryStartCapture();
                         move.SetMovePossible(false);
-                        playerAttack.bPossibleAttack = false;
+                        PlayerAttack.bPossibleAttack = false;
                         bActivate = true;
                     }
                 }
@@ -65,14 +65,14 @@ public class PlayerController : NetworkBehaviour
                 {
                     captureInteractor.TryStopCapture();
                     move.SetMovePossible(true);
-                    playerAttack.bPossibleAttack = true;
+                    PlayerAttack.bPossibleAttack = true;
                     bActivate = false;
                 }
                 if (data.buttons.WasPressed(previousButtons, EInputButton.Q)) extraWeaponSlot.Swap();
                 if (data.buttons.WasPressed(previousButtons, EInputButton.Attack))
                 {
                     if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
-                        playerAttack.Attack();
+                        PlayerAttack.Attack();
                 }
                 if (data.buttons.WasPressed(previousButtons, EInputButton.Z)) itemCollector.AcquireOne();
 
@@ -98,7 +98,7 @@ public class PlayerController : NetworkBehaviour
     private Movement move;
     private CameraController cameraController;
     private CapturePointInteracter captureInteractor;
-    private CharacterAttack playerAttack;
+    public CharacterAttack PlayerAttack { get; private set; }
     private ExtraWeaponSlot extraWeaponSlot;
 
     [Networked] private NetworkButtons previousButtons { get; set; }

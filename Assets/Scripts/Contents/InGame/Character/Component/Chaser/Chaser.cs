@@ -1,5 +1,5 @@
 using Fusion;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,30 +31,42 @@ public class Chaser : NetworkBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (bSpawned == false)
-            return;
-
-        if (Object.HasStateAuthority == false)
-            return;
+        if (!bSpawned || !Object.HasStateAuthority) return;
 
         Chased chased = other.GetComponent<Chased>();
-        if(chased)
+        if (chased && chased.IsActive)
+        {
             chaseds.Add(chased);
+            Action handler = () => RemoveChased(chased);
+            inactiveHandlers[chased] = handler;
+            chased.OnBecameInactive += handler;
+            Debug.Log("Chased On");
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (bSpawned == false)
-            return;
-
-        if (Object.HasStateAuthority == false)
-            return;
+        if (!bSpawned || !Object.HasStateAuthority) return;
 
         Chased chased = other.GetComponent<Chased>();
         if (chased)
-            chaseds.Remove(chased);
+            RemoveChased(chased);
     }
 
-    private List<Chased> chaseds = new List<Chased>();
+    private void RemoveChased(Chased chased)
+    {
+        if (!chaseds.Remove(chased)) return;
+
+        if (inactiveHandlers.TryGetValue(chased, out Action handler))
+        {
+            chased.OnBecameInactive -= handler;
+            inactiveHandlers.Remove(chased);
+        }
+
+        Debug.Log("Chased Off");
+    }
+
+    private readonly List<Chased> chaseds = new List<Chased>();
+    private readonly Dictionary<Chased, Action> inactiveHandlers = new Dictionary<Chased, Action>();
     private bool bSpawned = false;
 }
