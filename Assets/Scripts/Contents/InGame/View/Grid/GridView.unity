@@ -604,6 +604,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   offset: {x: 0, y: 9, z: -5}
   fixedEulerAngles: {x: 30, y: 0, z: 0}
+  maxMouseOffsetDistance: 3.5
+  cameraSmoothSpeed: 10
+  deadZoneRadius: 2
+  southOffsetMultiplier: 2
 --- !u!114 &818472004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1379,21 +1383,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   viewBuildComputeShader: {fileID: 7200000, guid: 17601f641f097624e87ef42cf28c738f, type: 3}
+  viewRenderShader: {fileID: 4800000, guid: e39d16edfcec4e34d991396a5cf078d9, type: 3}
+  obstacleMaskShader: {fileID: 4800000, guid: da9944ee25c9e8343a7c744083f36304, type: 3}
+  xRayMaterial: {fileID: 2100000, guid: 8745392f82506da4fabfc7bc1a460bfd, type: 2}
   _fogColor: {r: 0, g: 0, b: 0, a: 1}
   _fogOpacity: 0.7
   gridX: 1000
   gridY: 1000
   worldX: 50
   worldY: 50
-  playerTag: Player
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 64
   fovs:
   - angle: 80
     radius: 20
-  - angle: 360
-    radius: 3
 --- !u!1 &1938680369
 GameObject:
   m_ObjectHideFlags: 0
