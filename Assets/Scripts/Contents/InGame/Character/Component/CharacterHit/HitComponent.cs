@@ -23,16 +23,20 @@ public class HitComponent : NetworkBehaviour
         blinker?.StartBlink(dur);
     }
 
+    private CharacterAttack characterAttack;
+
     private void Start()
     {
         Debug.Assert(rb);
         Debug.Assert(health);
         Debug.Assert(blinker);
+        characterAttack = GetComponent<CharacterAttack>();
     }
 
     public void Hit(int damage, Vector3 knockbackDir, float knockbackForce, int vfxId = -1, int soundId = -1)
     {
-        if (Time.time < invincibilityEndTime) return;
+        if (Time.time < invincibilityEndTime)
+            return;
         RPC_Hit(damage, knockbackDir, knockbackForce, vfxId, soundId);
     }
 
@@ -48,7 +52,12 @@ public class HitComponent : NetworkBehaviour
         }
 
         if (Object.HasInputAuthority)
+        {
             playerController?.DisableInputForSeconds(hitStunDuration);
+            AttackDelay attackDelay = characterAttack?.AttackContext.AttackDelay;
+            if (attackDelay != null && attackDelay.Timer < hitStunDuration)
+                attackDelay.SetDelay(hitStunDuration);
+        }
 
         if (vfxId >= 0)
             VFXManager.Instance.Spawn(vfxId, transform.position);

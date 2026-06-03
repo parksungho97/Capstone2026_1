@@ -1,4 +1,5 @@
 using Fusion;
+using System.Collections;
 using UnityEngine;
 
 public class VoicePlayer : NetworkBehaviour
@@ -75,6 +76,18 @@ public class VoicePlayer : NetworkBehaviour
         AudioClip clip = VoiceClipManager.Instance.GetAttackClipAt(id);
         if (clip == null) return;
         audioSource.PlayOneShot(clip);
+    }
+
+    public void DisableAfterPlaying()
+    {
+        StopFootSteps();
+        StartCoroutine(DisableAfterPlayingRoutine());
+    }
+
+    private IEnumerator DisableAfterPlayingRoutine()
+    {
+        yield return new WaitWhile(() => audioSource.isPlaying);
+        audioSource.enabled = false;
     }
 
     private void PlayFootStep()

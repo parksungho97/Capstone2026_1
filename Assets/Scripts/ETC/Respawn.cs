@@ -7,6 +7,8 @@ using UnityEngine;
 public class Respawn : NetworkBehaviour
 {
     [SerializeField] private float respawnDelay = 12f;
+    [SerializeField] private float respawnDelayIncrement = 0f;
+    private float currentRespawnDelay;
     private CharacterHealth health;
 
     [Networked] public bool bDead { get; private set; }
@@ -22,10 +24,12 @@ public class Respawn : NetworkBehaviour
     {
         health = GetComponent<CharacterHealth>();
         Debug.Assert(health);
+        currentRespawnDelay = respawnDelay;
     }
 
     private void Update()
     {
+        if (!Object.HasStateAuthority) return;
         if (bDead) return;
 
         if (health.CurrentHP <= 0)
@@ -44,11 +48,12 @@ public class Respawn : NetworkBehaviour
     private IEnumerator TimerRoutine()
     {
         IsTimerActive = true;
-        timerDuration = respawnDelay;
-        timerEndTime = Time.realtimeSinceStartup + respawnDelay;
+        timerDuration = currentRespawnDelay;
+        timerEndTime = Time.realtimeSinceStartup + currentRespawnDelay;
 
-        yield return new WaitForSecondsRealtime(respawnDelay);
+        yield return new WaitForSecondsRealtime(currentRespawnDelay);
 
+        currentRespawnDelay += respawnDelayIncrement;
         IsTimerActive = false;
         bDead = false;
         ActionRespawnComplete?.Invoke();

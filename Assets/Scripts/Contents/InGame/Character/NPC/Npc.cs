@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using Fusion;
 using UnityEngine;
 
 public class Npc : NetworkBehaviour
 {
+    public static event Action<Npc> OnNetworkSpawned;
     [SerializeField] private ItemDropper itemDropper;
     [SerializeField] private float deathDespawnDelay = 10f;
 
@@ -26,6 +28,8 @@ public class Npc : NetworkBehaviour
 
         Debug.Assert(voicePlayer);
         Debug.Assert(npcMove);
+
+        OnNetworkSpawned?.Invoke(this);
     }
 
     public void DestroyNpc()
@@ -64,7 +68,7 @@ public class Npc : NetworkBehaviour
             animator.SetTrigger("Die");
 
         if (voicePlayer != null)
-            voicePlayer.StopFootSteps();
+            voicePlayer.DisableAfterPlaying();
     }
 
     public override void FixedUpdateNetwork()
