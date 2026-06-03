@@ -20,7 +20,7 @@ public class Attacker : NetworkBehaviour
 
         delay.SetDelay(data.ActivationTime + data.Duration);
         Vector3 spawnPos = transform.position + transform.rotation * data.SpawnOffset;
-        RPC_OnAttackCast(data.AttackVfxId, data.CastSoundId, spawnPos);
+        RPC_OnAttackCast(data.AttackVfxId, data.CastSoundId, spawnPos, transform.rotation);
         _ = SpawnMeleeAsync(data);
     }
 
@@ -31,7 +31,7 @@ public class Attacker : NetworkBehaviour
 
         delay.SetDelay(data.Cooldown);
         Vector3 spawnPos = transform.position + transform.rotation * data.SpawnOffset;
-        RPC_OnAttackCast(data.AttackVfxId, data.CastSoundId, spawnPos);
+        RPC_OnAttackCast(data.AttackVfxId, data.CastSoundId, spawnPos, transform.rotation);
         _ = SpawnRangedAsync(data);
     }
 
@@ -42,15 +42,15 @@ public class Attacker : NetworkBehaviour
 
         delay.SetDelay(data.ActivationTime + data.Duration);
         Vector3 spawnPos = transform.position + transform.rotation * data.SpawnOffset;
-        RPC_OnAttackCast(data.AttackVfxId, data.CastSoundId, spawnPos);
+        RPC_OnAttackCast(data.AttackVfxId, data.CastSoundId, spawnPos, transform.rotation);
         _ = SpawnShotgunAsync(data);
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
-    private void RPC_OnAttackCast(int vfxId, int soundId, Vector3 position)
+    private void RPC_OnAttackCast(int vfxId, int soundId, Vector3 position, Quaternion rotation)
     {
         if (vfxId >= 0)
-            VFXManager.Instance.Spawn(vfxId, position);
+            VFXManager.Instance.Spawn(vfxId, position, rotation);
         if (soundId >= 0)
             voicePlayer?.PlayAttackClip(soundId);
         ActionAttack?.Invoke();
