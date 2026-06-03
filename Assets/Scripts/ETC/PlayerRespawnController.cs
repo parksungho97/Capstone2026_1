@@ -1,5 +1,6 @@
 using Fusion;
 using System.Collections;
+using System.ComponentModel;
 using UnityEngine;
 
 public class PlayerRespawnController : NetworkBehaviour
@@ -15,6 +16,8 @@ public class PlayerRespawnController : NetworkBehaviour
     private Rigidbody rb;
     private Collider[] colliders;
     private PlayerAnimationSelector playerAnimationSelector;
+    private AudioListener audioListener;
+    private AudioSource audioSource;
 
     [SerializeField] private GameObject[] childs;
     [SerializeField] private HitComponent hitComponent;
@@ -32,6 +35,8 @@ public class PlayerRespawnController : NetworkBehaviour
         colliders = GetComponents<Collider>();
         playerAnimationSelector = GetComponent<PlayerAnimationSelector>();
         respawn = GetComponent<Respawn>();
+        audioListener = GetComponent<AudioListener>();
+        audioSource =  GetComponent<AudioSource>();
 
         if (animator == null)
             animator = GetComponent<Animator>();
@@ -43,6 +48,8 @@ public class PlayerRespawnController : NetworkBehaviour
         Debug.Assert(playerAnimationSelector);
         Debug.Assert(respawn);
         Debug.Assert(animator);
+        Debug.Assert(audioListener);
+        Debug.Assert(audioSource);
 
         respawn.ActionDead += Dead;
         respawn.ActionRespawnComplete += Respawn;
@@ -59,13 +66,18 @@ public class PlayerRespawnController : NetworkBehaviour
         Debug.Log("Rpc_Dead");
 
         if (Object.HasInputAuthority)
+        {
+            audioListener.enabled = false;
             playerController.bInputDisabled = true;
+        }
 
         hitComponent.enabled = false;
         rb.isKinematic = true;
 
         foreach (Collider c in colliders)
             c.enabled = false;
+
+        audioSource.enabled = false;
 
         if (deadAnimRoutine != null)
             StopCoroutine(deadAnimRoutine);
@@ -111,18 +123,22 @@ public class PlayerRespawnController : NetworkBehaviour
         }
 
         hitComponent.enabled = true;
+        hitComponent.SetInvincible();
         rb.isKinematic = false;
 
         foreach (Collider c in colliders)
             c.enabled = true;
-
+        
         characterHealth.ResetStat();
+
+        audioSource.enabled = true;
 
         if (Object.HasInputAuthority)
         {
             playerController.bInputDisabled = false;
             pendingRespawnPosition = RespawnManager.Instance.GetRandomSafeRespawnPosition();
             hasPendingRespawn = true;
+            audioListener.enabled = true;
         }
 
         Show(true);

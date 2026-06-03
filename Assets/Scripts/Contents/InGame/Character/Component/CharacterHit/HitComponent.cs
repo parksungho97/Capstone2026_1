@@ -8,18 +8,31 @@ public class HitComponent : NetworkBehaviour
     [SerializeField] private CharacterHealth health;
     [SerializeField] private PlayerController playerController;
     [SerializeField] private float hitStunDuration = 0.5f;
+    [SerializeField] private float invincibleDuration = 1.5f;
     [SerializeField] private VoicePlayer voicePlayer;
+    [SerializeField] private InvincibilityBlinker blinker;
 
     public Action ActionHitted;
+
+    private float invincibilityEndTime = -1f;
+
+    public void SetInvincible(float duration = -1f)
+    {
+        float dur = duration < 0f ? invincibleDuration : duration;
+        invincibilityEndTime = Time.time + dur;
+        blinker?.StartBlink(dur);
+    }
 
     private void Start()
     {
         Debug.Assert(rb);
         Debug.Assert(health);
+        Debug.Assert(blinker);
     }
 
     public void Hit(int damage, Vector3 knockbackDir, float knockbackForce, int vfxId = -1, int soundId = -1)
     {
+        if (Time.time < invincibilityEndTime) return;
         RPC_Hit(damage, knockbackDir, knockbackForce, vfxId, soundId);
     }
 

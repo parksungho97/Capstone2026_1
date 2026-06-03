@@ -202,7 +202,9 @@ MonoBehaviour:
   health: {fileID: 1987929451324610142}
   playerController: {fileID: 2854249696004987484}
   hitStunDuration: 0.5
+  invincibleDuration: 1.5
   voicePlayer: {fileID: 8227755266992488921}
+  blinker: {fileID: 1867514049902246755}
 --- !u!1 &6255750679721829725
 GameObject:
   m_ObjectHideFlags: 0
@@ -546,15 +548,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5659626534878db43b6e257276f9e34f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 10.117861
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5659626534878db43b6e257276f9e34f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.759514
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5659626534878db43b6e257276f9e34f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -52.53434
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5659626534878db43b6e257276f9e34f, type: 3}
       propertyPath: m_LocalRotation.w
@@ -760,6 +762,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5659626534878db43b6e257276f9e34f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1612610525157925437}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5659626534878db43b6e257276f9e34f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1867514049902246755}
   m_SourcePrefab: {fileID: 100100000, guid: 5659626534878db43b6e257276f9e34f, type: 3}
 --- !u!4 &112493039935944063 stripped
 Transform:
@@ -1273,7 +1278,6 @@ MonoBehaviour:
   upperBodyLayerIndex: 1
   aimHoldTime: 2
   aimExitFadeTime: 1.5
-  deadHideDelay: 3.5
 --- !u!114 &3026138583314769083
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1333,6 +1337,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0268a6cab4d5b542a29d2d6fb24c665, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 0}
+  deadAnimStateName: Dead
+  deadAnimDuration: 2
   childs:
   - {fileID: 1136104555502582882}
   - {fileID: 3256899345698773096}
@@ -1353,6 +1360,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healVfxId: 1
+--- !u!114 &1867514049902246755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7106837159742798860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6196af1e143f5444e8341cefde001f9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targets:
+  - {fileID: 1136104555502582882}
+  - {fileID: 3256899345698773096}
+  blinkInterval: 0.1
 --- !u!4 &7632297427691873974 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5659626534878db43b6e257276f9e34f, type: 3}
