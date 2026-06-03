@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
@@ -7,14 +5,19 @@ public class PlayerAnimationNetworkState : NetworkBehaviour
 {
     //[Networked] public Vector3 MoveDirection { get; private set; }
     //[Networked] public Vector3 AimDirection { get; private set; }
+
     [Networked] public int CurrentWeaponId { get; private set; }
     [Networked] public NetworkBool IsAttacking { get; private set; }
+    [Networked] public NetworkBool IsDead { get; private set; }
+
     public bool IsHit { get; private set; }
 
     [SerializeField] private HitComponent hitComponent;
     [SerializeField] private Movement movement;
     [SerializeField] private EquipmentSlot equipmentSlot;
     [SerializeField] private CharacterAttack characterAttack;
+    [SerializeField] private Respawn respawn;
+
     public void SetMoveDirection(Vector3 direction)
     {
         //if (!Object.HasStateAuthority)
@@ -27,15 +30,19 @@ public class PlayerAnimationNetworkState : NetworkBehaviour
 
     private void Awake()
     {
-        //if (movement == null)
-        //    movement = GetComponent<Movement>();
         if (equipmentSlot == null)
             equipmentSlot = GetComponent<EquipmentSlot>();
+
         if (characterAttack == null)
             characterAttack = GetComponent<CharacterAttack>();
+
         if (hitComponent == null)
             hitComponent = GetComponentInChildren<HitComponent>();
+
+        if (respawn == null)
+            respawn = GetComponent<Respawn>();
     }
+
     public override void Spawned()
     {
         if (characterAttack != null)
@@ -43,11 +50,13 @@ public class PlayerAnimationNetworkState : NetworkBehaviour
             characterAttack.ActionAttackStart += OnAttackStart;
             characterAttack.ActionAttackEnd += OnAttackEnd;
         }
+
         if (hitComponent != null)
         {
             hitComponent.ActionHitted += OnHit;
         }
     }
+
     public void SetAimDirection(Vector3 direction)
     {
         //if (!Object.HasStateAuthority)
@@ -74,6 +83,14 @@ public class PlayerAnimationNetworkState : NetworkBehaviour
         IsAttacking = isAttacking;
     }
 
+    public void SetDead(bool isDead)
+    {
+        if (!Object.HasStateAuthority)
+            return;
+
+        IsDead = isDead;
+    }
+
     private void OnAttackStart()
     {
         SetAttacking(true);
@@ -94,7 +111,6 @@ public class PlayerAnimationNetworkState : NetworkBehaviour
         IsHit = isHit;
     }
 
-
     public override void Despawned(NetworkRunner runner, bool hasState)
     {
         if (characterAttack != null)
@@ -102,27 +118,22 @@ public class PlayerAnimationNetworkState : NetworkBehaviour
             characterAttack.ActionAttackStart -= OnAttackStart;
             characterAttack.ActionAttackEnd -= OnAttackEnd;
         }
+
         if (hitComponent != null)
         {
             hitComponent.ActionHitted -= OnHit;
         }
     }
 
-
     public override void FixedUpdateNetwork()
     {
         if (!Object.HasStateAuthority)
             return;
 
-        //if (movement != null)
-        //{
-        //    SetMoveDirection(movement.MoveDirection);
-        //    SetAimDirection(movement.ViewDirection);
-        //}
         if (equipmentSlot != null)
-        {
             SetCurrentWeaponId(equipmentSlot.WeaponId);
-            
-        }
+
+        if (respawn != null)
+            SetDead(respawn.bDead);
     }
 }

@@ -1248,10 +1248,13 @@ MonoBehaviour:
   _CurrentWeaponId: 2
   _IsAttacking:
     _value: 0
+  _IsDead:
+    _value: 0
   hitComponent: {fileID: 8056722664998124107}
   movement: {fileID: 3779453830801691965}
   equipmentSlot: {fileID: 7379467843389735204}
   characterAttack: {fileID: 374315380834774277}
+  respawn: {fileID: 0}
 --- !u!114 &8837446890761899321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1270,6 +1273,7 @@ MonoBehaviour:
   upperBodyLayerIndex: 1
   aimHoldTime: 2
   aimExitFadeTime: 1.5
+  deadHideDelay: 3.5
 --- !u!114 &3026138583314769083
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1315,7 +1319,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4520f4cd03b3ca74ba9b94cfc3a60b81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  respawnDelay: 2
+  respawnDelay: 12
   _bDead: 0
 --- !u!114 &2877092397099777778
 MonoBehaviour:

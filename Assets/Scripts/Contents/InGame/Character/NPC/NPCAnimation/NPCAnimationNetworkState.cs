@@ -5,6 +5,7 @@ using UnityEngine.AI;
 public class NpcAnimationNetworkState : NetworkBehaviour
 {
     [Networked] public NetworkBool IsMoving { get; private set; }
+    [Networked] public NetworkBool IsAttack { get; set; }
 
     [SerializeField] private Npc npc;
     [SerializeField] private HitComponent hitComponent;
@@ -47,9 +48,6 @@ public class NpcAnimationNetworkState : NetworkBehaviour
         if (!Object.HasStateAuthority)
             return;
 
-        if(npc.bMoving)
-        {
-            // Tood: 
-        }
+        IsMoving = npc.bMoving;
     }
 }
