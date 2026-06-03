@@ -1,62 +1,130 @@
 using Fusion;
-using System.Collections.Generic;
+using System.Collections;
+using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class VoiceClipSender : NetworkBehaviour
 {
     [SerializeField] private VoiceClipManager voiceClipManager;
 
-    private const int CHUNK_SIZE = 100;
-    private const int SAMPLE_RATE = 16000; // 44100 → 16000
+    private const string BASE_URL = "http://192.168.3.63/";
+    private const string UPLOAD_URL = BASE_URL + "upload.php";
+    private const string CLEANUP_URL = BASE_URL + "cleanup.php";
+    private const int SAMPLE_RATE = 16000;
 
-    private List<byte> _receiveBuffer = new();
+    private bool _isUploading = false;
+
+    public override void Despawned(NetworkRunner runner, bool hasStateAuthority)
+    {
+        CleanupServerFiles();
+    }
+
+    private void OnDestroy()
+    {
+        CleanupServerFiles();
+    }
 
     public void SendVoice(float[] data)
     {
-        // 샘플레이트 다운샘플 (44100 → 16000)
+        if (_isUploading) return;
+        _isUploading = true;
+
         float[] downsampled = Downsample(data, 44100, SAMPLE_RATE);
+        byte[] wavFileBytes = ConvertToWavFileBytes(downsampled, SAMPLE_RATE);
 
-        // float[] → byte[] 압축
-        byte[] compressed = CompressToBytes(downsampled);
+        StartCoroutine(UploadVoiceToWebInterface(wavFileBytes));
+    }
 
-        int totalChunks = Mathf.CeilToInt((float)compressed.Length / CHUNK_SIZE);
+    private IEnumerator UploadVoiceToWebInterface(byte[] voiceData)
+    {
+        WWWForm form = new WWWForm();
+        form.AddBinaryData("file", voiceData, "voice.wav", "audio/wav");
 
-        for (int i = 0; i < totalChunks; i++)
+        using (UnityWebRequest www = UnityWebRequest.Post(UPLOAD_URL, form))
         {
-            int start = i * CHUNK_SIZE;
-            int size = Mathf.Min(CHUNK_SIZE, compressed.Length - start);
+            yield return www.SendWebRequest();
 
-            byte[] chunk = new byte[size];
-            System.Array.Copy(compressed, start, chunk, 0, size);
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Upload Failed: {www.error}");
+                _isUploading = false;
+                yield break;
+            }
 
-            RPC_SendVoiceChunk(chunk, i == totalChunks - 1);
+            string uploadedAudioUrl = www.downloadHandler.text.Trim();
+            RPC_SendAudioUrlToHost(uploadedAudioUrl);
+        }
+
+        _isUploading = false;
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
+    private void RPC_SendAudioUrlToHost(string audioUrl)
+    {
+        RPC_BroadcastAudioUrl(audioUrl);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
+    private void RPC_BroadcastAudioUrl(string audioUrl)
+    {
+        StartCoroutine(DownloadAndPlayAudioCoroutine(audioUrl));
+    }
+
+    private IEnumerator DownloadAndPlayAudioCoroutine(string audioUrl)
+    {
+        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(audioUrl, AudioType.WAV))
+        {
+            ((DownloadHandlerAudioClip)www.downloadHandler).streamAudio = true;
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.Success)
+            {
+                AudioClip downloadedClip = DownloadHandlerAudioClip.GetContent(www);
+                voiceClipManager.AddClip(downloadedClip);
+            }
         }
     }
 
-    [Rpc(RpcSources.All, RpcTargets.All)]
-    private void RPC_SendVoiceChunk(byte[] chunk, bool isLast)
+    public void CleanupServerFiles()
     {
-        _receiveBuffer.AddRange(chunk);
-
-        if (!isLast) return;
-
-        // byte[] → float[] 압축 해제
-        float[] data = DecompressFromBytes(_receiveBuffer.ToArray());
-        _receiveBuffer.Clear();
-
-        AudioClip clip = AudioClip.Create("Voice", data.Length, 1, SAMPLE_RATE, false);
-        clip.SetData(data, 0);
-
-        voiceClipManager.AddClip(clip);
+        if (Object != null && Object.HasStateAuthority)
+        {
+            RPC_RequestCleanup();
+        }
     }
 
-    // ── 다운샘플 ────────────────────────────────────────────────────
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
+    private void RPC_RequestCleanup()
+    {
+        if (Runner != null && Runner.IsRunning)
+        {
+            StartCoroutine(CleanupServerFilesCoroutine());
+        }
+    }
+
+    private IEnumerator CleanupServerFilesCoroutine()
+    {
+        using (UnityWebRequest www = UnityWebRequest.PostWwwForm(CLEANUP_URL, ""))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Cleanup Failed: {www.error}");
+            }
+            else
+            {
+                Debug.Log("Server voice files cleaned up successfully.");
+            }
+        }
+    }
+
     private float[] Downsample(float[] data, int fromRate, int toRate)
     {
         float ratio = (float)fromRate / toRate;
         int newLength = Mathf.FloorToInt(data.Length / ratio);
         float[] result = new float[newLength];
-
         for (int i = 0; i < newLength; i++)
         {
             int srcIndex = Mathf.FloorToInt(i * ratio);
@@ -65,28 +133,38 @@ public class VoiceClipSender : NetworkBehaviour
         return result;
     }
 
-    // ── 압축 ────────────────────────────────────────────────────────
-    private byte[] CompressToBytes(float[] data)
+    private byte[] ConvertToWavFileBytes(float[] samples, int sampleRate)
     {
-        byte[] bytes = new byte[data.Length * 2];
-        for (int i = 0; i < data.Length; i++)
+        using (MemoryStream stream = new MemoryStream())
         {
-            short s = (short)(Mathf.Clamp(data[i], -1f, 1f) * 32767);
-            bytes[i * 2] = (byte)(s & 0xFF);
-            bytes[i * 2 + 1] = (byte)((s >> 8) & 0xFF);
-        }
-        return bytes;
-    }
+            using (BinaryWriter writer = new BinaryWriter(stream))
+            {
+                short numChannels = 1;
+                short bitsPerSample = 16;
+                int byteRate = sampleRate * numChannels * (bitsPerSample / 8);
+                short blockAlign = (short)(numChannels * (bitsPerSample / 8));
 
-    // ── 압축 해제 ────────────────────────────────────────────────────
-    private float[] DecompressFromBytes(byte[] bytes)
-    {
-        float[] data = new float[bytes.Length / 2];
-        for (int i = 0; i < data.Length; i++)
-        {
-            short s = (short)(bytes[i * 2] | (bytes[i * 2 + 1] << 8));
-            data[i] = s / 32767f;
+                writer.Write(System.Text.Encoding.ASCII.GetBytes("RIFF"));
+                writer.Write(36 + samples.Length * 2);
+                writer.Write(System.Text.Encoding.ASCII.GetBytes("WAVE"));
+                writer.Write(System.Text.Encoding.ASCII.GetBytes("fmt "));
+                writer.Write(16);
+                writer.Write((short)1);
+                writer.Write(numChannels);
+                writer.Write(sampleRate);
+                writer.Write(byteRate);
+                writer.Write(blockAlign);
+                writer.Write(bitsPerSample);
+                writer.Write(System.Text.Encoding.ASCII.GetBytes("data"));
+                writer.Write(samples.Length * 2);
+
+                for (int i = 0; i < samples.Length; i++)
+                {
+                    short s = (short)(Mathf.Clamp(samples[i], -1f, 1f) * 32767);
+                    writer.Write(s);
+                }
+            }
+            return stream.ToArray();
         }
-        return data;
     }
 }

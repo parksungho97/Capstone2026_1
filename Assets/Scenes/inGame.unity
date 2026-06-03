@@ -3036,6 +3036,8 @@ MonoBehaviour:
   fixedEulerAngles: {x: 80, y: 0, z: 0}
   maxMouseOffsetDistance: 7
   cameraSmoothSpeed: 5
+  deadZoneRadius: 2
+  southOffsetMultiplier: 2
 --- !u!1 &1976954539
 GameObject:
   m_ObjectHideFlags: 0
@@ -3087,6 +3089,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28fa479ce9570de4cb17ae3c1dea7370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxClips: 10
   attackClips:
   - {fileID: 8300000, guid: c362e7e63b2cb19418ef972baa6757ab, type: 3}
   - {fileID: 8300000, guid: ae2760bef30bd46478aad687a537651e, type: 3}
@@ -3122,6 +3125,7 @@ MonoBehaviour:
   voiceClipSender: {fileID: 1976954542}
   maxRecordTime: 5
   cooldown: 1
+  percent: 0.5
 --- !u!4 &1976954544
 Transform:
   m_ObjectHideFlags: 0

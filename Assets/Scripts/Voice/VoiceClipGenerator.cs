@@ -6,6 +6,7 @@ public class VoiceClipGenerator : MonoBehaviour
     [SerializeField] private VoiceClipSender voiceClipSender;
     [SerializeField] private float maxRecordTime = 5f;
     [SerializeField] private float cooldown = 1f;
+    [SerializeField] private float percent = 0.8f;
 
     private const int SAMPLE_RATE = 44100;
     private const float THRESHOLD = 0.02f;
@@ -70,7 +71,12 @@ public class VoiceClipGenerator : MonoBehaviour
             {
                 _silenceTimer += Time.deltaTime;
                 if (_silenceTimer >= SILENCE_TIMEOUT)
-                    SaveClip();
+                {
+                    if (_recordTimer >= maxRecordTime * percent)
+                        SaveClip();
+                    else
+                        DiscardClip();
+                }
             }
             else
             {
@@ -94,6 +100,16 @@ public class VoiceClipGenerator : MonoBehaviour
         if (_buffer.Count > 0)
             voiceClipSender.SendVoice(_buffer.ToArray());
 
+        ResetRecording();
+    }
+
+    private void DiscardClip()
+    {
+        ResetRecording();
+    }
+
+    private void ResetRecording()
+    {
         _buffer.Clear();
         _isRecording = false;
         _silenceTimer = 0f;

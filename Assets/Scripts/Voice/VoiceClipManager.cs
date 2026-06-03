@@ -5,9 +5,14 @@ public class VoiceClipManager : MonoBehaviour
 {
     public static VoiceClipManager Instance { get; private set; }
 
+    [SerializeField] private int maxClips = 10;
+
     private List<AudioClip> clips = new();
 
     [SerializeField] private List<AudioClip> attackClips;
+
+    public int Count => clips.Count;
+    public int MaxClips => maxClips;
 
     private void Awake()
     {
@@ -26,6 +31,12 @@ public class VoiceClipManager : MonoBehaviour
         if (clip == null) return;
         Debug.Log("AddClip");
         clips.Add(clip);
+    }
+
+    public void ReplaceClipAt(int index, AudioClip clip)
+    {
+        if (clip == null || index < 0 || index >= clips.Count) return;
+        clips[index] = clip;
     }
 
     public int GetRandomIndex()
