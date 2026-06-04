@@ -27,16 +27,18 @@ public class CGameMode : NetworkBehaviour
         if (!Object.HasStateAuthority || bGameEnded)
             return;
 
-        if (networkTimerClock.IsExpired())
+        int redCount = 0, blueCount = 0;
+        foreach (var cp in capturePointControllers)
         {
-            int redCount = 0, blueCount = 0;
-            foreach (var cp in capturePointControllers)
-            {
-                if (cp == null) continue;
-                ECaptureState state = cp.CapturePoint.GetCaptureState();
-                if (state == ECaptureState.Red) redCount++;
-                else if (state == ECaptureState.Blue) blueCount++;
-            }
+            if (cp == null) continue;
+            ECaptureState state = cp.CapturePoint.GetCaptureState();
+            if (state == ECaptureState.Red) redCount++;
+            else if (state == ECaptureState.Blue) blueCount++;
+        }
+
+        int total = capturePointControllers.Length;
+        if (redCount == total || blueCount == total || networkTimerClock.IsExpired())
+        {
             EndGame(redCount, blueCount);
         }
     }

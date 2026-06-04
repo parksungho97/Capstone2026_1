@@ -1,4 +1,5 @@
 using Fusion;
+using Photon.Voice.Unity;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,6 +15,8 @@ namespace Network
         public NetworkRunner Runner { get; private set; }
         public NetworkSceneManagerDefault SceneManagerDefault { get; private set; }
 
+        public Recorder Recorder { get; private set; }
+
         private void Awake()
         {
             // 항상 최신 인스턴스를 사용한다.
@@ -27,6 +30,7 @@ namespace Network
 
             Runner = GetComponent<NetworkRunner>();
             SceneManagerDefault = GetComponent<NetworkSceneManagerDefault>();
+            Recorder = GetComponent<Recorder>();
 
             Debug.Assert(Runner != null, "[NetworkRoot] 같은 GameObject에 NetworkRunner가 필요합니다.");
             Debug.Assert(SceneManagerDefault != null, "[NetworkRoot] 같은 GameObject에 NetworkSceneManagerDefault가 필요합니다.");

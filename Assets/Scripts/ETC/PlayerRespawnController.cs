@@ -1,4 +1,5 @@
 using Fusion;
+using Network;
 using System.Collections;
 using System.ComponentModel;
 using UnityEngine;
@@ -69,6 +70,12 @@ public class PlayerRespawnController : NetworkBehaviour
 
     public void Dead()
     {
+        defaultVolume = AudioListener.volume;
+        AudioListener.volume = 0.0f;
+
+        if (NetworkRoot.Instance)
+            NetworkRoot.Instance.Recorder.enabled = false;
+
         RPC_Dead();
     }
 
@@ -125,6 +132,10 @@ public class PlayerRespawnController : NetworkBehaviour
 
     public void Respawn()
     {
+        AudioListener.volume = defaultVolume;
+        if (NetworkRoot.Instance)
+            NetworkRoot.Instance.Recorder.enabled = true;
+
         RPC_Respawn();
     }
 
@@ -182,4 +193,12 @@ public class PlayerRespawnController : NetworkBehaviour
         audioSource.enabled = false;
         disableAudioRoutine = null;
     }
+
+    //private void Update()
+    //{
+    //    if (Input.GetKeyDown(KeyCode.V))
+    //        GetComponent<CharacterHealth>().RPC_ServeHP(50);
+    //}
+
+    private float defaultVolume = 0.0f;
 }
