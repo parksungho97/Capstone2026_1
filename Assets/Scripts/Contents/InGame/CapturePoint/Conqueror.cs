@@ -12,6 +12,7 @@ public class Conqueror : MonoBehaviour
     [SerializeField] private float mIncreaseRate = 10f;
     [SerializeField] private float mDecreaseRate = 5f;
     [SerializeField] private float mHoldDecayDelay = 3f;
+    [SerializeField] private int requestCount = 1;
 
     public float GetRedGauge() => mRedActivater?.Gauge ?? 0f;
     public float GetBlueGauge() => mBlueActivater?.Gauge ?? 0f;
@@ -32,8 +33,8 @@ public class Conqueror : MonoBehaviour
 
     public void Tick(float dt)
     {
-        bool redEnough = mRedRequests.Count >= 1;
-        bool blueEnough = mBlueRequests.Count >= 1;
+        bool redEnough = mRedRequests.Count >= requestCount;
+        bool blueEnough = mBlueRequests.Count >= requestCount;
 
         if (redEnough && blueEnough) return; // standoff — freeze both
 

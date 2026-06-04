@@ -11,6 +11,7 @@ public class Rebel : MonoBehaviour
     [SerializeField] private float mIncreaseRate = 10f;
     [SerializeField] private float mDecreaseRate = 5f;
     [SerializeField] private float mHoldDecayDelay = 3f;
+    [SerializeField] private int requestCount = 1;
 
     public float GetGauge() => mActivater?.Gauge ?? 0f;
 
@@ -26,7 +27,7 @@ public class Rebel : MonoBehaviour
 
     public void Tick(float dt)
     {
-        mActivater.SetRequest(mRequests.Count >= 1);
+        mActivater.SetRequest(mRequests.Count >= requestCount);
         mActivater.Tick(dt);
     }
 
