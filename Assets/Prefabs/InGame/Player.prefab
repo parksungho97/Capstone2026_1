@@ -1090,7 +1090,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37c9b5ac520b90d4b97245ca7a8f6869, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 3
+  moveSpeed: 5
   turnSpeed: 50
   _MoveDirection: {x: 0, y: 0, z: 0}
   _ViewDirection: {x: 0, y: 0, z: 0}
@@ -1198,7 +1198,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 447739b80000d194b8dc27f6555c2243, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultWeaponId: 0
+  defaultWeaponId: 3
 --- !u!114 &-1771427423767313395
 MonoBehaviour:
   m_ObjectHideFlags: 0

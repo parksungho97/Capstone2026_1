@@ -12,6 +12,12 @@ public class PlayerNameItemUI : MonoBehaviour
 
     public bool IsReady { get; private set; }
 
+    private void Awake()
+    {
+        if (backgroundImage != null)
+            backgroundImage.transform.SetSiblingIndex(0);
+    }
+
     public void SetPlayerName(string playerName)
     {
         playerNameText.text = playerName;

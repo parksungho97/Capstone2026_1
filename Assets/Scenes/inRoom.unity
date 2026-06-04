@@ -670,7 +670,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   redTeamListParent: {fileID: 482571560}
   blueTeamListParent: {fileID: 482571559}
-  playerNameItemPrefab: {fileID: 1357479995152408029, guid: 2b6c6f3b3f55a7b489005dde2c696fe5, type: 3}
+  playerNameItemPrefab: {fileID: 6100973740377367735, guid: 48a2dc3d6bfd63747a8026b616e59f1b, type: 3}
 --- !u!4 &962186470
 Transform:
   m_ObjectHideFlags: 0

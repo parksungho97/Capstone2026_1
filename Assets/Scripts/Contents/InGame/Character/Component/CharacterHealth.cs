@@ -118,14 +118,14 @@ public class CharacterHealth : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_ResetStat()
     {
-        CurrentHP = MaxHP;
-        CurrentArmor = MaxArmor;
+        CurrentHP = initHP;
+        CurrentArmor = initArmor;
     }
 
     public void ResetStat()
     {
-        CurrentHP = MaxHP;
-        CurrentArmor = MaxArmor;
+        CurrentHP = initHP;
+        CurrentArmor = initArmor;
     }
 
     /// <summary>
