@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 2
   data:
     Prefab: {fileID: -1205818650260235087, guid: cb44016da669a2047bdc5fc2ad1e6d84, type: 3}
-    Damage: 10
+    Damage: 30
     KnockbackForce: 20
     SpawnOffset: {x: 0, y: 2, z: 2}
     AttackVfxId: 6

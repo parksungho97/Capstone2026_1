@@ -19,5 +19,5 @@ MonoBehaviour:
   desc: ShotgunBullet
   type: 1
   typeValue: 3
-  itemPrefab: {fileID: 5648260215369900215, guid: 0d39cd01026b6b0469785acd79db728a, type: 3}
+  itemPrefab: {fileID: 6287861342760140177, guid: 18cdbdd3f63595742b0961a0f65e41db, type: 3}
   spawnCount: 6
