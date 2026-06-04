@@ -134,10 +134,6 @@ public class GameEntryPoint : NetworkBehaviour
         Respawn respawn = newPlayer.GetComponent<Respawn>();
         Debug.Assert(respawn);
         respawnUIController.Initialize(respawn);
-
-        AudioListener audioListener = newPlayer.GetComponent<AudioListener>();
-        Debug.Assert(audioListener);
-        audioListener.enabled = true;
     }
 
     private IEnumerator LeaveAfterDelay(float seconds)
