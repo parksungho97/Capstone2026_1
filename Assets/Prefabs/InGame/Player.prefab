@@ -1238,8 +1238,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   footStepClips:
-  - {fileID: 8300000, guid: 387f86e66f8380e429965f9a18bb1744, type: 3}
-  - {fileID: 8300000, guid: 19d0da907a1847e4d8a6ae07750c227e, type: 3}
+  - {fileID: 8300000, guid: 4a78c96f36b21d04c8f5f71bba2b55eb, type: 3}
+  - {fileID: 8300000, guid: 82ef50b084a25754390cbc0957808297, type: 3}
 --- !u!114 &1496473159762783630
 MonoBehaviour:
   m_ObjectHideFlags: 0

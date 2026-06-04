@@ -74,7 +74,10 @@ public class PlayerRespawnController : NetworkBehaviour
         AudioListener.volume = 0.0f;
 
         if (NetworkRoot.Instance)
+        {
             NetworkRoot.Instance.Recorder.enabled = false;
+            NetworkRoot.Instance.Recorder.TransmitEnabled = false;
+        }
 
         RPC_Dead();
     }
@@ -134,7 +137,10 @@ public class PlayerRespawnController : NetworkBehaviour
     {
         AudioListener.volume = defaultVolume;
         if (NetworkRoot.Instance)
+        {
             NetworkRoot.Instance.Recorder.enabled = true;
+            NetworkRoot.Instance.Recorder.TransmitEnabled = true;
+        }
 
         RPC_Respawn();
     }

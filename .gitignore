@@ -40,3 +40,7 @@ Assets/MapElements/
 Assets/MapElements.meta
 
 .claude/
+
+# TextMesh Pro 예제 폴더 무시
+Assets/TextMesh Pro/Examples & Extras/
+Assets/TextMesh Pro/Examples & Extras.meta

@@ -84,7 +84,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2851153301350547637}
+  - component: {fileID: 2464978669449728629}
   - component: {fileID: 4833324787710764992}
+  - component: {fileID: -1280122199759952604}
   m_Layer: 5
   m_Name: PNI
   m_TagString: Untagged
@@ -113,6 +115,26 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2464978669449728629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6100973740377367735}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: -1
+  m_PreferredHeight: 40
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &4833324787710764992
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -129,6 +151,14 @@ MonoBehaviour:
   backgroundImage: {fileID: 8491028457969395171}
   normalColor: {r: 1, g: 1, b: 1, a: 0.3}
   readyColor: {r: 0.3, g: 1, b: 0.3, a: 0.7}
+--- !u!222 &-1280122199759952604
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6100973740377367735}
+  m_CullTransparentMesh: 1
 --- !u!1 &7065546540745343736
 GameObject:
   m_ObjectHideFlags: 0
