@@ -72,7 +72,7 @@ public class UpperBodyAttackRotationFix : MonoBehaviour
     {
         Pipe = 0,
         Pistol = 1,
-        ShotGun = 2
+        ShotGun = 3
     }
 
     private WeaponType GetWeaponType(int weaponId)
@@ -85,7 +85,7 @@ public class UpperBodyAttackRotationFix : MonoBehaviour
             case 1:
                 return WeaponType.Pistol;
 
-            case 2:
+            case 3:
                 return WeaponType.ShotGun;
 
             default:

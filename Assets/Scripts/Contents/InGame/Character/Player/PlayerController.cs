@@ -26,6 +26,9 @@ public class PlayerController : NetworkBehaviour
 
         extraWeaponSlot = GetComponent<ExtraWeaponSlot>();
         Debug.Assert(extraWeaponSlot);
+
+        animationState = GetComponent<PlayerAnimationNetworkState>();
+        Debug.Assert(animationState);
     }
 
     public override void FixedUpdateNetwork()
@@ -61,6 +64,7 @@ public class PlayerController : NetworkBehaviour
                         bActivate = true;
                     }
                 }
+
                 if (data.buttons.WasReleased(previousButtons, EInputButton.Space))
                 {
                     captureInteractor.TryStopCapture();
@@ -68,18 +72,29 @@ public class PlayerController : NetworkBehaviour
                     PlayerAttack.bPossibleAttack = true;
                     bActivate = false;
                 }
-                if (data.buttons.WasPressed(previousButtons, EInputButton.Q)) extraWeaponSlot.Swap();
+
+                if (data.buttons.WasPressed(previousButtons, EInputButton.Q))
+                {
+                    if (animationState == null || !animationState.IsAttacking)
+                    {
+                        extraWeaponSlot.Swap();
+                    }
+                }
+
                 if (data.buttons.WasPressed(previousButtons, EInputButton.Attack))
                 {
                     if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
                         PlayerAttack.Attack();
                 }
-                if (data.buttons.WasPressed(previousButtons, EInputButton.Z)) itemCollector.AcquireOne();
+
+                if (data.buttons.WasPressed(previousButtons, EInputButton.Z))
+                    itemCollector.AcquireOne();
 
                 if (cameraController != null && cameraController.GetMouseWorldPosition(data.mousePosition, out Vector3 mouseWorldPosition))
                 {
                     Vector3 lookDir = mouseWorldPosition - transform.position;
                     lookDir.y = 0f;
+
                     if (lookDir.sqrMagnitude > 0.0001f)
                         move.RotateTo(lookDir.normalized);
                 }
@@ -88,6 +103,7 @@ public class PlayerController : NetworkBehaviour
             }
 
             bMove = hasMovedThisTick;
+
             if (captureInteractor.IsCapturing)
                 bMove = false;
         }
@@ -98,8 +114,11 @@ public class PlayerController : NetworkBehaviour
     private Movement move;
     private CameraController cameraController;
     private CapturePointInteracter captureInteractor;
+
     public CharacterAttack PlayerAttack { get; private set; }
+
     private ExtraWeaponSlot extraWeaponSlot;
+    private PlayerAnimationNetworkState animationState;
 
     [Networked] private NetworkButtons previousButtons { get; set; }
     [Networked] public bool bMove { get; set; }

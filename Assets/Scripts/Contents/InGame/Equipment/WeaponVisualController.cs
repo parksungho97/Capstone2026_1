@@ -38,6 +38,6 @@ public class WeaponVisualController : MonoBehaviour
             pistolObject.SetActive(weaponId == 1);
 
         if (shotgunObject != null)
-            shotgunObject.SetActive(weaponId == 2);
+            shotgunObject.SetActive(weaponId == 3);
     }
 }
