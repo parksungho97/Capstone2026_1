@@ -182,10 +182,4 @@ public class PlayerRespawnController : NetworkBehaviour
         audioSource.enabled = false;
         disableAudioRoutine = null;
     }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.V))
-            GetComponent<CharacterHealth>().RPC_ServeHP(50);
-    }
 }

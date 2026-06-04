@@ -307,8 +307,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3350ad28863a884a9909094b1649453, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultMaxHP: 100
-  defaultMaxArmor: 0
+  maxHP: 100
+  initHP: 100
+  maxArmor: 0
+  initArmor: 0
   _MaxHP: 0
   _CurrentHP: 100
   _MaxArmor: 0

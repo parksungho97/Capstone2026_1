@@ -4,8 +4,10 @@ using UnityEngine;
 public class CharacterHealth : NetworkBehaviour
 {
     [Header("Default Stat")]
-    [SerializeField] private int defaultMaxHP = 100;
-    [SerializeField] private int defaultMaxArmor = 50;
+    [SerializeField] private int maxHP = 100;
+    [SerializeField] private int initHP = 100;
+    [SerializeField] private int maxArmor = 50;
+    [SerializeField] private int initArmor = 50;
 
     [Networked] public int MaxHP { get; private set; }
     [Networked] public int CurrentHP { get; private set; }
@@ -25,11 +27,11 @@ public class CharacterHealth : NetworkBehaviour
 
         if (Object.HasStateAuthority)
         {
-            MaxHP = defaultMaxHP;
-            CurrentHP = defaultMaxHP;
+            MaxHP = maxHP;
+            CurrentHP = initHP;
 
-            MaxArmor = defaultMaxArmor;
-            CurrentArmor = defaultMaxArmor;
+            MaxArmor = maxArmor;
+            CurrentArmor = initArmor;
 
             Debug.Log($"[PlayerHealth] 초기화 완료 HP:{CurrentHP}/{MaxHP}, Armor:{CurrentArmor}/{MaxArmor}");
         }
