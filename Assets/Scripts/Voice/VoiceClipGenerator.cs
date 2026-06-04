@@ -21,6 +21,10 @@ public class VoiceClipGenerator : MonoBehaviour
     private float _cooldownTimer = 0f;
     private int _lastSamplePos = 0;
 
+    // 수학적으로 정확한 최대/최소 샘플 개수 정의
+    private int MaxSampleCount => Mathf.RoundToInt(SAMPLE_RATE * maxRecordTime);
+    private int MinSampleCountRequired => Mathf.RoundToInt(MaxSampleCount * percent);
+
     private void Start()
     {
         Debug.Assert(voiceClipSender);
@@ -29,7 +33,7 @@ public class VoiceClipGenerator : MonoBehaviour
 
     private void Update()
     {
-        // 쿨다운 처리
+        // 쿨다운 처리 (이전 데이터 뻥튀기 방지 포함)
         if (_isCooldown)
         {
             _cooldownTimer += Time.deltaTime;
@@ -60,7 +64,7 @@ public class VoiceClipGenerator : MonoBehaviour
             _recordTimer += Time.deltaTime;
             _buffer.AddRange(samples);
 
-            // 최대 녹음 시간 초과
+            // 1차 방어선: 타이머 기반 최대 시간 초과 체크
             if (_recordTimer >= maxRecordTime)
             {
                 SaveClip();
@@ -73,7 +77,8 @@ public class VoiceClipGenerator : MonoBehaviour
                 _silenceTimer += Time.deltaTime;
                 if (_silenceTimer >= SILENCE_TIMEOUT)
                 {
-                    if (_recordTimer >= maxRecordTime * percent)
+                    // 정확한 분량 체크를 위해 샘플 개수(버퍼 크기) 기준으로 판단
+                    if (_buffer.Count >= MinSampleCountRequired)
                         SaveClip();
                     else
                         DiscardClip();
@@ -99,7 +104,16 @@ public class VoiceClipGenerator : MonoBehaviour
     private void SaveClip()
     {
         if (_buffer.Count > 0)
+        {
+            // 2차 방어선: 프레임 오차로 인해 5초보다 더 많이 담긴 데이터는 소수점 단위까지 칼같이 잘라냄
+            int targetCount = MaxSampleCount;
+            if (_buffer.Count > targetCount)
+            {
+                _buffer.RemoveRange(targetCount, _buffer.Count - targetCount);
+            }
+
             voiceClipSender.SendVoice(_buffer.ToArray());
+        }
 
         ResetRecording();
     }

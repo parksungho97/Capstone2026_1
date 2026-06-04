@@ -15,6 +15,12 @@ public class VoiceClipSender : NetworkBehaviour
 
     private bool _isUploading = false;
 
+    public override void Spawned()
+    {
+        base.Spawned();
+        CleanupServerFiles();
+    }
+
     public override void Despawned(NetworkRunner runner, bool hasStateAuthority)
     {
         CleanupServerFiles();
