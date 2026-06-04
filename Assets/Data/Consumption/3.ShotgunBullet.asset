@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: 3.ShotgunBullet
   m_EditorClassIdentifier: 
   consumptionId: 3
-  maxCount: 18
+  maxCount: 12
   attackPower: 10
