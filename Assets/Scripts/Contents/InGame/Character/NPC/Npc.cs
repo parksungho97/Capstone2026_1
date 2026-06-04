@@ -12,6 +12,8 @@ public class Npc : NetworkBehaviour
     private VoicePlayer voicePlayer;
     private NpcMove npcMove;
     private Animator animator;
+    private Collider[] colliders;
+    private Rigidbody rb;
 
     [Networked] public bool bMoving { get; private set; }
     [Networked] public NetworkBool IsDead { get; private set; }
@@ -25,6 +27,8 @@ public class Npc : NetworkBehaviour
         voicePlayer = GetComponent<VoicePlayer>();
         npcMove = GetComponent<NpcMove>();
         animator = GetComponentInChildren<Animator>();
+        colliders = GetComponentsInChildren<Collider>();
+        rb = GetComponent<Rigidbody>();
 
         Debug.Assert(voicePlayer);
         Debug.Assert(npcMove);
@@ -66,6 +70,13 @@ public class Npc : NetworkBehaviour
 
         if (animator != null)
             animator.SetTrigger("Die");
+
+        rb.velocity = Vector3.zero; 
+        rb.angularVelocity = Vector3.zero;
+        rb.useGravity = false;
+        if(colliders.Length > 0)
+            foreach (var collider in colliders)
+                collider.enabled = false;
 
         if (voicePlayer != null)
             voicePlayer.DisableAfterPlaying();

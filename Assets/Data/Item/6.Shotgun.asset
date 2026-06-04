@@ -15,8 +15,9 @@ MonoBehaviour:
   itemId:
     Value: 6
   itemName: Shotgun
-  icon: {fileID: 21300000, guid: dd1177f8a1dcf2d4096f8e25c06ff068, type: 3}
+  icon: {fileID: 21300000, guid: 71eb668ef36f6fc4e9c7554234a1c6a7, type: 3}
   desc: Pistol
   type: 0
   typeValue: 3
-  itemPrefab: {fileID: 1236257789494122, guid: 8b0b86b42def11849a8eba21f4a6a684, type: 3}
+  itemPrefab: {fileID: 1403598560008418080, guid: 052e82f1de1b5314f9eba93c6e1621d8, type: 3}
+  spawnCount: 1

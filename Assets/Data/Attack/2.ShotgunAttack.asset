@@ -14,16 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 2
   data:
-    Prefab: {fileID: -1205818650260235087, guid: bcfc6301c3662b148b8475e96ab1031c, type: 3}
-    Damage: 50
-    KnockbackForce: 40
+    Prefab: {fileID: -1205818650260235087, guid: cb44016da669a2047bdc5fc2ad1e6d84, type: 3}
+    Damage: 10
+    KnockbackForce: 20
     SpawnOffset: {x: 0, y: 2, z: 2}
     AttackVfxId: 6
     HitVfxId: 5
     CastSoundId: 3
     HitSoundId: 1
+    HitStunDuration: 1
     ActivationTime: 0
-    Duration: 1
-    InitialScale: {x: 1, y: 1, z: 1}
-    FinalScale: {x: 8, y: 5, z: 5}
-    DashSpeed: 20
+    Cooldown: 2
+    Speed: 80
+    MaxDistance: 7
+    PelletCount: 3
+    SpreadAngle: 90
+    ObstacleLayer:
+      serializedVersion: 2
+      m_Bits: 64

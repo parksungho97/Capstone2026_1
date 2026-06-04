@@ -17,7 +17,7 @@ public class NeutralObjectInitializer : NetworkBehaviour
         foreach (ItemDropper dropper in droppers)
         {
             int id = itemIds[Random.Range(0, itemIds.Count)];
-            dropper.SetDropData(new ItemId(id), 1);
+            dropper.SetDropData(new ItemId(id));
         }
     }
 }

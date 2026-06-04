@@ -9,10 +9,10 @@ public class AttackDelay
     public void SetDelay(float delay)
     {
         timer = delay;
-        IsReady = false;
+        IsReady = delay <= 0f;
     }
-    public float Timer {  get { return timer; } }
-    public bool IsAttackReady() => IsReady == true;
+    public float Timer { get { return timer; } }
+    public bool IsAttackReady() => IsReady;
 
     public void Tick()
     {
@@ -24,9 +24,11 @@ public class AttackDelay
         if (timer > 0f)
         {
             timer -= dt;
-
             if (timer <= 0f)
+            {
+                timer = 0f;
                 IsReady = true;
+            }
         }
     }
 }
@@ -58,7 +60,7 @@ public class CharacterAttack : MonoBehaviour
 
     public void Attack()
     {
-        if (bPossibleAttack == false)
+        if (!bPossibleAttack)
             return;
 
         if (equipmentComponent.Weapon == null)
@@ -126,5 +128,4 @@ public class CharacterAttack : MonoBehaviour
     private bool bPrevAttackReady = true;
 
     public bool bPossibleAttack { get; set; } = true;
-
 }

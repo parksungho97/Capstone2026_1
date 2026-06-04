@@ -22,18 +22,18 @@ public class InventoryController : MonoBehaviour
         equipmentStore = GetComponent<EquipmentStore>();
         consumptionStore = GetComponent<ConsumptionStore>();
 
-        equipmentStore.OnItemAdded += _ => OnStoreItemAdded();
+        equipmentStore.OnItemAdded += OnEquipmentItemAdded;
         equipmentStore.OnItemRemoved += OnEquipmentItemRemoved;
         consumptionStore.OnItemAdded += OnStoreItemAdded;
         consumptionStore.OnItemRemoved += OnConsumptionItemRemoved;
         consumptionStore.OnCountChanged += OnConsumptionCountChanged;
     }
 
-    public void AddItem(ItemId itemId, int count)
+    public bool AddItem(ItemId itemId, int count)
     {
-        if (count <= 0) return;
+        if (count <= 0) return false;
         if (!ItemMappings.Instance.TryGet(itemId, out EItemMapType type, out int typeValue))
-            return;
+            return false;
 
         ItemData itemData = ItemManager.Instance.Get(itemId);
 
@@ -43,22 +43,41 @@ public class InventoryController : MonoBehaviour
                 if (EquipmentManager.Instance.TryGet(typeValue, out EquipmentData data))
                 {
                     int slotIndex = equipmentStore.AddEquip(data.Generate());
-                    if (slotIndex >= 0 && itemData != null)
-                        OnEquipmentAdded?.Invoke(slotIndex, itemData.Name, itemData.Icon);
+                    return slotIndex >= 0;
                 }
-                break;
+                return false;
 
             case EItemMapType.Consumption:
                 bool isNew = !consumptionStore.HasItem(typeValue);
-                consumptionStore.Add(typeValue, count);
-                if (itemData == null) break;
-                consumptionItemData[typeValue] = (itemData.Name, itemData.Icon);
-                if (isNew && consumptionStore.HasItem(typeValue))
-                    OnConsumptionAdded?.Invoke(typeValue, itemData.Name, itemData.Icon, count);
-                else if (!isNew)
-                    OnConsumptionUpdated?.Invoke(typeValue, itemData.Name, itemData.Icon, consumptionStore.GetCount(typeValue));
-                break;
+                if (!consumptionStore.Add(typeValue, count))
+                    return false;
+                if (itemData != null)
+                {
+                    consumptionItemData[typeValue] = (itemData.Name, itemData.Icon);
+                    if (isNew)
+                        OnConsumptionAdded?.Invoke(typeValue, itemData.Name, itemData.Icon, count);
+                    else
+                        OnConsumptionUpdated?.Invoke(typeValue, itemData.Name, itemData.Icon, consumptionStore.GetCount(typeValue));
+                }
+                return true;
         }
+
+        return false;
+    }
+
+    private void OnEquipmentItemAdded(int slotIndex)
+    {
+        OnStoreItemAdded();
+
+        Equipment equipment = equipmentStore.Get<Equipment>(slotIndex);
+        if (equipment == null) return;
+
+        if (!ItemMappings.Instance.TryGetItemByTypeValue(EItemMapType.Equipment, equipment.Id, out ItemId itemId))
+            return;
+
+        ItemData itemData = ItemManager.Instance.Get(itemId);
+        if (itemData != null)
+            OnEquipmentAdded?.Invoke(slotIndex, itemData.Name, itemData.Icon);
     }
 
     private void OnStoreItemAdded()

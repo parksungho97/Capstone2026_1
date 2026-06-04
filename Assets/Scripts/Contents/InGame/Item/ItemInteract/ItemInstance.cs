@@ -19,7 +19,7 @@ public class ItemInstance : MonoBehaviour
 
     public void Take(InventoryController controller)
     {
-        controller.AddItem(ItemId, Count);
-        ItemInstanceManager.Instance.RequestDestroy(this);
+        if (controller.AddItem(ItemId, Count))
+            ItemInstanceManager.Instance.RequestDestroy(this);
     }
 }

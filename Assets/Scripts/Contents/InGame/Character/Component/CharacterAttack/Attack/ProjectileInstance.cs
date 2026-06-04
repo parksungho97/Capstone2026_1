@@ -10,6 +10,8 @@ public class ProjectileInstance : MonoBehaviour
     private float maxDistance;
     private int vfxId;
     private int hitSoundId;
+    private float hitStunDuration;
+    private LayerMask obstacleLayer;
 
     private NetworkObject self;
     private NetworkObject owner;
@@ -28,6 +30,8 @@ public class ProjectileInstance : MonoBehaviour
         maxDistance = data.MaxDistance;
         vfxId = data.HitVfxId;
         hitSoundId = data.HitSoundId;
+        hitStunDuration = data.HitStunDuration;
+        obstacleLayer = data.ObstacleLayer;
         startPosition = transform.position;
         despawning = false;
     }
@@ -47,11 +51,18 @@ public class ProjectileInstance : MonoBehaviour
         if (!self.HasStateAuthority || despawning) return;
         if (owner != null && other.transform.IsChildOf(owner.transform)) return;
 
+        if ((obstacleLayer.value & (1 << other.gameObject.layer)) != 0)
+        {
+            DoDespawn();
+            return;
+        }
+
         HitComponent hit = other.GetComponent<HitComponent>();
         if (hit)
         {
             Debug.Log(other.name);
-            hit.Hit(damage, transform.forward, knockbackForce, vfxId, hitSoundId);
+            Vector3 dir = new Vector3(transform.forward.x, 0f, transform.forward.z).normalized;
+            hit.Hit(damage, dir, knockbackForce, vfxId, hitSoundId, hitStunDuration);
             DoDespawn();
         }
     }

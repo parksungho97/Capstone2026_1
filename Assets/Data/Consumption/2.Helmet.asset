@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: 2.Helmet
   m_EditorClassIdentifier: 
   consumptionId: 2
+  maxCount: 1
   armorAmount: 33

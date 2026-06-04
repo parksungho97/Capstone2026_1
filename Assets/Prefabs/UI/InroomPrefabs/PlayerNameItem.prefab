@@ -170,7 +170,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerNameText: {fileID: 8532378347139013464}
-  backgroundImage: {fileID: 0}
+  backgroundImage: {fileID: 1385068434840355679}
   normalColor: {r: 1, g: 1, b: 1, a: 0.3}
   readyColor: {r: 0.3, g: 1, b: 0.3, a: 0.7}
 --- !u!1 &4115607949489119461

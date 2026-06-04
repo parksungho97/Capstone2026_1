@@ -8,8 +8,9 @@ public class NpcAttackNetworkState : NetworkBehaviour
 
     [SerializeField] private Animator animator;
 
+    public AttackDelay AttackDelay { get; } = new AttackDelay();
+
     private Attacker attacker;
-    private readonly AttackDelay attackDelay = new AttackDelay();
 
     public override void Spawned()
     {
@@ -27,7 +28,7 @@ public class NpcAttackNetworkState : NetworkBehaviour
         if (!Object.HasStateAuthority)
             return;
 
-        attackDelay.Tick(Runner.DeltaTime);
+        AttackDelay.Tick(Runner.DeltaTime);
     }
 
     public void Attack()
@@ -35,11 +36,11 @@ public class NpcAttackNetworkState : NetworkBehaviour
         if (!Object.HasStateAuthority)
             return;
 
-        if (!attackDelay.IsAttackReady())
+        if (!AttackDelay.IsAttackReady())
             return;
 
-        attacker.MeleeAttack(meleeAttackId, attackDelay);
-        attackDelay.SetDelay(attackInterval);
+        attacker.MeleeAttack(meleeAttackId, AttackDelay);
+        AttackDelay.SetDelay(attackInterval);
 
         RPC_OnAttack();
     }

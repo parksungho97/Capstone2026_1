@@ -14,14 +14,14 @@ public class ConsumptionStore : MonoBehaviour
 
     public bool HasItem(int consumptionId) => counts.ContainsKey(consumptionId);
 
-    public void Add(int consumptionId, int count)
+    public bool Add(int consumptionId, int count)
     {
         if (!ConsumptionManager.Instance.TryGet(consumptionId, out ConsumptionData data))
-            return;
+            return false;
 
         int current = counts.TryGetValue(consumptionId, out int c) ? c : 0;
         if (data.MaxCount > 0 && current + count > data.MaxCount)
-            return;
+            return false;
 
         if (counts.ContainsKey(consumptionId))
         {
@@ -29,10 +29,12 @@ public class ConsumptionStore : MonoBehaviour
         }
         else
         {
-            if (IsFull) return;
+            if (IsFull) return false;
             counts[consumptionId] = count;
             OnItemAdded?.Invoke();
         }
+
+        return true;
     }
 
     public bool Consume(int consumptionId, GameObject user)

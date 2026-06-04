@@ -6,14 +6,13 @@ public class ItemDropper : MonoBehaviour
     public class DropData
     {
         public ItemId ItemId;
-        public int Count;
     }
 
     private readonly List<DropData> dropDataList = new();
 
-    public void SetDropData(ItemId itemId, int count)
+    public void SetDropData(ItemId itemId)
     {
-        dropDataList.Add(new DropData { ItemId = itemId, Count = count });
+        dropDataList.Add(new DropData { ItemId = itemId });
     }
 
     public void Drop()
@@ -26,7 +25,6 @@ public class ItemDropper : MonoBehaviour
         if (ItemManager.Instance != null && ItemManager.Instance.TryGet(data.ItemId, out ItemData itemData))
             spawnCount = itemData.SpawnCount;
 
-        for (int i = 0; i < spawnCount; i++)
-            ItemInstanceManager.Instance.SpawnImmediate(data.ItemId.Value, transform.position, data.Count);
+        ItemInstanceManager.Instance.SpawnImmediate(data.ItemId.Value, transform.position, spawnCount);
     }
 }

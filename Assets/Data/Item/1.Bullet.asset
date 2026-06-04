@@ -19,4 +19,5 @@ MonoBehaviour:
   desc: Bullet
   type: 1
   typeValue: 1
-  itemPrefab: {fileID: 5919220286410709334, guid: 487dbb68ef818f247a229a25fa68bcac, type: 3}
+  itemPrefab: {fileID: 5418796778691519599, guid: 78711e4e859d92842b26d1d764794237, type: 3}
+  spawnCount: 9
