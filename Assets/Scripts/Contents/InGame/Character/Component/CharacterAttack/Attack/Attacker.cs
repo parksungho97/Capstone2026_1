@@ -40,7 +40,7 @@ public class Attacker : NetworkBehaviour
         ShotgunAttackData data = AttackManager.Instance.Get<ShotgunAttackData>(id);
         if (data == null) return;
 
-        delay.SetDelay(data.ActivationTime + data.Duration);
+        delay.SetDelay(data.ActivationTime + data.Cooldown);
         Vector3 spawnPos = transform.position + transform.rotation * data.SpawnOffset;
         RPC_OnAttackCast(data.AttackVfxId, data.CastSoundId, spawnPos, transform.rotation);
         _ = SpawnShotgunAsync(data);
@@ -59,16 +59,28 @@ public class Attacker : NetworkBehaviour
     private async Task SpawnShotgunAsync(ShotgunAttackData data)
     {
         if (data.Prefab == null) { Debug.LogError("ShotgunAttackData: Prefab이 등록되지 않았습니다."); return; }
-        await Runner.SpawnAsync(
-            data.Prefab,
-            transform.position + transform.rotation * data.SpawnOffset,
-            transform.rotation,
-            onBeforeSpawned: (runner, obj) =>
-            {
-                ShotgunAttackInstance instance = obj.gameObject.AddComponent<ShotgunAttackInstance>();
-                instance.Init(obj, Object, data);
-            }
-        );
+
+        int count = Mathf.Max(1, data.PelletCount);
+        Vector3 spawnPos = transform.position + transform.rotation * data.SpawnOffset;
+
+        for (int i = 0; i < count; i++)
+        {
+            float angle = count == 1
+                ? 0f
+                : Mathf.Lerp(-data.SpreadAngle * 0.5f, data.SpreadAngle * 0.5f, (float)i / (count - 1));
+            Quaternion rotation = transform.rotation * Quaternion.Euler(0f, angle, 0f);
+
+            await Runner.SpawnAsync(
+                data.Prefab,
+                spawnPos,
+                rotation,
+                onBeforeSpawned: (runner, obj) =>
+                {
+                    ShotgunAttackInstance instance = obj.gameObject.AddComponent<ShotgunAttackInstance>();
+                    instance.Init(obj, Object, data);
+                }
+            );
+        }
     }
 
     private async Task SpawnMeleeAsync(MeleeAttackData data)

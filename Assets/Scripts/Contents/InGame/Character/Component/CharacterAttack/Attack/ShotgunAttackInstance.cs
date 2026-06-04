@@ -1,31 +1,24 @@
 using Fusion;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ShotgunAttackInstance : MonoBehaviour
 {
     private int damage;
     private float knockbackForce;
-    private float activationTime;
-    private float duration;
+    private float speed;
+    private float maxDistance;
     private int vfxId;
     private int hitSoundId;
     private float hitStunDuration;
-    private Vector3 initialScale;
-    private Vector3 finalScale;
-    private float dashSpeed;
-    private Vector3 dashDir;
-    private Vector3 spawnOffset;
-    private Quaternion spawnRotation;
+    private LayerMask obstacleLayer;
+    private float activationTimer;
 
-    private Collider hitCollider;
-    private Rigidbody ownerRb;
     private NetworkObject self;
     private NetworkObject owner;
-    private float activationTimer;
-    private float durationTimer;
-    private readonly HashSet<HitComponent> hitTargets = new();
+    private Vector3 startPosition;
+    private bool despawning;
+    private Collider hitCollider;
 
     public Action ActionDestroy;
 
@@ -35,32 +28,24 @@ public class ShotgunAttackInstance : MonoBehaviour
         this.owner = owner;
         damage = data.Damage;
         knockbackForce = data.KnockbackForce;
-        activationTime = data.ActivationTime;
-        duration = data.Duration;
+        speed = data.Speed;
+        maxDistance = data.MaxDistance;
         vfxId = data.HitVfxId;
         hitSoundId = data.HitSoundId;
         hitStunDuration = data.HitStunDuration;
-        initialScale = data.InitialScale;
-        finalScale = data.FinalScale;
-        dashSpeed = data.DashSpeed;
-        dashDir = owner.transform.forward;
-        spawnOffset = data.SpawnOffset;
-        spawnRotation = owner.transform.rotation;
+        obstacleLayer = data.ObstacleLayer;
+        activationTimer = data.ActivationTime;
+        startPosition = transform.position;
+        despawning = false;
 
         hitCollider = GetComponent<Collider>();
-        ownerRb = owner.GetComponent<Rigidbody>();
-
-        transform.localScale = initialScale;
-        activationTimer = activationTime;
-        durationTimer = duration;
-
         if (hitCollider != null)
-            hitCollider.enabled = activationTime <= 0f;
+            hitCollider.enabled = activationTimer <= 0f;
     }
 
     private void FixedUpdate()
     {
-        if (!self.HasStateAuthority) return;
+        if (!self.HasStateAuthority || despawning) return;
 
         if (activationTimer > 0f)
         {
@@ -70,35 +55,36 @@ public class ShotgunAttackInstance : MonoBehaviour
             return;
         }
 
-        transform.position += dashDir * dashSpeed * Time.fixedDeltaTime;
+        transform.position += transform.forward * speed * Time.fixedDeltaTime;
 
-
-        durationTimer -= Time.fixedDeltaTime;
-
-        float t = Mathf.Clamp01(1f - (durationTimer / duration));
-        transform.localScale = new Vector3(
-            Mathf.Lerp(initialScale.x, finalScale.x, t),
-            initialScale.y,
-            Mathf.Lerp(initialScale.z, finalScale.z, t)
-        );
-
-        if (durationTimer <= 0f)
-        {
-            ActionDestroy?.Invoke();
-            self.Runner.Despawn(self);
-        }
+        if (Vector3.Distance(transform.position, startPosition) >= maxDistance)
+            DoDespawn();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!self.HasStateAuthority || activationTimer > 0f) return;
+        if (!self.HasStateAuthority || despawning) return;
         if (owner != null && other.transform.IsChildOf(owner.transform)) return;
 
-        HitComponent hit = other.GetComponent<HitComponent>();
-        if (hit == null || hitTargets.Contains(hit)) return;
+        if ((obstacleLayer.value & (1 << other.gameObject.layer)) != 0)
+        {
+            DoDespawn();
+            return;
+        }
 
-        hitTargets.Add(hit);
-        Vector3 dir = (other.transform.position - transform.position).normalized;
-        hit.Hit(damage, dir, knockbackForce, vfxId, hitSoundId, hitStunDuration);
+        HitComponent hit = other.GetComponent<HitComponent>();
+        if (hit != null)
+        {
+            Vector3 dir = new Vector3(transform.forward.x, 0f, transform.forward.z).normalized;
+            hit.Hit(damage, dir, knockbackForce, vfxId, hitSoundId, hitStunDuration);
+            DoDespawn();
+        }
+    }
+
+    private void DoDespawn()
+    {
+        despawning = true;
+        ActionDestroy?.Invoke();
+        self.Runner.Despawn(self);
     }
 }

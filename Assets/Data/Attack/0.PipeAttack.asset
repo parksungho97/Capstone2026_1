@@ -16,11 +16,12 @@ MonoBehaviour:
   data:
     Prefab: {fileID: -1205818650260235087, guid: bcfc6301c3662b148b8475e96ab1031c, type: 3}
     Damage: 34
-    KnockbackForce: 17
-    SpawnOffset: {x: 0, y: 2, z: 3}
+    KnockbackForce: 7
+    SpawnOffset: {x: 0, y: 2, z: 3.2}
     AttackVfxId: -1
     HitVfxId: 0
     CastSoundId: -1
     HitSoundId: 0
+    HitStunDuration: 0.7
     ActivationTime: 0.6
     Duration: 1.3

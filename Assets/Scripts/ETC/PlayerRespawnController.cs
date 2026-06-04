@@ -79,7 +79,6 @@ public class PlayerRespawnController : NetworkBehaviour
 
         if (Object.HasInputAuthority)
         {
-            audioListener.enabled = false;
             playerController.bInputDisabled = true;
         }
 
@@ -163,7 +162,6 @@ public class PlayerRespawnController : NetworkBehaviour
         if (Object.HasInputAuthority)
         {
             playerController.bInputDisabled = false;
-            audioListener.enabled = true;
         }
 
         Show(true);

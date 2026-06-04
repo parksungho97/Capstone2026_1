@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -6,20 +7,23 @@ public class BGMManager : MonoBehaviour
 {
     public static BGMManager Instance { get; private set; }
 
-    [Header("BGM")]
-    [SerializeField] private AudioClip bgmClip;
+    [Serializable]
+    public class SceneBGMEntry
+    {
+        public string sceneName;
+        public AudioClip clip;
+    }
+
+    [Header("Scene BGM")]
+    [SerializeField] private SceneBGMEntry[] sceneBGMs;
 
     [Range(0f, 1f)]
     [SerializeField] private float volume = 0.5f;
-
-    [Header("Stop Scene")]
-    [SerializeField] private string inGameSceneName = "inGame";
 
     private AudioSource audioSource;
 
     private void Awake()
     {
-        // 이미 살아 있는 BGMManager가 있으면 새로 만들어진 것은 제거
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -27,41 +31,24 @@ public class BGMManager : MonoBehaviour
         }
 
         Instance = this;
-
-        // 씬이 바뀌어도 유지
         DontDestroyOnLoad(gameObject);
 
         audioSource = GetComponent<AudioSource>();
-
-        // AudioSource 기본 설정
-        audioSource.clip = bgmClip;
         audioSource.loop = true;
         audioSource.playOnAwake = false;
         audioSource.volume = volume;
-        audioSource.spatialBlend = 0f; // 2D 사운드
+        audioSource.spatialBlend = 0f;
     }
 
-    private void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
+    private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
+    private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
 
-    private void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-
-    private void Start()
-    {
-        HandleSceneBGM(SceneManager.GetActiveScene().name);
-    }
+    private void Start() => HandleSceneBGM(SceneManager.GetActiveScene().name);
 
     private void OnDestroy()
     {
         if (Instance == this)
-        {
             Instance = null;
-        }
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -71,50 +58,47 @@ public class BGMManager : MonoBehaviour
 
     private void HandleSceneBGM(string sceneName)
     {
-        if (sceneName == inGameSceneName)
+        AudioClip clip = FindClipForScene(sceneName);
+        if (clip == null)
         {
             StopBGM();
             return;
         }
-
-        PlayBGM();
+        PlayBGM(clip);
     }
 
-    public void PlayBGM()
+    private AudioClip FindClipForScene(string sceneName)
     {
-        if (audioSource == null)
-            return;
-
-        if (bgmClip == null)
+        if (sceneBGMs == null) return null;
+        foreach (var entry in sceneBGMs)
         {
-            Debug.LogWarning("[BGMManager] BGM Clip이 연결되지 않았습니다.");
-            return;
+            if (entry.sceneName == sceneName)
+                return entry.clip;
         }
+        return null;
+    }
 
-        if (!audioSource.isPlaying)
-        {
-            audioSource.Play();
-        }
+    public void PlayBGM(AudioClip clip)
+    {
+        if (audioSource == null || clip == null) return;
+
+        // 같은 클립이 이미 재생 중이면 재시작하지 않음
+        if (audioSource.clip == clip && audioSource.isPlaying) return;
+
+        audioSource.clip = clip;
+        audioSource.Play();
     }
 
     public void StopBGM()
     {
-        if (audioSource == null)
-            return;
-
-        if (audioSource.isPlaying)
-        {
+        if (audioSource != null && audioSource.isPlaying)
             audioSource.Stop();
-        }
     }
 
     public void SetVolume(float newVolume)
     {
         volume = Mathf.Clamp01(newVolume);
-
         if (audioSource != null)
-        {
             audioSource.volume = volume;
-        }
     }
 }

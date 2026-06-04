@@ -4,10 +4,12 @@ using UnityEngine;
 public class ShotgunAttackData : AttackDataBase
 {
     public float ActivationTime;
-    public float Duration;
-    public Vector3 InitialScale;
-    public Vector3 FinalScale;
-    public float DashSpeed;
+    public float Cooldown;
+    public float Speed;
+    public float MaxDistance;
+    public int PelletCount;
+    public float SpreadAngle;
+    public LayerMask ObstacleLayer;
 }
 
 [CreateAssetMenu(fileName = "ShotgunAttackSO", menuName = "Attack/Shotgun")]

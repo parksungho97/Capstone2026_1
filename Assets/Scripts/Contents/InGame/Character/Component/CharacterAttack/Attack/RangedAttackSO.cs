@@ -7,6 +7,7 @@ public class RangedAttackData : AttackDataBase
     public float Speed;
     public float MaxDistance;
     public float Cooldown;
+    public LayerMask ObstacleLayer;
 }
 
 

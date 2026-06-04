@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class ExtraWeaponSlot : MonoBehaviour
 {
+    [SerializeField] private int defaultWeaponId = 0;
+
     public Weapon Weapon { get; private set; }
 
     private EquipmentSlot equipmentSlot;
@@ -35,9 +37,19 @@ public class ExtraWeaponSlot : MonoBehaviour
 
     public void Equip(Weapon weapon)
     {
-        if (equipmentSlot.Weapon == null)
-            equipmentSlot.SetWeapon(weapon);
-        else
+        bool defaultInSlot = equipmentSlot.Weapon?.Id == defaultWeaponId;
+
+        if (defaultInSlot)
+        {
+            if (Weapon != null)
+                equipmentStore.AddEquip(Weapon);
             Weapon = weapon;
+        }
+        else
+        {
+            if (equipmentSlot.Weapon != null)
+                equipmentStore.AddEquip(equipmentSlot.Weapon);
+            equipmentSlot.SetWeapon(weapon);
+        }
     }
 }

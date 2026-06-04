@@ -8,31 +8,45 @@ public class AttackConsumptionMapping : MonoBehaviour
     [System.Serializable]
     private struct Entry
     {
+        public bool enabled;
         public int attackId;
         public int consumptionId;
     }
 
     [SerializeField] private List<Entry> entries = new();
 
-    private Dictionary<int, int> attackToConsumption = new();
-    private Dictionary<int, int> consumptionToAttack = new();
-
     private void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
-        foreach (var e in entries)
-        {
-            attackToConsumption[e.attackId] = e.consumptionId;
-            consumptionToAttack[e.consumptionId] = e.attackId;
-        }
     }
 
     public bool TryGetConsumption(int attackId, out int consumptionId)
-        => attackToConsumption.TryGetValue(attackId, out consumptionId);
+    {
+        foreach (var e in entries)
+        {
+            if (e.enabled && e.attackId == attackId)
+            {
+                consumptionId = e.consumptionId;
+                return true;
+            }
+        }
+        consumptionId = -1;
+        return false;
+    }
 
     public bool TryGetAttack(int consumptionId, out int attackId)
-        => consumptionToAttack.TryGetValue(consumptionId, out attackId);
+    {
+        foreach (var e in entries)
+        {
+            if (e.enabled && e.consumptionId == consumptionId)
+            {
+                attackId = e.attackId;
+                return true;
+            }
+        }
+        attackId = -1;
+        return false;
+    }
 }

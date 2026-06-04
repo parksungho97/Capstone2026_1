@@ -247,6 +247,7 @@ public class VoiceNPCStateManager : NetworkBehaviour
 {
     [SerializeField] private Chaser chaser;
     [SerializeField] private float attackRange = 2f;
+    [SerializeField] private float chaseTime = 3.0f;
 
     public override void Spawned()
     {
@@ -287,7 +288,7 @@ public class VoiceNPCStateManager : NetworkBehaviour
         stateMachine.AddTransition(npcPlayVoiceSecond, idle,         new VoiceEndConditional(voicePlayer, chaser, 0.0f, requiresTarget: false));
 
         stateMachine.AddTransition(chaseTarget, npcAttack, new WithinAttackRange(chaser, transform, attackRange));
-        stateMachine.AddTransition(chaseTarget, back, new TimeOut(1.0f));
+        stateMachine.AddTransition(chaseTarget, back, new TimeOut(chaseTime));
 
         stateMachine.AddTransition(npcAttack, chaseTarget, new OutOfAttackRange(chaser, transform, attackRange));
         stateMachine.AddTransition(back, idle, new ReachPosition(gameObject.transform, npcMove.CenterPos));

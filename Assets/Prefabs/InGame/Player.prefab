@@ -201,10 +201,12 @@ MonoBehaviour:
   rb: {fileID: 4633489097491031141}
   health: {fileID: 1987929451324610142}
   playerController: {fileID: 2854249696004987484}
-  hitStunDuration: 0.5
   invincibleDuration: 1.5
   voicePlayer: {fileID: 8227755266992488921}
   blinker: {fileID: 1867514049902246755}
+  npcMove: {fileID: 0}
+  characterAttack: {fileID: 374315380834774277}
+  npcAttackNetworkState: {fileID: 0}
 --- !u!1 &6255750679721829725
 GameObject:
   m_ObjectHideFlags: 0
@@ -828,7 +830,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7106837159742798860}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 5
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -1088,8 +1090,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37c9b5ac520b90d4b97245ca7a8f6869, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 15
-  turnSpeed: 15
+  moveSpeed: 3
+  turnSpeed: 50
   _MoveDirection: {x: 0, y: 0, z: 0}
   _ViewDirection: {x: 0, y: 0, z: 0}
 --- !u!114 &1987929451324610142
@@ -1220,6 +1222,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40d6b000b32846a4fb8287d3a2008b23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultWeaponId: 0
 --- !u!114 &8227755266992488921
 MonoBehaviour:
   m_ObjectHideFlags: 0

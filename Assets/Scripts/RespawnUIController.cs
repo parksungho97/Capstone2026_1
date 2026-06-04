@@ -37,8 +37,8 @@ public class RespawnUIController : MonoBehaviour
             if (countdownText != null)
                 countdownText.text = Mathf.CeilToInt(respawn.GetRemainingSeconds()).ToString();
 
-            if (progressImage != null)
-                progressImage.fillAmount = respawn.GetProgress01();
+            //if (progressImage != null)
+                //progressImage.fillAmount = respawn.GetProgress01();
         }
         else
         {

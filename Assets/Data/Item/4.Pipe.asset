@@ -15,9 +15,9 @@ MonoBehaviour:
   itemId:
     Value: 4
   itemName: Pipe
-  icon: {fileID: 21300000, guid: 9ad6e2f6bab70c14399a68157d8d86ad, type: 3}
+  icon: {fileID: 21300000, guid: 0a97e1dc7a7c9164485ccfcbd9f504cc, type: 3}
   desc: Pipe
   type: 0
   typeValue: 0
-  mesh: {fileID: 0}
-  material: {fileID: 0}
+  itemPrefab: {fileID: 0}
+  spawnCount: 1

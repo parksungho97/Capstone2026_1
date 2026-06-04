@@ -15,8 +15,9 @@ MonoBehaviour:
   itemId:
     Value: 0
   itemName: Potion
-  icon: {fileID: 21300000, guid: 2a26ddb392d5aeb45824140ebee50f91, type: 3}
+  icon: {fileID: 21300000, guid: 872be4f1783171b489e3bbaa37b1332a, type: 3}
   desc: Potion
   type: 1
   typeValue: 0
   itemPrefab: {fileID: 3343229072912101299, guid: bf58252b67b807e4eb830e9401bb344d, type: 3}
+  spawnCount: 1

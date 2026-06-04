@@ -7,7 +7,6 @@ public class MeleeAttackInstance : MonoBehaviour
     private int damage;
     private float knockbackForce;
     private float activationTime;
-    private float duration;
     private int vfxId;
     private int hitSoundId;
     private float hitStunDuration;
@@ -17,7 +16,8 @@ public class MeleeAttackInstance : MonoBehaviour
     private NetworkObject owner;
     private Vector3 spawnOffset;
     private float activationTimer;
-    private float durationTimer;
+    private bool activated;
+    private bool despawning;
 
     public Action ActionDestroy;
 
@@ -29,23 +29,32 @@ public class MeleeAttackInstance : MonoBehaviour
         damage = data.Damage;
         knockbackForce = data.KnockbackForce;
         activationTime = data.ActivationTime;
-        duration = data.Duration;
         vfxId = data.HitVfxId;
         hitSoundId = data.HitSoundId;
         hitStunDuration = data.HitStunDuration;
 
         hitCollider = GetComponent<Collider>();
-        if (hitCollider != null) hitCollider.enabled = false;
+        if (hitCollider != null) hitCollider.enabled = activationTime <= 0f;
 
         activationTimer = activationTime;
-        durationTimer = duration;
-        if (hitCollider != null)
-            hitCollider.enabled = activationTime <= 0f;
+    }
+
+    private void DoDespawn()
+    {
+        despawning = true;
+        ActionDestroy?.Invoke();
+        self.Runner.Despawn(self);
     }
 
     private void FixedUpdate()
     {
-        if (!self.HasStateAuthority) return;
+        if (!self.HasStateAuthority || despawning) return;
+
+        if (activated)
+        {
+            DoDespawn();
+            return;
+        }
 
         if (activationTimer > 0f)
         {
@@ -57,31 +66,33 @@ public class MeleeAttackInstance : MonoBehaviour
 
             activationTimer -= Time.fixedDeltaTime;
             if (activationTimer <= 0f && hitCollider != null)
+            {
                 hitCollider.enabled = true;
+                activated = true;
+            }
             return;
         }
 
-        durationTimer -= Time.fixedDeltaTime;
-        if (durationTimer <= 0f)
-        {
-            ActionDestroy?.Invoke();
-            self.Runner.Despawn(self);
-        }
+        // activationTime <= 0: collider already enabled from Init, mark for despawn next tick
+        activated = true;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!self.HasStateAuthority || activationTimer > 0f) 
+        if (!self.HasStateAuthority || despawning)
             return;
 
-        if (owner == null || other.transform.IsChildOf(owner.transform)) 
+        if (owner == null || other.transform.IsChildOf(owner.transform))
             return;
 
         HitComponent hit = other.GetComponent<HitComponent>();
         if (hit)
         {
-            Vector3 dir = (other.transform.position - transform.position).normalized;
+            Vector3 diff = other.transform.position - owner.transform.position;
+            diff.y = 0f;
+            Vector3 dir = diff.normalized;
             hit.Hit(damage, dir, knockbackForce, vfxId, hitSoundId, hitStunDuration);
+            DoDespawn();
         }
     }
 }

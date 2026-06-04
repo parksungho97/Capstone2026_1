@@ -10,6 +10,9 @@ public class HitComponent : NetworkBehaviour
     [SerializeField] private float invincibleDuration = 1.5f;
     [SerializeField] private VoicePlayer voicePlayer;
     [SerializeField] private InvincibilityBlinker blinker;
+    [SerializeField] private NpcMove npcMove;
+    [SerializeField] private CharacterAttack characterAttack;
+    [SerializeField] private NpcAttackNetworkState npcAttackNetworkState;
 
     public Action ActionHitted;
 
@@ -22,14 +25,12 @@ public class HitComponent : NetworkBehaviour
         blinker?.StartBlink(dur);
     }
 
-    private CharacterAttack characterAttack;
 
     private void Start()
     {
         Debug.Assert(rb);
         Debug.Assert(health);
         Debug.Assert(blinker);
-        characterAttack = GetComponent<CharacterAttack>();
     }
 
     public void Hit(int damage, Vector3 knockbackDir, float knockbackForce, int vfxId = -1, int soundId = -1, float stunDuration = 0f)
@@ -46,14 +47,20 @@ public class HitComponent : NetworkBehaviour
 
         if (Object.HasStateAuthority)
         {
-            if (rb) rb.velocity = knockbackDir.normalized * knockbackForce;
+            Vector3 knockback = knockbackDir.normalized * knockbackForce;
+            if (npcMove != null)
+                npcMove.Knockback(knockback);
+            else if (rb)
+                rb.velocity = knockback;
             health?.ApplyDamage(damage);
         }
 
         if (Object.HasInputAuthority)
         {
             playerController?.DisableInputForSeconds(stunDuration);
-            AttackDelay attackDelay = characterAttack?.AttackContext.AttackDelay;
+            AttackDelay attackDelay = characterAttack != null
+                ? characterAttack.AttackContext.AttackDelay
+                : npcAttackNetworkState?.AttackDelay;
             if (attackDelay != null && attackDelay.Timer < stunDuration)
                 attackDelay.SetDelay(stunDuration);
         }
