@@ -5,7 +5,7 @@ public class VoiceClipManager : MonoBehaviour
 {
     public static VoiceClipManager Instance { get; private set; }
 
-    [SerializeField] private int maxClips = 10;
+    [SerializeField] private int maxClips = 50;
 
     private List<AudioClip> clips = new();
 
@@ -24,12 +24,12 @@ public class VoiceClipManager : MonoBehaviour
         }
 
         Instance = this;
+        clips.Capacity = MaxClips;
     }
 
     public void AddClip(AudioClip clip)
     {
-        if (clip == null) return;
-        Debug.Log("AddClip");
+        if (clip == null || clips.Count >= maxClips) return;
         clips.Add(clip);
     }
 

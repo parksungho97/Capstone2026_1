@@ -7,9 +7,9 @@ public class VoiceClipGenerator : MonoBehaviour
     [SerializeField] private float maxRecordTime = 5f;
     [SerializeField] private float cooldown = 1f;
     [SerializeField] private float percent = 0.8f;
+    [SerializeField] private float THRESHOLD = 0.02f;
 
     private const int SAMPLE_RATE = 44100;
-    private const float THRESHOLD = 0.02f;
     private const float SILENCE_TIMEOUT = 0.5f;
 
     private AudioClip _micClip;
@@ -38,6 +38,7 @@ public class VoiceClipGenerator : MonoBehaviour
                 _isCooldown = false;
                 _cooldownTimer = 0f;
             }
+            _lastSamplePos = Microphone.GetPosition(null);
             return;
         }
 

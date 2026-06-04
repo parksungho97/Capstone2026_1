@@ -68,6 +68,7 @@ public class VoiceClipSender : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
     private void RPC_BroadcastAudioUrl(string audioUrl)
     {
+        if (VoiceClipManager.Instance.Count >= VoiceClipManager.Instance.MaxClips) return;
         StartCoroutine(DownloadAndPlayAudioCoroutine(audioUrl));
     }
 
