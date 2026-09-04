@@ -2201,7 +2201,7 @@ MonoBehaviour:
   mIncreaseRate: 10
   mDecreaseRate: 5
   mHoldDecayDelay: 3
-  requestCount: 1
+  requestCount: 2
 --- !u!1 &887439957
 GameObject:
   m_ObjectHideFlags: 0
@@ -2986,7 +2986,7 @@ MonoBehaviour:
   mIncreaseRate: 10
   mDecreaseRate: 5
   mHoldDecayDelay: 3
-  requestCount: 1
+  requestCount: 2
 --- !u!1001 &1234493243
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3761,7 +3761,7 @@ MonoBehaviour:
   mIncreaseRate: 10
   mDecreaseRate: 5
   mHoldDecayDelay: 3
-  requestCount: 1
+  requestCount: 2
 --- !u!1 &1352932868
 GameObject:
   m_ObjectHideFlags: 0
@@ -6362,6 +6362,7 @@ MonoBehaviour:
   maxRecordTime: 5
   cooldown: 1
   percent: 0.5
+  THRESHOLD: 0.02
 --- !u!4 &1976954544
 Transform:
   m_ObjectHideFlags: 0
