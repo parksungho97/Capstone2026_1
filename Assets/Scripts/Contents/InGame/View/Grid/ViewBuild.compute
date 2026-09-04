@@ -1,0 +1,64 @@
+#pragma kernel CSClearAndUpdate
+
+struct FovInfo
+{
+    float3 origin;
+    float angle; // 도(Degree) 단위 각도
+    float3 forward;
+    float radius; // 시야 거리
+};
+
+// 입력: CPU에서 보낸 데이터 그대로
+StructuredBuffer<FovInfo> _FOVs;
+
+uint _GridX;
+uint _GridY;
+float _WorldX;
+float _WorldY;
+float4 _WorldOrigin;
+int _FOVCount;
+
+// 출력: 가시성 텍스처 (0~1 값)
+RWTexture2D<float> _Grid;
+
+[numthreads(8, 8, 1)]
+void CSClearAndUpdate(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= _GridX || id.y >= _GridY)
+        return;
+
+    // 1. 그리드 인덱스를 월드 좌표로 변환
+    float wx = _WorldOrigin.x + ((float) id.x + 0.5) / (float) _GridX * _WorldX;
+    float wz = _WorldOrigin.z + ((float) id.y + 0.5) / (float) _GridY * _WorldY;
+    float3 cellPos = float3(wx, 0.0, wz);
+
+    float finalVisible = 0.0;
+
+    // // 2. 모든 FOV 순회
+    for (int i = 0; i < _FOVCount; ++i)
+    {
+        float3 fovPos = float3(_FOVs[i].origin.x, 0.0, _FOVs[i].origin.z);
+        float3 toCell = cellPos - fovPos;
+        float dist = length(toCell);
+    
+        // [거리 판정]
+        if (dist > _FOVs[i].radius)
+            continue;
+    
+        // [각도 판정]
+        float3 dirToCell = (dist > 0.0001) ? toCell / dist : _FOVs[i].forward;
+        float dotProduct = dot(_FOVs[i].forward, dirToCell);
+        
+        // cos(시야각의 절반) 값을 구함
+        float cosHalfAngle = cos(_FOVs[i].angle * 0.5 * 0.0174532925); // Degree to Rad 변환 포함
+    
+        if (dotProduct >= cosHalfAngle)
+        {
+            // 현재 셀이 시야 안에 있음 (일단 1.0으로 처리)
+            // 외곽을 부드럽게 하고 싶다면 여기서 saturate 등을 사용하면 됩니다.
+            finalVisible = max(finalVisible, 1.0);
+        }
+    }
+
+    _Grid[id.xy] = finalVisible;
+}

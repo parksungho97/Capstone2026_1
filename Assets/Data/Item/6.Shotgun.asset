@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8cdd10e11b0acb42b0997b029dc6418, type: 3}
+  m_Name: 6.Shotgun
+  m_EditorClassIdentifier: 
+  itemId:
+    Value: 6
+  itemName: Shotgun
+  icon: {fileID: 21300000, guid: 71eb668ef36f6fc4e9c7554234a1c6a7, type: 3}
+  desc: Pistol
+  type: 0
+  typeValue: 3
+  itemPrefab: {fileID: 1403598560008418080, guid: 052e82f1de1b5314f9eba93c6e1621d8, type: 3}
+  spawnCount: 1
